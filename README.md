@@ -1,2 +1,10 @@
-# backstage-sleuth
-A backstage plugin to integrate with Sleuth and display DORA metrics
+# [Backstage](https://backstage.io)
+
+This is your newly scaffolded Backstage App, Good Luck!
+
+To start the app, run:
+
+```sh
+yarn install
+yarn start
+```

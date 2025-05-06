@@ -1,0 +1,76 @@
+//import { parseEntityRef } from '@backstage/catalog-model';
+import {
+  ConfigApi,
+  createApiRef,
+  IdentityApi,
+} from '@backstage/core-plugin-api';
+import { IProjectMetricInsights, IProjectMetricResponse, ITeamMetricResponse } from '../DORAMetricModel';
+
+const API_PATHS = {
+  PERMISSION: '/api/permission/',
+  TEAM_METRICS: '/api/proxy/dora/teammetrics',
+  PROJECT_METRICS: '/api/proxy/dora/projectmetrics',
+  PROJECT_INSIGHTS: '/api/proxy/dora/projectmetricsinsights',
+} as const;
+
+export type DORAAPI = {
+  getUserAuthorization: () => Promise<{ status: string }>;
+  getTeamDORAMetrics: (team: string, dateRange: string) => Promise<ITeamMetricResponse | null>;
+  getProjectDORAMetrics: (project: string, env: string, deployment: string, dateRange: string) => Promise<IProjectMetricResponse | null>;
+  getProjectDORAMetricsInsights: (project: string, env: string, deployment: string, dateRange: string) => Promise<IProjectMetricInsights | null>;
+};
+
+export type Options = {
+  configApi: ConfigApi;
+  identityApi: IdentityApi;
+};
+
+export const doraApiRef = createApiRef<DORAAPI>({
+  id: 'plugin.dora-sleuth.service',
+});
+
+export class DORABackendClient implements DORAAPI {
+  private readonly configApi: ConfigApi;
+  private readonly identityApi: IdentityApi;
+  private readonly baseUrl: string;
+
+  constructor(options: Options) {
+    this.configApi = options.configApi;
+    this.identityApi = options.identityApi;
+    this.baseUrl = this.configApi.getString('backend.baseUrl');
+  }
+
+  private async fetchWithAuth(url: string) {
+    const { token: idToken } = await this.identityApi.getCredentials();
+    const response = await fetch(url, {
+      headers: {
+        ...(idToken && { Authorization: `Bearer ${idToken}` }),
+      },
+    });
+
+    if (response.status !== 200 && response.status !== 204) {
+      return null;
+    }
+
+    return response.json();
+  }
+
+  async getUserAuthorization() {
+    return this.fetchWithAuth(`${this.baseUrl}${API_PATHS.PERMISSION}`);
+  }
+
+  async getTeamDORAMetrics(team: string, dateRange: string) {
+    const url = `${this.baseUrl}${API_PATHS.TEAM_METRICS}?team=${team}&dateRange=${dateRange}`;
+    return this.fetchWithAuth(url);
+  }
+
+  async getProjectDORAMetrics(project: string, env: string, deployment: string, dateRange: string) {
+    const url = `${this.baseUrl}${API_PATHS.PROJECT_METRICS}?project=${project}&environment=${env}&deployment=${deployment}&dateRange=${dateRange}`;
+    return this.fetchWithAuth(url);
+  }
+
+  async getProjectDORAMetricsInsights(project: string, env: string, deployment: string, dateRange: string) {
+    const url = `${this.baseUrl}${API_PATHS.PROJECT_INSIGHTS}?project=${project}&environment=${env}&deployment=${deployment}&dateRange=${dateRange}`;
+    return this.fetchWithAuth(url);
+  }
+}
