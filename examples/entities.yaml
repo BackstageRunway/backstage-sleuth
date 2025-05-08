@@ -13,7 +13,7 @@ kind: Component
 metadata:
   name: Dora-website
   annotations:
-    sleuth.io/project-id: sleuth
+    sleuth.io/project-id: sleuth/backend
 spec:
   type: website
   lifecycle: experimental

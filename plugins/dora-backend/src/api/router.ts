@@ -43,6 +43,15 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       const { projectId } = req.params;
       const { start, end } = req.query;
 
+      logger.info('Received metrics request', {
+        projectId,
+        start,
+        end,
+        path: req.path,
+        url: req.url,
+        method: req.method,
+      });
+
       if (!start || !end) {
         logger.warn('Missing time range parameters', { query: req.query });
         return res.status(400).json({ error: 'Missing time range parameters' });
