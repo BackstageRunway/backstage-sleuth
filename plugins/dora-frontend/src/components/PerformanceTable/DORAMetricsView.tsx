@@ -1,131 +1,126 @@
-import { useEffect, useRef, useState } from "react";
-import { useApi } from "@backstage/core-plugin-api";
-import { Chip, Grid } from "@material-ui/core";
-import { useEntity } from "@backstage/plugin-catalog-react";
-import { doraApiRef } from "../../api/DORABackendClient";
-import { IProjectMetricResponse, ITeamMetricResponse } from "../../DORAMetricModel";
-import PerformanceTable from "./DORAMetricsTable";
+import { makeStyles } from '@material-ui/core/styles';
+import { MetricType, getMetricPerformance, calculateTrendChange, getTrend } from '../../DORAMetricModel';
+import DORAMetricsTable from './DORAMetricsTable';
+import { useApi } from '@backstage/core-plugin-api';
+import { doraBackendApiRef } from '../../api/DORABackendClient';
+import { useEffect, useState } from 'react';
+import { Alert } from '@material-ui/lab';
 
-interface DateRangeChip {
-    label: string;
-    value: string;
-    key: number;
+interface DORAMetricsViewProps {
+    projectId: string;
+    timeRange: {
+        start: string;
+        end: string;
+    };
 }
 
-const DATE_RANGE_CHIPS: DateRangeChip[] = [
-    { label: 'Last 7 days', value: 'Last7Days', key: 1 },
-    { label: 'Last 14 days', value: 'Last14Days', key: 2 },
-    { label: 'Last 28 days', value: 'Last28Days', key: 3 },
-    { label: 'Quarter', value: 'Quarter', key: 4 }
-];
+const useStyles = makeStyles({
+    container: {
+        padding: '1rem',
+    },
+    error: {
+        marginBottom: '1rem',
+    },
+});
 
-const DEFAULT_DATE_RANGE: DateRangeChip = DATE_RANGE_CHIPS[0];
-
-const CHIP_CONTAINER_STYLE = {
-    display: 'flex',
-    justifyContent: 'center'
-};
-
-const CHIP_WRAPPER_STYLE = {
-    display: 'flex',
-    flex: '1',
-    justifyContent: 'center'
-};
-
-const DORAMetricsView = (): JSX.Element => {
-    const service = useApi(doraApiRef);
-    const { entity } = useEntity();
-    const isEntityTeamRef = useRef(false);
-
-    const [teamMetrics, setTeamMetrics] = useState<ITeamMetricResponse | null>(null);
-    const [projectMetrics, setProjectMetrics] = useState<IProjectMetricResponse | null>(null);
-    const [selectedDateRange, setSelectedDateRange] = useState<DateRangeChip>(DEFAULT_DATE_RANGE);
-
-    const handleDateRangeChange = (chip: DateRangeChip) => {
-        setSelectedDateRange(chip);
-    };
-
-    const fetchTeamMetrics = async (team: string, dateRange: string) => {
-        const response = await service.getTeamDORAMetrics(team, dateRange);
-        setTeamMetrics(response);
-    };
-
-    const fetchProjectMetrics = async (project: string, env: string, deployment: string, dateRange: string) => {
-        const response = await service.getProjectDORAMetrics(project, env, deployment, dateRange);
-        console.log(response)
-        // TODO: Remove dummy data when API is ready
-        const dummyProjectMetricResponse: IProjectMetricResponse = {
-            project: {
-                name: 'Example Project',
-                currentRange: {
-                    avgLeadTimeInSec: 21850,
-                    avgMttrDurationInSec: 782,
-                    failureRatePercent: 16.67,
-                    numOfDeploys: 6,
-                    numOfDeploysPerDay: 0.43,
-                },
-                previousRange: {
-                    avgLeadTimeInSec: 78001,
-                    avgMttrDurationInSec: 1582,
-                    failureRatePercent: 54.55,
-                    numOfDeploys: 11,
-                    numOfDeploysPerDay: 0.79,
-                },
-            },
-        };
-
-        setProjectMetrics(dummyProjectMetricResponse);
-    };
+const InternalDORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) => {
+    const classes = useStyles();
+    const doraApi = useApi(doraBackendApiRef);
+    const [error, setError] = useState<string | null>(null);
+    const [metrics, setMetrics] = useState<any[]>([]);
 
     useEffect(() => {
-        if (entity?.spec?.type === 'team') {
-            isEntityTeamRef.current = true;
-            fetchTeamMetrics(entity.metadata.name, selectedDateRange.value);
-        } else {
-            isEntityTeamRef.current = false;
-            fetchProjectMetrics('project', 'production', 'deployment', selectedDateRange.value);
-        }
-    }, [selectedDateRange, entity]);
+        const fetchMetrics = async () => {
+            try {
+                const result = await doraApi.getMetrics(projectId, timeRange);
+                
+                const metricsData = [
+                    {
+                        metricName: MetricType.Frequency,
+                        value: getMetricPerformance(MetricType.Frequency, result.currentRange.numOfDeploysPerDay),
+                        previousValue: getMetricPerformance(MetricType.Frequency, result.previousRange.numOfDeploysPerDay),
+                        percentageChange: calculateTrendChange(
+                            result.currentRange.numOfDeploysPerDay,
+                            result.previousRange.numOfDeploysPerDay
+                        ),
+                        trend: getTrend(
+                            MetricType.Frequency,
+                            result.currentRange.numOfDeploysPerDay,
+                            result.previousRange.numOfDeploysPerDay
+                        ),
+                    },
+                    {
+                        metricName: MetricType.LeadTime,
+                        value: getMetricPerformance(MetricType.LeadTime, result.currentRange.avgLeadTimeInSec),
+                        previousValue: getMetricPerformance(MetricType.LeadTime, result.previousRange.avgLeadTimeInSec),
+                        percentageChange: calculateTrendChange(
+                            result.currentRange.avgLeadTimeInSec,
+                            result.previousRange.avgLeadTimeInSec
+                        ),
+                        trend: getTrend(
+                            MetricType.LeadTime,
+                            result.currentRange.avgLeadTimeInSec,
+                            result.previousRange.avgLeadTimeInSec
+                        ),
+                    },
+                    {
+                        metricName: MetricType.FailureRate,
+                        value: getMetricPerformance(MetricType.FailureRate, result.currentRange.failureRatePercent),
+                        previousValue: getMetricPerformance(MetricType.FailureRate, result.previousRange.failureRatePercent),
+                        percentageChange: calculateTrendChange(
+                            result.currentRange.failureRatePercent,
+                            result.previousRange.failureRatePercent
+                        ),
+                        trend: getTrend(
+                            MetricType.FailureRate,
+                            result.currentRange.failureRatePercent,
+                            result.previousRange.failureRatePercent
+                        ),
+                    },
+                    {
+                        metricName: MetricType.Mttr,
+                        value: getMetricPerformance(MetricType.Mttr, result.currentRange.avgMttrDurationInSec),
+                        previousValue: getMetricPerformance(MetricType.Mttr, result.previousRange.avgMttrDurationInSec),
+                        percentageChange: calculateTrendChange(
+                            result.currentRange.avgMttrDurationInSec,
+                            result.previousRange.avgMttrDurationInSec
+                        ),
+                        trend: getTrend(
+                            MetricType.Mttr,
+                            result.currentRange.avgMttrDurationInSec,
+                            result.previousRange.avgMttrDurationInSec
+                        ),
+                    },
+                ];
 
-    const renderDateRangeChips = () => (
-        <div style={CHIP_WRAPPER_STYLE}>
-            {DATE_RANGE_CHIPS.map(chip => (
-                <Chip
-                    key={chip.key}
-                    label={chip.label}
-                    color={selectedDateRange.key === chip.key ? 'primary' : 'secondary'}
-                    onClick={() => handleDateRangeChange(chip)}
-                />
-            ))}
-        </div>
-    );
+                setMetrics(metricsData);
+                setError(null);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch metrics');
+            }
+        };
 
-    const renderMetricsTable = () => {
-        if (isEntityTeamRef.current) {
-            return (
-                <Grid item xs={6}>
-                    <PerformanceTable data={teamMetrics?.team} />
-                </Grid>
-            );
-        }
+        fetchMetrics();
+    }, [projectId, timeRange, doraApi]);
+
+    if (error) {
         return (
-            <Grid item xs={6}>
-                <PerformanceTable data={projectMetrics?.project} />
-            </Grid>
+            <div className={classes.container}>
+                <Alert severity="error" className={classes.error}>
+                    {error}
+                </Alert>
+            </div>
         );
-    };
+    }
 
     return (
-        <div>
-            <Grid container>
-                <Grid style={CHIP_CONTAINER_STYLE} item xs={12} md={12} lg={12}>
-                    {renderDateRangeChips()}
-                </Grid>
-                <Grid item xs={12} md={12} lg={12} />
-                {renderMetricsTable()}
-            </Grid>
+        <div className={classes.container}>
+            <DORAMetricsTable metrics={metrics} />
         </div>
     );
 };
 
-export { DORAMetricsView };
+// Public wrapper component that accepts projectId and timeRange
+export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) => {
+    return <InternalDORAMetricsView projectId={projectId} timeRange={timeRange} />;
+};

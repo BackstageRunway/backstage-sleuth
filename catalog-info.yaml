@@ -7,6 +7,8 @@ metadata:
   # annotations:
   #   github.com/project-slug: backstage/backstage
   #   backstage.io/techdocs-ref: dir:.
+  annotations:
+    sleuth.io/project-id: sleuth
 spec:
   type: website
   owner: john@example.com

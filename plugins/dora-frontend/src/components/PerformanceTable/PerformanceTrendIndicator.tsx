@@ -1,61 +1,82 @@
-import CallMadeIcon from '@material-ui/icons/CallMade';
-import { toMaxLimit } from '../../DORAMetricModel';
 
-type TrendType = 'ailing' | 'neutral' | 'improving';
+import { makeStyles } from '@material-ui/core/styles';
+import { MetricType } from '../../DORAMetricModel';
 
 interface PerformanceTrendIndicatorProps {
     width: number;
-    metricName: string;
+    metricName: MetricType;
     percentageChange: number;
-    trend: TrendType;
+    trend: 'improving' | 'ailing';
 }
 
-const PerformanceTrendIndicator: React.FC<PerformanceTrendIndicatorProps> = ({
+const useStyles = makeStyles({
+    container: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+    },
+    indicator: {
+        width: '100%',
+        height: '4px',
+        backgroundColor: '#e0e0e0',
+        borderRadius: '2px',
+        overflow: 'hidden',
+    },
+    bar: {
+        height: '100%',
+        transition: 'width 0.3s ease-in-out',
+    },
+    improving: {
+        backgroundColor: '#4caf50',
+    },
+    ailing: {
+        backgroundColor: '#f44336',
+    },
+    percentage: {
+        fontSize: '0.875rem',
+        fontWeight: 500,
+    },
+    improvingText: {
+        color: '#4caf50',
+    },
+    ailingText: {
+        color: '#f44336',
+    },
+});
+
+const PerformanceTrendIndicator = ({
     width,
-    metricName,
+  
     percentageChange,
     trend,
-}) => {
-    const containerStyle: React.CSSProperties = {
-        width: `${width}%`,
-        position: 'relative',
-        paddingLeft: '5px',
-        paddingRight: '5px',
-        fontSize: '9px',
+}: PerformanceTrendIndicatorProps) => {
+    const classes = useStyles();
+
+    const barWidth = Math.min(Math.abs(percentageChange), 100);
+    const barStyle = {
+        width: `${barWidth}%`,
     };
 
-    const arrowContainerStyle: React.CSSProperties = {
-        display: 'inline-block',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: '10px'
-    };
-
-    const contentStyle: React.CSSProperties = {
-        textAlign: 'center',
-    };
-
-    const trendColors: Record<TrendType, string> = {
-        ailing: 'red',
-        neutral: 'black',
-        improving: 'green',
-    };
-
-    const arrowIconStyle: React.CSSProperties = {
-        color: trendColors[trend],
-        fontSize: '18px',
-        paddingBottom: '1px',
-    };
-
-    console.log(metricName);
     return (
-        <div style={containerStyle}>
-            <div style={contentStyle}>
-                ({toMaxLimit(Math.round(percentageChange))}%)
-                <div style={arrowContainerStyle}>
-                    <CallMadeIcon style={arrowIconStyle} />
-                </div>
+        <div className={classes.container} style={{ width: `${width}px` }}>
+            <div className={classes.indicator}>
+                <div
+                    className={`${classes.bar} ${
+                        trend === 'improving' ? classes.improving : classes.ailing
+                    }`}
+                    style={barStyle}
+                />
             </div>
+            <span
+                className={`${classes.percentage} ${
+                    trend === 'improving'
+                        ? classes.improvingText
+                        : classes.ailingText
+                }`}
+            >
+                {percentageChange > 0 ? '+' : ''}
+                {percentageChange}%
+            </span>
         </div>
     );
 };

@@ -1,9 +1,14 @@
 app:
-  title: Scaffolded Backstage App
+  title: Backstage
   baseUrl: http://localhost:3000
 
 organization:
-  name: My Company
+  name: Example Company
+
+dora:
+  sleuth:
+    apiUrl: 'https://app.sleuth.io/api/1'
+    apiKey: 'your-sleuth-api-key-here'
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
@@ -15,8 +20,7 @@ backend:
   baseUrl: http://localhost:7007
   listen:
     port: 7007
-    # Uncomment the following host directive to bind to specific interfaces
-    # host: 127.0.0.1
+    host: 0.0.0.0
   csp:
     connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
@@ -38,6 +42,10 @@ integrations:
       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
       # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
       token: ${GITHUB_TOKEN}
+    - host: ghe.example.com
+      apiBaseUrl: https://ghe.example.com/api/v3
+      rawBaseUrl: https://ghe.example.com/raw
+      token: ${GITHUB_TOKEN}
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3
@@ -50,6 +58,11 @@ proxy:
   #   '/test':
   #     target: 'https://example.com'
   #     changeOrigin: true
+  '/dora':
+    target: 'https://app.sleuth.io/api/1'
+    allowedMethods: ['GET']
+    headers:
+      Authorization: ''
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs
@@ -61,6 +74,8 @@ techdocs:
     runIn: 'docker' # Alternatives - 'local'
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+  storageUrl: http://localhost:7007/api/techdocs/static/docs
+  requestUrl: http://localhost:7007/api/techdocs
 
 auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers

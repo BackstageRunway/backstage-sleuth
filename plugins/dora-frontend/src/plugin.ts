@@ -6,8 +6,7 @@ import {
   createRoutableExtension,
   identityApiRef,
 } from '@backstage/core-plugin-api';
-import { doraApiRef, DORABackendClient } from './api/DORABackendClient';
-
+import { doraBackendApiRef, DORABackendClientImpl } from './api/DORABackendClient';
 import { innerRouteRef, rootRouteRef } from './routes';
 
 export const doraFrontendPlugin = createPlugin({
@@ -18,13 +17,13 @@ export const doraFrontendPlugin = createPlugin({
   },
   apis: [
     createApiFactory({
-      api: doraApiRef,
+      api: doraBackendApiRef,
       deps: {
         configApi: configApiRef,
         identityApi: identityApiRef,
       },
       factory: ({ configApi, identityApi }) =>
-        new DORABackendClient({ configApi, identityApi }),
+        new DORABackendClientImpl({ configApi, identityApi }),
     })
   ],
 });
@@ -53,7 +52,7 @@ export const DoraPerformanceComponent = doraFrontendPlugin.provide(
   createComponentExtension({
     name: 'PerformanceComponent',
     component: {
-      lazy: () => import('./components/PerformanceTable/DORAMetricsView').then(m => m.DORAMetricsView),
+      lazy: () => import('./components/PerformanceTable/EntityDoraMetrics').then(m => m.EntityDoraMetrics),
     },
   }),
 );

@@ -50,5 +50,9 @@
       "prettier --write"
     ]
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@4.4.1",
+  "dependencies": {
+    "graphql": "^16.11.0",
+    "graphql-request": "^7.1.2"
+  }
 }

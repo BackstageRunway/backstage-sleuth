@@ -1,39 +1,30 @@
-import {
-  coreServices,
-  createBackendPlugin,
-} from '@backstage/backend-plugin-api';
-import { createRouter } from './router';
-import { catalogServiceRef } from '@backstage/plugin-catalog-node';
-import { createTodoListService } from './services/TodoListService';
+import { createBackendPlugin } from '@backstage/backend-plugin-api';
+import { coreServices } from '@backstage/backend-plugin-api';
+import { createRouter } from './api/router';
+import { SleuthClient } from './infrastructure/sleuth/SleuthClient';
+import { MetricsService } from './application/services/MetricsService';
 
-/**
- * doraBackendPlugin backend plugin
- *
- * @public
- */
 export const doraBackendPlugin = createBackendPlugin({
   pluginId: 'dora-backend',
   register(env) {
     env.registerInit({
       deps: {
-        logger: coreServices.logger,
-        httpAuth: coreServices.httpAuth,
         httpRouter: coreServices.httpRouter,
-        catalog: catalogServiceRef,
+        logger: coreServices.logger,
+        config: coreServices.rootConfig,
       },
-      async init({ logger, httpAuth, httpRouter, catalog }) {
-        const todoListService = await createTodoListService({
-          logger,
-          catalog,
-        });
+      async init({ httpRouter, logger, config }) {
+        const sleuthApiKey = config.getString('dora.sleuth.apiKey');
+        const client = new SleuthClient(sleuthApiKey);
+        const metricsService = new MetricsService(client, logger);
 
         httpRouter.use(
           await createRouter({
-            httpAuth,
-            todoListService,
+            metricsService,
+            logger,
           }),
         );
       },
     });
   },
-});
+}); 

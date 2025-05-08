@@ -1,1 +1,1 @@
-export {};
+import '@backstage/backend-test-utils'; 

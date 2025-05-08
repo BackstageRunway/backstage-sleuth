@@ -240,23 +240,26 @@ const useStyles = makeStyles({
   },
 });
 
+// More flexible type definitions
 type User = {
-  gender: string; // "male"
+  gender: string;
   name: {
-    title: string; // "Mr",
-    first: string; // "Duane",
-    last: string; // "Reed"
+    title: string;
+    first: string;
+    last: string;
   };
-  email: string; // "duane.reed@example.com"
-  picture: string; // "https://api.dicebear.com/6.x/open-peeps/svg?seed=Duane"
-  nat: string; // "AU"
+  email: string;
+  picture: string;
+  nat: string;
+  [key: string]: any; // Allow additional properties
 };
 
 type DenseTableProps = {
   users: User[];
+  [key: string]: any; // Allow additional props
 };
 
-export const DenseTable = ({ users }: DenseTableProps) => {
+export const DenseTable = ({ users, ...props }: DenseTableProps) => {
   const classes = useStyles();
 
   const columns: TableColumn[] = [
@@ -266,20 +269,18 @@ export const DenseTable = ({ users }: DenseTableProps) => {
     { title: 'Nationality', field: 'nationality' },
   ];
 
-  const data = users.map(user => {
-    return {
-      avatar: (
-        <img
-          src={user.picture}
-          className={classes.avatar}
-          alt={user.name.first}
-        />
-      ),
-      name: `${user.name.first} ${user.name.last}`,
-      email: user.email,
-      nationality: user.nat,
-    };
-  });
+  const data = users.map(user => ({
+    avatar: (
+      <img
+        src={user.picture}
+        className={classes.avatar}
+        alt={user.name.first}
+      />
+    ),
+    name: `${user.name.first} ${user.name.last}`,
+    email: user.email,
+    nationality: user.nat,
+  }));
 
   return (
     <Table
@@ -287,20 +288,21 @@ export const DenseTable = ({ users }: DenseTableProps) => {
       options={{ search: false, paging: false }}
       columns={columns}
       data={data}
+      {...props}
     />
   );
 };
 
 export const ExampleFetchComponent = () => {
-
   const { value, loading, error } = useAsync(async (): Promise<User[]> => {
-    // Would use fetch in a real world example
     return exampleUsers.results;
   }, []);
 
   if (loading) {
     return <Progress />;
-  } else if (error) {
+  }
+  
+  if (error) {
     return <ResponseErrorPanel error={error} />;
   }
 
