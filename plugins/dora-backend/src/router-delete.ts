@@ -4,6 +4,7 @@ import { z } from 'zod';
 import express from 'express';
 import Router from 'express-promise-router';
 import { TodoListService } from './services/TodoListService/types';
+import { MetricsService } from 'application/services/MetricsService';
 
 export async function createRouter({
   httpAuth,
@@ -11,6 +12,7 @@ export async function createRouter({
 }: {
   httpAuth: HttpAuthService;
   todoListService: TodoListService;
+  metricsService: MetricsService;
 }): Promise<express.Router> {
   const router = Router();
   router.use(express.json());
@@ -26,6 +28,30 @@ export async function createRouter({
     entityRef: z.string().optional(),
   });
 
+
+  /**
+ * Helper method to extract the userEntityRef from the request.
+ */
+  // const getUserEntityRef = async (req: Request): Promise<string> => {
+  //   const credentials = await httpAuth.credentials(req, {
+  //     allow: ['user'],
+  //   });
+  //   return credentials.principal.userEntityRef;
+  // };
+
+  router.get('/todos', async (req, res) => {
+    const parsed = todoSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new InputError(parsed.error.toString());
+    }
+
+    const result = await todoListService.createTodo(parsed.data, {
+      credentials: await httpAuth.credentials(req, { allow: ['user'] }),
+    });
+
+    res.status(201).json(result);
+  });
+  
   router.post('/todos', async (req, res) => {
     const parsed = todoSchema.safeParse(req.body);
     if (!parsed.success) {

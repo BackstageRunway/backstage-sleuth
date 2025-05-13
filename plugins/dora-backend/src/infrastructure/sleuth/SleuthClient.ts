@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { DoraMetricsError } from '../../domain/models/DoraMetrics';
-import { BatchMetricsRequest, BatchMetricsResponse } from '../../domain/models/SleuthBatchTypes';
+import { BatchMetricsRequest, BatchMetricsResponse, DeploymentRequest, DeploymentResponse } from '../../domain/models/SleuthBatchTypes';
 
 export class SleuthClient {
   private readonly client: GraphQLClient;
@@ -25,69 +25,127 @@ export class SleuthClient {
     }
   }
 
+  async getDeployments(request: DeploymentRequest): Promise<DeploymentResponse> {
+    const query = `
+      query GetProjectDeploys(
+        $orgSlug: ID!
+        $teamSlugs: [ID!]
+        $projectSlugs: [ID!]!
+        $environmentSlugs: [ID!]!
+        $deploymentSlugs: [ID!]!
+        $start: DateTime!
+        $end: DateTime!
+        $page: Int!
+        $deploymentType: [String!]!
+        $size: [String]!
+        $healthTimes: [String]!
+        $onlyFailedDeploys: Boolean
+        $orderBy: OrderByType
+      ) {
+        orgDeploys: orgChanges(
+          orgSlug: $orgSlug
+          projectSlugs: $projectSlugs
+          deploymentSlugs: $deploymentSlugs
+          environmentSlugs: $environmentSlugs
+          page: $page
+          start: $start
+          end: $end
+          deploymentType: $deploymentType
+          size: $size
+          healthTimes: $healthTimes
+          orderBy: $orderBy
+          onlyFailedDeploys: $onlyFailedDeploys
+          teamSlugs: $teamSlugs
+        ) {
+          page
+          pages
+          count
+          hasNext
+          hasPrev
+          objects {
+            __typename
+            on
+            slug
+            deploymentSlug
+            deploymentName
+            projectName
+            summary
+            healthManuallySet
+            magnitude
+            trackingType
+            deploymentTrackingType
+            deploymentCollectImpact
+            environment {
+              name
+              slug
+            }
+            commits {
+              revision
+            }
+            numOfAllPullRequests
+            numOfIgnoredPullRequests
+            authors {
+              name
+            }
+            tags
+            deploymentType: changeSourceType
+            compareUrl
+            approvalStatuses
+            changeLeadTime
+            healthTimeBreakdown {
+              healthy
+              ailing
+              unhealthy
+              rolledBack
+              incident
+            }
+            nextDeploy {
+              on
+            }
+            workingHoursUsedForCltCalculation
+          }
+        }
+      }
+    `;
+  
+    try {
+      const response = await this.client.request<DeploymentResponse>(query, request as unknown as Record<string, unknown>);
+      return response;
+    } catch (error) {
+      throw new DoraMetricsError(
+        'Failed to query Sleuth API for deployments',
+        'PROVIDER_ERROR',
+        error,
+      );
+    }
+  }
+
   async batchQuery(request: BatchMetricsRequest): Promise<BatchMetricsResponse> {
     const query = `
-      query BatchMetrics(
-        $orgSlug: String!
-        $teamSlug: String!
-        $currentRangeStart: String!
-        $currentRangeEnd: String!
-        $previousRangeStart: String!
-        $previousRangeEnd: String!
+      query GetProjectMetrics(
+        $orgSlug: ID!
+        $projectSlug: ID!
+        $environmentSlug: ID!
+        $deploymentSlugs: [ID!]!
+        $currentRangeStartDate: DateTime!
+        $currentRangeEndDate: DateTime!
+        $teamSlug: ID
       ) {
-        team(orgSlug: $orgSlug, teamSlug: $teamSlug) {
-          teamMetrics {
-            currentRange: metricRecap(start: $currentRangeStart, end: $currentRangeEnd) {
-              numOfDeploysPerDay
-              avgLeadTimeInSec
-              failureRatePercent
-              avgMttrDurationInSec
-            }
-            previousRange: metricRecap(start: $previousRangeStart, end: $previousRangeEnd) {
-              numOfDeploysPerDay
-              avgLeadTimeInSec
-              failureRatePercent
-              avgMttrDurationInSec
-            }
-          }
-          teamDeploys {
-            currentRange: deployStats(start: $currentRangeStart, end: $currentRangeEnd) {
-              total
-              successful
-              failed
-            }
-            previousRange: deployStats(start: $previousRangeStart, end: $previousRangeEnd) {
-              total
-              successful
-              failed
-            }
-          }
-          teamDeployFrequency {
-            currentRange: frequency(start: $currentRangeStart, end: $currentRangeEnd) {
-              frequency
-            }
-            previousRange: frequency(start: $previousRangeStart, end: $previousRangeEnd) {
-              frequency
-            }
-          }
-          teamLeadTime {
-            currentRange: leadTime(start: $currentRangeStart, end: $currentRangeEnd) {
-              avgLeadTimeInSec
-            }
-            previousRange: leadTime(start: $previousRangeStart, end: $previousRangeEnd) {
-              avgLeadTimeInSec
-            }
-          }
-          wipSummary {
-            currentRange: summary(start: $currentRangeStart, end: $currentRangeEnd) {
-              total
-              inProgress
-              completed
-            }
-            previousRange: summary(start: $previousRangeStart, end: $previousRangeEnd) {
-              total
-              inProgress
-              completed
+        project(orgSlug: $orgSlug, projectSlug: $projectSlug) {
+          currentRange: metricRecap(
+            environmentSlug: $environmentSlug
+            deploymentSlugs: $deploymentSlugs
+            start: $currentRangeStartDate
+            end: $currentRangeEndDate
+            teamSlug: $teamSlug
+          ) {
+            avgLeadTimeInSec
+            numOfDeploys
+            numOfDeploysPerDay
+            failureRatePercent
+            avgMttrDurationInSec
+            contributingTeams {
+              slug
             }
           }
         }
@@ -96,11 +154,12 @@ export class SleuthClient {
 
     const variables = {
       orgSlug: request.orgSlug,
-      teamSlug: request.teamSlug,
-      currentRangeStart: request.currentRangeStart,
-      currentRangeEnd: request.currentRangeEnd,
-      previousRangeStart: request.previousRangeStart,
-      previousRangeEnd: request.previousRangeEnd,
+      projectSlug: request.orgSlug,
+      environmentSlug: 'production',
+      deploymentSlugs: ['application'],
+      currentRangeStartDate: request.currentRangeStart,
+      currentRangeEndDate: request.currentRangeEnd,
+      teamSlug: request.teamSlug
     };
 
     try {

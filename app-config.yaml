@@ -60,7 +60,7 @@ proxy:
   #     changeOrigin: true
   '/dora':
     target: 'https://app.sleuth.io/api/1'
-    allowedMethods: ['GET']
+    allowedMethods: ['GET','POST']
     headers:
       Authorization: ''
 

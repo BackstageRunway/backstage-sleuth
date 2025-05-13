@@ -42,6 +42,7 @@ export class DoraMetrics {
     public readonly mttr: number,
     public readonly project: ProjectId,
     public readonly timeRange: TimeRange,
+    public readonly contributingTeams?: { slug: string }[],
   ) {
     if (deployFrequency < 0) throw new Error('Deployment frequency cannot be negative');
     if (leadTime < 0) throw new Error('Lead time cannot be negative');

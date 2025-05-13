@@ -4,6 +4,7 @@ import {
   createComponentExtension,
   createPlugin,
   createRoutableExtension,
+  discoveryApiRef,
   identityApiRef,
 } from '@backstage/core-plugin-api';
 import { doraBackendApiRef, DORABackendClientImpl } from './api/DORABackendClient';
@@ -21,9 +22,10 @@ export const doraFrontendPlugin = createPlugin({
       deps: {
         configApi: configApiRef,
         identityApi: identityApiRef,
+        discoveryApi: discoveryApiRef,
       },
-      factory: ({ configApi, identityApi }) =>
-        new DORABackendClientImpl({ configApi, identityApi }),
+      factory: ({ configApi, identityApi, discoveryApi }) =>
+        new DORABackendClientImpl({  configApi, identityApi, discoveryApi }),
     })
   ],
 });
