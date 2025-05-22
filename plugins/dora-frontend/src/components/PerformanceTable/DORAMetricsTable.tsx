@@ -49,12 +49,14 @@ const DORAMetricsTable = ({ metrics }: DORAMetricsTableProps) => {
                         <TableRow>
                             <TableCell>Metric</TableCell>
                             <TableCell>Trend</TableCell>
-                            <TableCell className={classes.headerCell}>Elite</TableCell>
-                            <TableCell />
-                            <TableCell className={classes.headerCell}>High</TableCell>
+                            <TableCell className={classes.headerCell}>Low</TableCell>
                             <TableCell />
                             <TableCell className={classes.headerCell}>Medium</TableCell>
-                            <TableCell className={classes.headerCell}>Low</TableCell>
+                         
+                            <TableCell />
+                            <TableCell className={classes.headerCell}>High</TableCell>
+                            <TableCell className={classes.headerCell}>Elite</TableCell>
+                            
                         </TableRow>
                     </TableHead>
                     <TableBody>

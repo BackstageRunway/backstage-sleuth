@@ -1,6 +1,5 @@
 import { DatabaseService, LoggerService } from '@backstage/backend-plugin-api';
-import { DoraMetrics, DoraMetricsResult, ProjectId, TimeRange } from '../../domain/models/DoraMetrics';
-import { BatchMetricsRequest, BatchMetricsResponse, DeploymentRequest, DeploymentResponse } from '../../domain/models/SleuthBatchTypes';
+import { DeploymentRequest, DeploymentResponse, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
 import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {
@@ -10,42 +9,94 @@ export class MetricsService {
     private readonly logger: LoggerService,
   ) {}
 
-  async getMetrics(projectId: string, timeRange: { start: string; end: string }): Promise<DoraMetricsResult> {
+  private parseDateRange(rangeStr: string): number {
+    const match = rangeStr.match(/last(\d+)days/i);
+    if (!match) {
+      throw new Error('Invalid date range format. Expected format: lastXdays (e.g., last7days)');
+    }
+    return parseInt(match[1], 10);
+  }
+
+  private calculateDateRanges(dateRange: string): {
+    currentRangeStart: string;
+    currentRangeEnd: string;
+    previousRangeStart: string;
+    previousRangeEnd: string;
+  } {
+    // Get number of days from the range string (e.g., "last7days" -> 7)
+    const days = this.parseDateRange(dateRange);
+    
+    // Calculate current period
+    const currentEnd = new Date();
+    currentEnd.setHours(23, 59, 59, 999); // End of the day
+    
+    const currentStart = new Date(currentEnd);
+    currentStart.setDate(currentStart.getDate() - days);
+    currentStart.setHours(0, 0, 0, 0); // Start of the day
+    
+    // Previous period ends where current period starts
+    const previousEnd = new Date(currentStart);
+    previousEnd.setHours(23, 59, 59, 999);
+    
+    // Previous period starts by subtracting the same number of days
+    const previousStart = new Date(previousEnd);
+    previousStart.setDate(previousStart.getDate() - days);
+    previousStart.setHours(0, 0, 0, 0);
+
+    return {
+      currentRangeStart: currentStart.toISOString(),
+      currentRangeEnd: currentEnd.toISOString(),
+      previousRangeStart: previousStart.toISOString(),
+      previousRangeEnd: previousEnd.toISOString(),
+    };
+  }
+
+  async getProjectMetrics(orgId:string, projectId: string, environment:string, deploymentId:string, team:string, timeRange: string): Promise<ProjectMetricsResponse> {
     try {
-      const project = ProjectId.fromString('sleuth/frontend');
-      const range = new TimeRange(timeRange.start, timeRange.end);
+      const dateRanges = this.calculateDateRanges(timeRange);
 
       this.logger.info('Fetching metrics', {
-        projectId: project.toString(),
-        timeRange: {
-          start: range.start,
-          end: range.end,
-        },
+        projectId: projectId,
+        timeRange: timeRange,
       });
 
-      const metrics = await this.client.batchQuery({
-        orgSlug: project.orgSlug,
-        teamSlug: project.teamSlug,
+      const response = await this.client.projectMetrics({
+        orgSlug: orgId,
+        projectSlug: projectId,
+        environment: environment,
+        deploymentSlug: deploymentId,
+        teamSlug: team,
         metricTypes: ['metrics'],
-        currentRangeStart: range.start,
-        currentRangeEnd: range.end,
+        currentRangeStart: dateRanges.currentRangeStart,
+        currentRangeEnd: dateRanges.currentRangeEnd,
+        previousRangeStart: dateRanges.previousRangeStart,
+        previousRangeEnd: dateRanges.previousRangeEnd,
       });
 
-      if (!metrics.project?.currentRange) {
+      if (!response.project?.currentRange || !response.project?.previousRange) {
         throw new Error('No metrics data available');
       }
 
-      const doraMetrics = new DoraMetrics(
-        metrics.project.currentRange.numOfDeploysPerDay,
-        metrics.project.currentRange.avgLeadTimeInSec,
-        metrics.project.currentRange.failureRatePercent,
-        metrics.project.currentRange.avgMttrDurationInSec,
-        project,
-        range,
-        metrics.project.currentRange.contributingTeams,
-      );
+      // Log the metrics for monitoring
+      this.logger.info('Retrieved metrics', {
+        projectId,
+        currentRange: {
+          avgLeadTimeInSec: response.project.currentRange.avgLeadTimeInSec,
+          numOfDeploys: response.project.currentRange.numOfDeploys,
+          numOfDeploysPerDay: response.project.currentRange.numOfDeploysPerDay,
+          failureRatePercent: response.project.currentRange.failureRatePercent,
+          avgMttrDurationInSec: response.project.currentRange.avgMttrDurationInSec,
+        },
+        previousRange: {
+          avgLeadTimeInSec: response.project.previousRange.avgLeadTimeInSec,
+          numOfDeploys: response.project.previousRange.numOfDeploys,
+          numOfDeploysPerDay: response.project.previousRange.numOfDeploysPerDay,
+          failureRatePercent: response.project.previousRange.failureRatePercent,
+          avgMttrDurationInSec: response.project.previousRange.avgMttrDurationInSec,
+        }
+      });
 
-      return new DoraMetricsResult(doraMetrics);
+      return response;
     } catch (error) {
       this.logger.error('Failed to fetch metrics', {
         error: error instanceof Error ? error.message : String(error),
@@ -55,24 +106,6 @@ export class MetricsService {
     }
   }
 
-  async getBatchMetrics(request: BatchMetricsRequest): Promise<BatchMetricsResponse> {
-    try {
-      this.logger.info('Fetching batch metrics', {
-        orgSlug: request.orgSlug,
-        teamSlug: request.teamSlug,
-        metricTypes: request.metricTypes,
-      });
-
-      return await this.client.batchQuery(request);
-    } catch (error) {
-      this.logger.error('Failed to fetch batch metrics', {
-        error: error instanceof Error ? error.message : String(error),
-        orgSlug: request.orgSlug,
-        teamSlug: request.teamSlug,
-      });
-      throw error;
-    }
-  }
 
   async getDeployments(request: DeploymentRequest): Promise<DeploymentResponse> {
     try {

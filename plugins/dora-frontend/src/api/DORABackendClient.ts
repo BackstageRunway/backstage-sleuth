@@ -5,7 +5,7 @@ import {
   DiscoveryApi,
   IdentityApi,
 } from '@backstage/core-plugin-api';
-import { IProjectMetricInsights, IProjectMetricResponse, ITeamMetricResponse } from '../DORAMetricModel';
+import { IProjectMetricResponse } from '../DORAMetricModel';
 import { DoraMetricsResult } from '../types/DoraMetrics';
 
 const API_PATHS = {
@@ -21,7 +21,7 @@ export interface DORABackendClient {
   // Existing Sleuth API methods
   // getUserAuthorization(): Promise<{ status: string; [key: string]: any }>;
   // getTeamDORAMetrics(team: string, dateRange: string): Promise<ITeamMetricResponse | null>;
-  // getProjectDORAMetrics(project: string, env: string, deployment: string, dateRange: string): Promise<IProjectMetricResponse | null>;
+  getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<IProjectMetricResponse | null>;
   // getProjectDORAMetricsInsights(project: string, env: string, deployment: string, dateRange: string): Promise<IProjectMetricInsights | null>;
   
   // New DORA metrics method
@@ -95,8 +95,10 @@ export class DORABackendClientImpl implements DORABackendClient {
     return this.fetchWithAuth(url);
   }
 
-  async getProjectDORAMetrics(project: string, env: string, deployment: string, dateRange: string) {
-    const url = `${this.baseUrl}${API_PATHS.PROJECT_METRICS}?project=${project}&environment=${env}&deployment=${deployment}&dateRange=${dateRange}`;
+  async getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
+    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const url = `${baseUrl}/metrics/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
+    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 
@@ -137,12 +139,12 @@ export class DORABackendClientImpl implements DORABackendClient {
     deploymentSlugs: string[];
     start: string;
     end: string;
-    // page: number;
-    // deploymentType: string[];
-    // size: string[];
-    // healthTimes: string[];
-    // onlyFailedDeploys?: boolean;
-    // orderBy?: string | null;
+    page: number;
+    deploymentType: string[];
+    size: string[];
+    healthTimes: string[];
+    onlyFailedDeploys?: boolean;
+    orderBy?: string | null;
   }): Promise<any> {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
     return this.fetchWithAuth(

@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { DoraMetricsError } from '../../domain/models/DoraMetrics';
-import { BatchMetricsRequest, BatchMetricsResponse, DeploymentRequest, DeploymentResponse } from '../../domain/models/SleuthBatchTypes';
+import { DeploymentRequest, DeploymentResponse, ProjectMetricsRequest, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
 
 export class SleuthClient {
   private readonly client: GraphQLClient;
@@ -120,18 +120,34 @@ export class SleuthClient {
     }
   }
 
-  async batchQuery(request: BatchMetricsRequest): Promise<BatchMetricsResponse> {
+  async projectMetrics(request: ProjectMetricsRequest): Promise<ProjectMetricsResponse> {
     const query = `
       query GetProjectMetrics(
         $orgSlug: ID!
         $projectSlug: ID!
-        $environmentSlug: ID!
         $deploymentSlugs: [ID!]!
+        $environmentSlug: ID!
         $currentRangeStartDate: DateTime!
         $currentRangeEndDate: DateTime!
+        $previousRangeStartDate: DateTime!
+        $previousRangeEndDate: DateTime!
         $teamSlug: ID
       ) {
         project(orgSlug: $orgSlug, projectSlug: $projectSlug) {
+          previousRange: metricRecap(
+            environmentSlug: $environmentSlug
+            deploymentSlugs: $deploymentSlugs
+            start: $previousRangeStartDate
+            end: $previousRangeEndDate
+            teamSlug: $teamSlug
+          ) {
+            avgLeadTimeInSec
+            numOfDeploys
+            numOfDeploysPerDay
+            failureRatePercent
+            avgMttrDurationInSec
+          }
+
           currentRange: metricRecap(
             environmentSlug: $environmentSlug
             deploymentSlugs: $deploymentSlugs
@@ -144,9 +160,6 @@ export class SleuthClient {
             numOfDeploysPerDay
             failureRatePercent
             avgMttrDurationInSec
-            contributingTeams {
-              slug
-            }
           }
         }
       }
@@ -154,16 +167,18 @@ export class SleuthClient {
 
     const variables = {
       orgSlug: request.orgSlug,
-      projectSlug: request.orgSlug,
-      environmentSlug: 'production',
+      projectSlug: request.projectSlug,
+      environmentSlug: request.environment,
       deploymentSlugs: ['application'],
       currentRangeStartDate: request.currentRangeStart,
       currentRangeEndDate: request.currentRangeEnd,
-      teamSlug: request.teamSlug
-    };
+      previousRangeStartDate: request.previousRangeStart,
+      previousRangeEndDate: request.previousRangeEnd,
+      teamSlug: request.teamSlug,
+     };
 
     try {
-      const response = await this.client.request<BatchMetricsResponse>(query, variables);
+      const response = await this.client.request<ProjectMetricsResponse>(query, variables);
       return response;
     } catch (error) {
       throw new DoraMetricsError(

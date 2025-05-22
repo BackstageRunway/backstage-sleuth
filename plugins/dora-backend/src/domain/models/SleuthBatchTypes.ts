@@ -2,12 +2,17 @@
 
 export type MetricType = 'metrics';
 
-export interface BatchMetricsRequest {
+export interface ProjectMetricsRequest {
   orgSlug: string;
+  projectSlug: string;
+  environment: string;
+  deploymentSlug: string;
   teamSlug: string;
   metricTypes: MetricType[];
-  currentRangeStart: string;
   currentRangeEnd: string;
+  currentRangeStart: string;
+  previousRangeEnd: string;
+  previousRangeStart: string;
 }
 
 export interface ContributingTeam {
@@ -23,8 +28,9 @@ export interface MetricRecap {
   contributingTeams?: ContributingTeam[];
 }
 
-export interface BatchMetricsResponse {
+export interface ProjectMetricsResponse {
   project: {
+    previousRange: MetricRecap;
     currentRange: MetricRecap;
   };
 }

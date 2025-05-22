@@ -1,7 +1,7 @@
-
-import { TableRow, TableCell } from '@material-ui/core';
-import { getPerformanceDescription, MetricType, Performance } from '../../DORAMetricModel';
-import PerformanceMetricIndicator from './PerformanceTrendIndicator';
+import { makeStyles } from '@material-ui/core/styles';
+import { TableCell, TableRow } from '@material-ui/core';
+import { MetricType, Performance, getPerformanceDescription } from '../../DORAMetricModel';
+import PerformanceTrendIndicator from './PerformanceTrendIndicator';
 import PerformanceStatusMarker from './PerformanceStatusMarker';
 
 interface PerformanceStatusRowProps {
@@ -12,90 +12,78 @@ interface PerformanceStatusRowProps {
     trend: 'improving' | 'ailing';
 }
 
-const INDICATOR_WIDTH = 100;
+const useStyles = makeStyles({
+    cell: {
+        textAlign: 'center',
+    },
+    statusCell: {
+        width: '100px',
+    },
+});
 
-const PerformanceStatusRow = ({ 
-    metricName, 
-    value, 
-    previousValue, 
-    percentageChange, 
-    trend 
+const PerformanceStatusRow = ({
+    metricName,
+    value,
+    previousValue,
+    percentageChange,
+    trend,
 }: PerformanceStatusRowProps) => {
+    const classes = useStyles();
     const performanceDescription = getPerformanceDescription(metricName);
 
     return (
         <TableRow>
             <TableCell>{metricName}</TableCell>
-            <TableCell>
-                <PerformanceMetricIndicator
-                    width={INDICATOR_WIDTH}
-                    metricName={metricName}
+            <TableCell className={classes.statusCell}>
+                <PerformanceTrendIndicator
+                    metricType={metricName}
                     percentageChange={percentageChange}
-                    trend={trend}
                 />
             </TableCell>
-            <TableCell>
+            <TableCell className={classes.cell}>
                 <PerformanceStatusMarker
                     iconStyle="checkedCircle"
-                    checked={value === Performance.elite}
-                    previousChecked={previousValue === Performance.elite}
-                    width={INDICATOR_WIDTH}
+                    checked={value === Performance.low}
+                    previousChecked={previousValue === Performance.low}
+                    width={100}
                     metricName={metricName}
-                    performance={value}
-                    toolTip={performanceDescription[Performance.elite]}
+                    performance={Performance.low}
+                    toolTip={performanceDescription[Performance.low]}
                 />
             </TableCell>
-            <TableCell>
-                <PerformanceStatusMarker
-                    iconStyle="line"
-                    checked={false}
-                    previousChecked={false}
-                    width={INDICATOR_WIDTH}
-                    performance={value}
-                    toolTip={performanceDescription[Performance.high]}
-                />
-            </TableCell>
-            <TableCell>
-                <PerformanceStatusMarker
-                    iconStyle="checkedCircle"
-                    checked={value === Performance.high}
-                    previousChecked={previousValue === Performance.high}
-                    width={INDICATOR_WIDTH}
-                    metricName={metricName}
-                    performance={value}
-                    toolTip={performanceDescription[Performance.high]}
-                />
-            </TableCell>
-            <TableCell>
-                <PerformanceStatusMarker
-                    iconStyle="line"
-                    checked={false}
-                    previousChecked={false}
-                    width={INDICATOR_WIDTH}
-                    performance={value}
-                    toolTip={performanceDescription[Performance.medium]}
-                />
-            </TableCell>
-            <TableCell>
+            <TableCell />
+            <TableCell className={classes.cell}>
                 <PerformanceStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.medium}
                     previousChecked={previousValue === Performance.medium}
-                    width={INDICATOR_WIDTH}
+                    width={100}
                     metricName={metricName}
-                    performance={value}
+                    performance={Performance.medium}
                     toolTip={performanceDescription[Performance.medium]}
                 />
             </TableCell>
-            <TableCell>
+            <TableCell />
+            <TableCell className={classes.cell}>
+                <PerformanceStatusMarker
+                    iconStyle="checkedCircle"
+                    checked={value === Performance.high}
+                    previousChecked={previousValue === Performance.high}
+                    width={100}
+                    metricName={metricName}
+                    performance={Performance.high}
+                    toolTip={performanceDescription[Performance.high]}
+                />
+            </TableCell>
+            <TableCell className={classes.cell}>
                 <PerformanceStatusMarker
                     iconStyle="trophy"
-                    checked={value === Performance.low}
-                    previousChecked={previousValue === Performance.low}
-                    width={INDICATOR_WIDTH}
+                    checked={value === Performance.elite}
+                    previousChecked={previousValue === Performance.elite}
+                    width={100}
                     metricName={metricName}
-                    performance={value}
-                    toolTip={performanceDescription[Performance.low]}
+                    performance={Performance.elite}
+                    toolTip={performanceDescription[Performance.elite]}
                 />
             </TableCell>
         </TableRow>

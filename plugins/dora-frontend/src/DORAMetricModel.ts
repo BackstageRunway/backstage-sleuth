@@ -38,7 +38,20 @@ export interface ITeamMetricResponse {
 }
 
 export interface IProjectMetricResponse {
-  project: IMetric;
+  project: {
+    currentRange: {
+      numOfDeploysPerDay: number;
+      avgLeadTimeInSec: number;
+      failureRatePercent: number;
+      avgMttrDurationInSec: number;
+    };
+    previousRange: {
+      numOfDeploysPerDay: number;
+      avgLeadTimeInSec: number;
+      failureRatePercent: number;
+      avgMttrDurationInSec: number;
+    };
+  };
 }
 
 export interface IProjectMetricInsights {
