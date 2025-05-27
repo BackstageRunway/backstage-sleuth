@@ -5,7 +5,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import EmojiEventsIcon from '@material-ui/icons/EmojiEvents';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 
-interface PerformanceStatusMarkerProps {
+type Props = {
     iconStyle: 'checkedCircle' | 'trophy';
     checked: boolean;
     previousChecked: boolean;
@@ -13,7 +13,7 @@ interface PerformanceStatusMarkerProps {
     metricName: MetricType;
     performance: Performance;
     toolTip: string;
-}
+};
 
 const useStyles = makeStyles({
     container: {
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
     },
 });
 
-const PerformanceStatusMarker = ({
+export function MetricStatusMarker({
     iconStyle,
     checked,
     previousChecked,
@@ -44,7 +44,7 @@ const PerformanceStatusMarker = ({
     metricName,
     performance,
     toolTip,
-}: PerformanceStatusMarkerProps) => {
+}: Props) {
     const classes = useStyles();
 
     const getIcon = () => {
@@ -74,6 +74,4 @@ const PerformanceStatusMarker = ({
             </div>
         </Tooltip>
     );
-};
-
-export default PerformanceStatusMarker; 
+} 

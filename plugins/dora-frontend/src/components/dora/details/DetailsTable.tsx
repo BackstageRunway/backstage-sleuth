@@ -41,9 +41,7 @@ const DetailsTable = ({ metrics }: DetailsTableProps) => {
 
     return (
         <div>
-            <Typography variant="h6" className={classes.title}>
-                DORA Metrics Performance
-            </Typography>
+           
             <TableContainer component={Paper}>
                 <Table className={classes.table}>
                     <TableHead>

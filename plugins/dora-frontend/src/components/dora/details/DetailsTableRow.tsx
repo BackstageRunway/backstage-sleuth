@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { TableRow, TableCell } from '@material-ui/core';
 import { MetricType, Performance, getPerformanceDescription } from '../../../DORAMetricModel';
 import { DeploymentTrendCell } from '../shared/DeploymentTrendCell';
-import PerformanceStatusMarker from './PerformanceStatusMarker';
+import { MetricStatusMarker } from '../shared/MetricStatusMarker';
 
 interface DetailsTableRowProps {
     metricName: MetricType;
@@ -41,7 +41,7 @@ const DetailsTableRow = ({
                 />
             </TableCell>
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.low}
                     previousChecked={previousValue === Performance.low}
@@ -53,7 +53,7 @@ const DetailsTableRow = ({
             </TableCell>
             <TableCell />
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.medium}
                     previousChecked={previousValue === Performance.medium}
@@ -65,7 +65,7 @@ const DetailsTableRow = ({
             </TableCell>
             <TableCell />
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.high}
                     previousChecked={previousValue === Performance.high}
@@ -76,7 +76,7 @@ const DetailsTableRow = ({
                 />
             </TableCell>
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="trophy"
                     checked={value === Performance.elite}
                     previousChecked={previousValue === Performance.elite}
