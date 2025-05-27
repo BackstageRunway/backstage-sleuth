@@ -4,6 +4,22 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import WarningIcon from '@material-ui/icons/Warning';
 import ErrorIcon from '@material-ui/icons/Error';
 
+
+export const formatMetricValue = (metricName: MetricType, value: number): string => {
+    switch (metricName) {
+        case MetricType.Frequency:
+            return `${value.toFixed(2)}/day`;
+        case MetricType.LeadTime:
+            return `${(value / 3600).toFixed(1)}h`;
+        case MetricType.FailureRate:
+            return `${value.toFixed(1)}%`;
+        case MetricType.Mttr:
+            return `${(value / 3600).toFixed(1)}h`;
+        default:
+            return value.toString();
+    }
+}; 
+
 export const getMetricDisplayValue = (metricName: MetricType, rawValue: number): string => {
     switch (metricName) {
         case MetricType.Frequency:

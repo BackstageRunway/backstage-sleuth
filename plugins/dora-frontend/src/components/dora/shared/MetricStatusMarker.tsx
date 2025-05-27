@@ -41,8 +41,6 @@ export function MetricStatusMarker({
     checked,
     previousChecked,
     width,
-    metricName,
-    performance,
     toolTip,
 }: Props) {
     const classes = useStyles();

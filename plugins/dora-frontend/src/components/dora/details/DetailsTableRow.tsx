@@ -26,7 +26,6 @@ const DetailsTableRow = ({
     value,
     previousValue,
     percentageChange,
-    trend,
 }: DetailsTableRowProps) => {
     const classes = useStyles();
     const performanceDescription = getPerformanceDescription(metricName);
