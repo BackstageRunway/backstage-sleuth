@@ -1,8 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { MetricType, getMetricPerformance, calculateTrendChange, getTrend, Performance } from '../../DORAMetricModel';
-import DetailsTable from '../dora/details/DetailsTable';
+import { MetricType, getMetricPerformance, calculateTrendChange, getTrend, Performance } from '../../../DORAMetricModel';
+import DetailsTable from './DetailsTable';
 import { useApi } from '@backstage/core-plugin-api';
-import { doraBackendApiRef } from '../../api/DORABackendClient';
+import { doraBackendApiRef } from '../../../api/DORABackendClient';
 import { useEffect, useState } from 'react';
 import { CircularProgress } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';

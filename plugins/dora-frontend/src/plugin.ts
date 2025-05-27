@@ -54,7 +54,7 @@ export const DoraPerformanceComponent = doraFrontendPlugin.provide(
   createComponentExtension({
     name: 'PerformanceComponent',
     component: {
-      lazy: () => import('./components/PerformanceTable/EntityDoraMetrics').then(m => m.EntityDoraMetrics),
+      lazy: () => import('./components/dora/EntityDoraMetrics').then(m => m.EntityDoraMetrics),
     },
   }),
 );
