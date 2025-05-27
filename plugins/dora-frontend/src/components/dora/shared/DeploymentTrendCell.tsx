@@ -1,14 +1,13 @@
-import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { MetricType } from '../../../DORAMetricModel';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 
-interface DeploymentTrendCellProps {
+type Props = {
     metricType: MetricType;
     percentageChange: number;
-}
+};
 
 const useStyles = makeStyles({
     container: {
@@ -31,7 +30,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const DeploymentTrendCell: React.FC<DeploymentTrendCellProps> = ({ metricType, percentageChange }) => {
+export function DeploymentTrendCell({ metricType, percentageChange }: Props) {
     const classes = useStyles();
     const isImproving = (metricType === MetricType.Frequency || metricType === MetricType.LeadTime) 
         ? percentageChange > 0 
@@ -59,4 +58,4 @@ export const DeploymentTrendCell: React.FC<DeploymentTrendCellProps> = ({ metric
             </span>
         </div>
     );
-}; 
+} 

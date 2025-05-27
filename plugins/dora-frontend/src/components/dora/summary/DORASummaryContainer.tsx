@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Grid, CircularProgress } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { useApi } from '@backstage/core-plugin-api';
@@ -8,7 +8,9 @@ import { DORASummaryContainerProps, MetricData, ProjectMetricsResponse } from '.
 import { useStyles } from './styles';
 import { MetricCard } from './MetricCard';
 
-export const DORASummaryContainer: React.FC<DORASummaryContainerProps> = ({ projectId, timeRange }) => {
+type Props = DORASummaryContainerProps;
+
+export function DORASummaryContainer({ projectId, timeRange }: Props) {
     const classes = useStyles();
     const doraApi = useApi(doraBackendApiRef);
     const [error, setError] = useState<string | null>(null);
@@ -136,4 +138,4 @@ export const DORASummaryContainer: React.FC<DORASummaryContainerProps> = ({ proj
             </Grid>
         </div>
     );
-}; 
+} 
