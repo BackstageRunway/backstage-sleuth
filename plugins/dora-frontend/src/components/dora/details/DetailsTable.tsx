@@ -1,18 +1,10 @@
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    Typography,
-} from '@material-ui/core';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { MetricType, Performance } from '../../DORAMetricModel';
-import PerformanceStatusRow from './PerformanceStatusRow';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@material-ui/core';
+import DetailsTableRow from './DetailsTableRow';
+import { MetricType, Performance } from '../../../DORAMetricModel';
 
-interface DORAMetricsTableProps {
+interface DetailsTableProps {
     metrics: {
         metricName: MetricType;
         value: Performance;
@@ -29,13 +21,22 @@ const useStyles = makeStyles({
     headerCell: {
         fontWeight: 'bold',
         textAlign: 'center',
+        width: '120px',
+    },
+    metricCell: {
+        width: '150px',
+        textAlign: 'left',
+    },
+    trendCell: {
+        width: '120px',
+        textAlign: 'center',
     },
     title: {
         marginBottom: '1rem',
     },
 });
 
-const DORAMetricsTable = ({ metrics }: DORAMetricsTableProps) => {
+const DetailsTable = ({ metrics }: DetailsTableProps) => {
     const classes = useStyles();
 
     return (
@@ -52,16 +53,14 @@ const DORAMetricsTable = ({ metrics }: DORAMetricsTableProps) => {
                             <TableCell className={classes.headerCell}>Low</TableCell>
                             <TableCell />
                             <TableCell className={classes.headerCell}>Medium</TableCell>
-                         
                             <TableCell />
                             <TableCell className={classes.headerCell}>High</TableCell>
                             <TableCell className={classes.headerCell}>Elite</TableCell>
-                            
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {metrics.map((metric) => (
-                            <PerformanceStatusRow
+                            <DetailsTableRow
                                 key={metric.metricName}
                                 metricName={metric.metricName}
                                 value={metric.value}
@@ -77,4 +76,4 @@ const DORAMetricsTable = ({ metrics }: DORAMetricsTableProps) => {
     );
 };
 
-export default DORAMetricsTable;
+export default DetailsTable;

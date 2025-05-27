@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { MetricType, getMetricPerformance, calculateTrendChange, getTrend, Performance } from '../../DORAMetricModel';
-import DORAMetricsTable from './DORAMetricsTable';
+import DetailsTable from '../dora/details/DetailsTable';
 import { useApi } from '@backstage/core-plugin-api';
 import { doraBackendApiRef } from '../../api/DORABackendClient';
 import { useEffect, useState } from 'react';
@@ -170,7 +170,7 @@ export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) 
 
     return (
         <div className={classes.container}>
-            <DORAMetricsTable metrics={metrics} />
+            <DetailsTable metrics={metrics} />
         </div>
     );
 };

@@ -1,10 +1,10 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { TableCell, TableRow } from '@material-ui/core';
-import { MetricType, Performance, getPerformanceDescription } from '../../DORAMetricModel';
-import PerformanceTrendIndicator from './PerformanceTrendIndicator';
+import { TableRow, TableCell } from '@material-ui/core';
+import { MetricType, Performance, getPerformanceDescription } from '../../../DORAMetricModel';
+import { DeploymentTrendCell } from '../shared/DeploymentTrendCell';
 import PerformanceStatusMarker from './PerformanceStatusMarker';
 
-interface PerformanceStatusRowProps {
+interface DetailsTableRowProps {
     metricName: MetricType;
     value: Performance;
     previousValue: Performance;
@@ -21,13 +21,13 @@ const useStyles = makeStyles({
     },
 });
 
-const PerformanceStatusRow = ({
+const DetailsTableRow = ({
     metricName,
     value,
     previousValue,
     percentageChange,
     trend,
-}: PerformanceStatusRowProps) => {
+}: DetailsTableRowProps) => {
     const classes = useStyles();
     const performanceDescription = getPerformanceDescription(metricName);
 
@@ -35,7 +35,7 @@ const PerformanceStatusRow = ({
         <TableRow>
             <TableCell>{metricName}</TableCell>
             <TableCell className={classes.statusCell}>
-                <PerformanceTrendIndicator
+                <DeploymentTrendCell
                     metricType={metricName}
                     percentageChange={percentageChange}
                 />
@@ -90,4 +90,4 @@ const PerformanceStatusRow = ({
     );
 };
 
-export default PerformanceStatusRow;
+export default DetailsTableRow; 
