@@ -1,10 +1,10 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { TableCell, TableRow } from '@material-ui/core';
-import { MetricType, Performance, getPerformanceDescription } from '../../DORAMetricModel';
-import PerformanceTrendIndicator from './PerformanceTrendIndicator';
-import PerformanceStatusMarker from './PerformanceStatusMarker';
+import { TableRow, TableCell } from '@material-ui/core';
+import { MetricType, Performance, getPerformanceDescription } from '../../../DORAMetricModel';
+import { DeploymentTrendCell } from '../shared/DeploymentTrendCell';
+import { MetricStatusMarker } from '../shared/MetricStatusMarker';
 
-interface PerformanceStatusRowProps {
+interface DetailsTableRowProps {
     metricName: MetricType;
     value: Performance;
     previousValue: Performance;
@@ -21,13 +21,12 @@ const useStyles = makeStyles({
     },
 });
 
-const PerformanceStatusRow = ({
+const DetailsTableRow = ({
     metricName,
     value,
     previousValue,
     percentageChange,
-    trend,
-}: PerformanceStatusRowProps) => {
+}: DetailsTableRowProps) => {
     const classes = useStyles();
     const performanceDescription = getPerformanceDescription(metricName);
 
@@ -35,13 +34,13 @@ const PerformanceStatusRow = ({
         <TableRow>
             <TableCell>{metricName}</TableCell>
             <TableCell className={classes.statusCell}>
-                <PerformanceTrendIndicator
+                <DeploymentTrendCell
                     metricType={metricName}
                     percentageChange={percentageChange}
                 />
             </TableCell>
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.low}
                     previousChecked={previousValue === Performance.low}
@@ -53,7 +52,7 @@ const PerformanceStatusRow = ({
             </TableCell>
             <TableCell />
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.medium}
                     previousChecked={previousValue === Performance.medium}
@@ -65,7 +64,7 @@ const PerformanceStatusRow = ({
             </TableCell>
             <TableCell />
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="checkedCircle"
                     checked={value === Performance.high}
                     previousChecked={previousValue === Performance.high}
@@ -76,7 +75,7 @@ const PerformanceStatusRow = ({
                 />
             </TableCell>
             <TableCell className={classes.cell}>
-                <PerformanceStatusMarker
+                <MetricStatusMarker
                     iconStyle="trophy"
                     checked={value === Performance.elite}
                     previousChecked={previousValue === Performance.elite}
@@ -90,4 +89,4 @@ const PerformanceStatusRow = ({
     );
 };
 
-export default PerformanceStatusRow;
+export default DetailsTableRow; 

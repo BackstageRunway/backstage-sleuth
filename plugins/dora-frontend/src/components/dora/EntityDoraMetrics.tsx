@@ -1,88 +1,93 @@
-import { makeStyles } from '@material-ui/core/styles';
-import { MetricType, getMetricPerformance, calculateTrendChange, getTrend, Performance } from '../../DORAMetricModel';
-import DORAMetricsTable from './DORAMetricsTable';
-import { useApi } from '@backstage/core-plugin-api';
-import { doraBackendApiRef } from '../../api/DORABackendClient';
-import { useEffect, useState } from 'react';
-import { CircularProgress } from '@material-ui/core';
+import { useEntity } from '@backstage/plugin-catalog-react';
+import { DORAMetricsView } from './details/DORAMetricsView';
 import { Alert } from '@material-ui/lab';
+import { makeStyles } from '@material-ui/core/styles';
+import { DORASummaryContainer } from './summary/DORASummaryContainer';
+import { CircularProgress, Grid, Paper } from '@material-ui/core';
+import { useApi } from '@backstage/core-plugin-api';
+import { useEffect, useState } from 'react';
+import { doraBackendApiRef } from '../../api/DORABackendClient';
+import { MetricData, ProjectMetricsResponse } from './summary/types';
+import { MetricType, getMetricPerformance, calculateTrendChange, getTrend } from '../../DORAMetricModel';
 
-interface DORAMetricsViewProps {
-    projectId: string;
-    timeRange: {
-        start: string;
-        end: string;
-    };
-}
 
-interface MetricData {
-    metricName: MetricType;
-    value: Performance;
-    previousValue: Performance;
-    percentageChange: number;
-    trend: 'improving' | 'ailing';
-}
-
-interface ProjectMetricsResponse {
-    project: {
-        currentRange: {
-            numOfDeploysPerDay: number;
-            avgLeadTimeInSec: number;
-            failureRatePercent: number;
-            avgMttrDurationInSec: number;
-        };
-        previousRange: {
-            numOfDeploysPerDay: number;
-            avgLeadTimeInSec: number;
-            failureRatePercent: number;
-            avgMttrDurationInSec: number;
-        };
-    };
-}
 
 const useStyles = makeStyles({
+    error: {
+        marginBottom: '1rem',
+    },
     container: {
         padding: '1rem',
     },
-    error: {
+    paper: {
+        padding: '1rem',
         marginBottom: '1rem',
+    },
+    title: {
+        marginBottom: '1rem',
+        fontSize: '1.25rem',
+        fontWeight: 500,
     },
     loader: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '200px',
-    },
+    }
 });
 
-export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) => {
+export const EntityDoraMetrics = () => {
     const classes = useStyles();
+    const { entity } = useEntity();
     const doraApi = useApi(doraBackendApiRef);
     const [error, setError] = useState<string | null>(null);
     const [metrics, setMetrics] = useState<MetricData[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Get the project ID from entity annotations
+    const projectId = entity.metadata.annotations?.['sleuth.io/project-id'];
+
+    console.log('Entity:', entity);
+    console.log('Project ID:', projectId);
+
+    if (!projectId) {
+        return (
+            <Alert severity="warning" className={classes.error}>
+                No Sleuth project ID found in entity annotations. Add the 'sleuth.io/project-id' annotation to view DORA metrics.
+                <br />
+                Available annotations: {JSON.stringify(entity.metadata.annotations, null, 2)}
+            </Alert>
+        );
+    }
+
     const orgId = 'sleuth';
     const projectSlug = 'sleuth';
     const environment = 'production';
     const deployment = 'application';
-    const timeRangeDummy = 'last28days'
+    const timeRange = 'last28days'
 
     useEffect(() => {
         const fetchMetrics = async () => {
             setLoading(true);
             try {
-                const result = await doraApi.getProjectDORAMetrics(orgId, projectSlug, environment, deployment, timeRangeDummy) as ProjectMetricsResponse;
+                const result = await doraApi.getProjectDORAMetrics(
+                    orgId,
+                    projectSlug,
+                    environment,
+                    deployment,
+                    timeRange,
+                ) as ProjectMetricsResponse;
                 
                 if (!result || !result.project) {
                     throw new Error('No metrics data available');
                 }
 
                 const project = result.project;
-
                 const metricsData: MetricData[] = [
                     {
                         metricName: MetricType.Frequency,
                         value: getMetricPerformance(MetricType.Frequency, project.currentRange.numOfDeploysPerDay),
+                        rawValue: project.currentRange.numOfDeploysPerDay,
                         previousValue: getMetricPerformance(MetricType.Frequency, project.previousRange.numOfDeploysPerDay),
                         percentageChange: calculateTrendChange(
                             project.currentRange.numOfDeploysPerDay,
@@ -97,6 +102,7 @@ export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) 
                     {
                         metricName: MetricType.LeadTime,
                         value: getMetricPerformance(MetricType.LeadTime, project.currentRange.avgLeadTimeInSec),
+                        rawValue: project.currentRange.avgLeadTimeInSec,
                         previousValue: getMetricPerformance(MetricType.LeadTime, project.previousRange.avgLeadTimeInSec),
                         percentageChange: calculateTrendChange(
                             project.currentRange.avgLeadTimeInSec,
@@ -111,6 +117,7 @@ export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) 
                     {
                         metricName: MetricType.FailureRate,
                         value: getMetricPerformance(MetricType.FailureRate, project.currentRange.failureRatePercent),
+                        rawValue: project.currentRange.failureRatePercent,
                         previousValue: getMetricPerformance(MetricType.FailureRate, project.previousRange.failureRatePercent),
                         percentageChange: calculateTrendChange(
                             project.currentRange.failureRatePercent,
@@ -125,6 +132,7 @@ export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) 
                     {
                         metricName: MetricType.Mttr,
                         value: getMetricPerformance(MetricType.Mttr, project.currentRange.avgMttrDurationInSec),
+                        rawValue: project.currentRange.avgMttrDurationInSec,
                         previousValue: getMetricPerformance(MetricType.Mttr, project.previousRange.avgMttrDurationInSec),
                         percentageChange: calculateTrendChange(
                             project.currentRange.avgMttrDurationInSec,
@@ -148,7 +156,7 @@ export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) 
         };
 
         fetchMetrics();
-    }, [projectId, timeRange, doraApi]);
+    }, [projectId, doraApi]);
 
     if (loading) {
         return (
@@ -170,7 +178,20 @@ export const DORAMetricsView = ({ projectId, timeRange }: DORAMetricsViewProps) 
 
     return (
         <div className={classes.container}>
-            <DORAMetricsTable metrics={metrics} />
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                        <div className={classes.title}>DORA Metrics Overview</div>
+                        <DORASummaryContainer metrics={metrics}/>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                        <div className={classes.title}>Detailed DORA Metrics</div>
+                        <DORAMetricsView metrics={metrics}/>
+                    </Paper>
+                </Grid>
+            </Grid>
         </div>
     );
-};
+}; 
