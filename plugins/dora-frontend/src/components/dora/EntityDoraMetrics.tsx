@@ -64,23 +64,18 @@ export const EntityDoraMetrics = () => {
     const projectSlug = 'sleuth';
     const environment = 'production';
     const deployment = 'application';
-    const timeRangeDummy = 'last28days'
-    
-    // Default to last 30 days
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 30);
+    const timeRange = 'last28days'
 
     useEffect(() => {
         const fetchMetrics = async () => {
             setLoading(true);
             try {
                 const result = await doraApi.getProjectDORAMetrics(
-                    'sleuth',
-                    'sleuth',
-                    'production',
-                    'application',
-                    'last28days'
+                    orgId,
+                    projectSlug,
+                    environment,
+                    deployment,
+                    timeRange,
                 ) as ProjectMetricsResponse;
                 
                 if (!result || !result.project) {

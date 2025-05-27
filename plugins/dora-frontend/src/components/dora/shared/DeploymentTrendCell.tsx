@@ -32,16 +32,25 @@ const useStyles = makeStyles({
 
 export function DeploymentTrendCell({ metricType, percentageChange }: Props) {
     const classes = useStyles();
-    const isImproving = (metricType === MetricType.Frequency || metricType === MetricType.LeadTime) 
-        ? percentageChange > 0 
-        : percentageChange < 0;
-
+    
     const getTrendIcon = () => {
         if (percentageChange === 0) {
             return <TrendingFlatIcon className={classes.neutral} />;
         }
-        return isImproving 
-            ? <TrendingUpIcon className={classes.improving} />
+
+        // For lead time, failure rate, and MTTR, show down arrow when decreasing
+        if (metricType !== MetricType.Frequency && percentageChange < 0) {
+            return <TrendingDownIcon className={classes.improving} />;
+        }
+        
+        // For frequency, show up arrow when increasing
+        if (metricType === MetricType.Frequency && percentageChange > 0) {
+            return <TrendingUpIcon className={classes.improving} />;
+        }
+
+        // Otherwise show the opposite trend in red
+        return percentageChange > 0 
+            ? <TrendingUpIcon className={classes.ailing} />
             : <TrendingDownIcon className={classes.ailing} />;
     };
 
