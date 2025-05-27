@@ -13,12 +13,15 @@ const useStyles = makeStyles({
     trendIndicator: {
         display: 'flex',
         alignItems: 'center',
-        gap: '0.5rem',
-        minWidth: '120px',
+        justifyContent: 'center',
+        gap: '0.25rem',
+        marginTop: '0.125rem',
     },
     percentage: {
         whiteSpace: 'nowrap',
         fontSize: '0.875rem',
+        display: 'flex',
+        alignItems: 'center',
     },
     improving: {
         color: '#4caf50',
@@ -36,13 +39,9 @@ const PerformanceTrendIndicator = ({ metricType, percentageChange }: Performance
 
     const renderTrendIcon = () => {
         // For Frequency: up arrow (green) when increasing
-        // For LeadTime: down arrow (green) when decreasing
-        // For FailureRate: down arrow (green) when decreasing
-        // For Mttr: down arrow (green) when decreasing
+        // For LeadTime, FailureRate, and Mttr: down arrow (green) when decreasing
         const isGood = (metricType === MetricType.Frequency && percentageChange > 0) ||
-                      (metricType === MetricType.LeadTime && percentageChange < 0) ||
-                      (metricType === MetricType.FailureRate && percentageChange < 0) ||
-                      (metricType === MetricType.Mttr && percentageChange < 0);
+                      (metricType !== MetricType.Frequency && percentageChange < 0);
 
         // For Frequency: up arrow when increasing
         if (metricType === MetricType.Frequency) {
@@ -52,15 +51,9 @@ const PerformanceTrendIndicator = ({ metricType, percentageChange }: Performance
         }
         
         // For LeadTime, FailureRate, and Mttr: down arrow when decreasing
-        if (metricType === MetricType.LeadTime || 
-            metricType === MetricType.FailureRate || 
-            metricType === MetricType.Mttr) {
-            return percentageChange < 0 ? 
-                <TrendingDownIcon className={classes.improving} /> : 
-                <TrendingUpIcon className={classes.ailing} />;
-        }
-
-        return <TrendingFlatIcon className={classes.neutral} />;
+        return percentageChange < 0 ? 
+            <TrendingDownIcon className={classes.improving} /> : 
+            <TrendingUpIcon className={classes.ailing} />;
     };
 
     return (
@@ -69,17 +62,14 @@ const PerformanceTrendIndicator = ({ metricType, percentageChange }: Performance
             <span
                 className={`${classes.percentage} ${
                     (metricType === MetricType.Frequency && percentageChange > 0) ||
-                    (metricType === MetricType.LeadTime && percentageChange < 0) ||
-                    (metricType === MetricType.FailureRate && percentageChange < 0) ||
-                    (metricType === MetricType.Mttr && percentageChange < 0)
+                    (metricType !== MetricType.Frequency && percentageChange < 0)
                         ? classes.improving
                         : percentageChange === 0
                         ? classes.neutral
                         : classes.ailing
                 }`}
             >
-                {percentageChange > 0 ? '+' : ''}
-                {percentageChange.toFixed(1)}%
+                {Math.abs(percentageChange).toFixed(1)}%
             </span>
         </div>
     );

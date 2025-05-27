@@ -2,7 +2,7 @@ import { useEntity } from '@backstage/plugin-catalog-react';
 import { DORAMetricsView } from './DORAMetricsView';
 import { Alert } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
-import { DORAMetricsDashboard } from './DORAMetricsDashboard';
+import { DORASummaryContainer } from '../dora/summary/DORASummaryContainer';
 import { Grid, Paper } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -54,7 +54,7 @@ export const EntityDoraMetrics = () => {
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <div className={classes.title}>DORA Metrics Overview</div>
-                        <DORAMetricsDashboard
+                        <DORASummaryContainer
                             projectId={projectId}
                             timeRange={{
                                 start: start.toISOString(),
