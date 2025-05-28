@@ -3,13 +3,15 @@ import { TableRow, TableCell } from '@material-ui/core';
 import { MetricType, Performance, getPerformanceDescription } from '../../../DORAMetricModel';
 import { DeploymentTrendCell } from '../shared/DeploymentTrendCell';
 import { MetricStatusMarker } from '../shared/MetricStatusMarker';
+import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
 interface DetailsTableRowProps {
     metricName: MetricType;
     value: Performance;
     previousValue: Performance;
     percentageChange: number;
-    trend: 'improving' | 'ailing';
+    trend: 'up' | 'down' | 'stable';
 }
 
 const useStyles = makeStyles({
@@ -19,6 +21,12 @@ const useStyles = makeStyles({
     statusCell: {
         width: '100px',
     },
+    trendUp: {
+        color: 'green',
+    },
+    trendDown: {
+        color: 'red',
+    },
 });
 
 const DetailsTableRow = ({
@@ -26,9 +34,21 @@ const DetailsTableRow = ({
     value,
     previousValue,
     percentageChange,
+    trend,
 }: DetailsTableRowProps) => {
     const classes = useStyles();
     const performanceDescription = getPerformanceDescription(metricName);
+
+    const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
+        switch (trend) {
+            case 'up':
+                return <TrendingUpIcon className={classes.trendUp} />;
+            case 'down':
+                return <TrendingDownIcon className={classes.trendDown} />;
+            default:
+                return null;
+        }
+    };
 
     return (
         <TableRow>

@@ -22,6 +22,7 @@ export interface DORABackendClient {
   // getUserAuthorization(): Promise<{ status: string; [key: string]: any }>;
   // getTeamDORAMetrics(team: string, dateRange: string): Promise<ITeamMetricResponse | null>;
   getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<IProjectMetricResponse | null>;
+  getProjectDORAMetricsInsights(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<any>;
   // getProjectDORAMetricsInsights(project: string, env: string, deployment: string, dateRange: string): Promise<IProjectMetricInsights | null>;
   
   // New DORA metrics method
@@ -102,8 +103,10 @@ export class DORABackendClientImpl implements DORABackendClient {
     return this.fetchWithAuth(url);
   }
 
-  async getProjectDORAMetricsInsights(project: string, env: string, deployment: string, dateRange: string) {
-    const url = `${this.baseUrl}${API_PATHS.PROJECT_INSIGHTS}?project=${project}&environment=${env}&deployment=${deployment}&dateRange=${dateRange}`;
+  async getProjectDORAMetricsInsights(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
+    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const url = `${baseUrl}/metrics-insights/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
+    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 

@@ -7,7 +7,7 @@ import { CircularProgress, Grid, Paper } from '@material-ui/core';
 import { useApi } from '@backstage/core-plugin-api';
 import { useEffect, useState } from 'react';
 import { doraBackendApiRef } from '../../api/DORABackendClient';
-import { MetricData, ProjectMetricsResponse } from './summary/types';
+import { ApiInsight, MetricData, ProjectMetricsResponse, ProjectInsightsResponse } from './summary/types';
 import { MetricType, getMetricPerformance, calculateTrendChange, getTrend } from '../../DORAMetricModel';
 import { TimeRangeSelector } from './TimeRangeSelector';
 
@@ -58,6 +58,7 @@ export const EntityDoraMetrics = () => {
     const doraApi = useApi(doraBackendApiRef);
     const [error, setError] = useState<string | null>(null);
     const [metrics, setMetrics] = useState<MetricData[]>([]);
+    const [insights, setInsights] = useState<ApiInsight[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
 
@@ -167,13 +168,53 @@ export const EntityDoraMetrics = () => {
         }
     };
 
+    const fetchMetricsInsights = async (timeRange: TimeRange) => {
+        setLoading(true);
+        try {
+            const result = await doraApi.getProjectDORAMetricsInsights(
+                orgId,
+                projectSlug,
+                environment,
+                deployment,
+                timeRange,
+            );
+            
+            if (!result?.project?.insights) {
+                throw new Error('No insights data available');
+            }
+
+            // "DEPLOYING" = frequency
+            // "MTTR" = Mttr
+
+            const mappedInsights = result.project.insights
+                .filter((insight:any) => insight.__typename === 'MetricOffsetFromAverageInsightType')
+                .map((insight:any) => ({
+                    message: insight.message,
+                    icon: insight.icon,
+                    isPositive: insight.isPositive,
+                    metricType: insight.insightMetricType === 'DEPLOYING' ? 'Frequency' : 
+                              insight.insightMetricType === 'MTTR' ? 'Mttr' : 
+                              insight.insightMetricType
+                }));
+
+            setInsights(mappedInsights);
+            setError(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to fetch insights');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchMetrics(selectedTimeRange);
+        fetchMetricsInsights(selectedTimeRange);
     }, [projectId, doraApi]);
 
     const handleTimeRangeChange = (range: TimeRange) => {
         setSelectedTimeRange(range);
         fetchMetrics(range);
+        fetchMetricsInsights(range);
     };
 
     if (error) {
@@ -202,7 +243,10 @@ export const EntityDoraMetrics = () => {
                     <Grid item xs={12}>
                         <Paper className={classes.paper}>
                             <div className={classes.title}>DORA Metrics Overview</div>
-                            <DORASummaryContainer metrics={metrics}/>
+                            <DORASummaryContainer 
+                                metrics={metrics} 
+                                insights={insights}
+                            />
                         </Paper>
                     </Grid>
                     <Grid item xs={12}>

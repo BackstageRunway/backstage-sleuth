@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { DoraMetricsError } from '../../domain/models/DoraMetrics';
-import { DeploymentRequest, DeploymentResponse, ProjectMetricsRequest, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
+import { DeploymentRequest, DeploymentResponse, ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse } from '../../domain/models/SleuthBatchTypes';
 
 export class SleuthClient {
   private readonly client: GraphQLClient;
@@ -188,4 +188,59 @@ export class SleuthClient {
       );
     }
   }
+
+   async projectMetricsInsights(request: ProjectMetricsRequest): Promise<ProjectInsightsResponse> {
+
+   const query = `query GetInsights(
+    $orgSlug: ID!, 
+    $projectSlug: ID!, 
+    $environmentSlug: ID!,
+    $deploymentSlugs: [ID!]!, 
+    $teamSlug: ID, 
+    $startDate: DateTime!, 
+    $endDate: DateTime!) 
+    {
+         project(orgSlug: $orgSlug, projectSlug: $projectSlug)
+         {
+            insights(
+              environmentSlug: $environmentSlug
+              deploymentSlugs: $deploymentSlugs
+              start: $startDate
+              end: $endDate
+              teamSlug: $teamSlug
+            ) {
+              __typename
+              ... on MetricOffsetFromAverageInsightType {
+                insightMetricType
+                offsetPercentage
+                message
+                icon
+                isPositive
+                insightLink
+              }
+            }
+          }
+        }`;
+
+
+    const variables = {
+      orgSlug: request.orgSlug,
+      projectSlug: request.projectSlug,
+      environmentSlug: request.environment,
+      deploymentSlugs: ['application'],
+      startDate: request.currentRangeStart,
+      endDate: request.currentRangeEnd,
+     };
+
+        try {
+            const response = await this.client.request<ProjectInsightsResponse>(query, variables);
+            return response;
+        } catch (error) {
+            throw new DoraMetricsError(
+                'Failed to query Sleuth API for insights',
+                'PROVIDER_ERROR',
+                error,
+            );
+        }
+    }
 } 

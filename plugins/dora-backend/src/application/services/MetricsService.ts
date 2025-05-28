@@ -1,5 +1,5 @@
 import { DatabaseService, LoggerService } from '@backstage/backend-plugin-api';
-import { DeploymentRequest, DeploymentResponse, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
+import { DeploymentRequest, DeploymentResponse, ProjectInsightsResponse, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
 import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {
@@ -99,6 +99,45 @@ export class MetricsService {
       return response;
     } catch (error) {
       this.logger.error('Failed to fetch metrics', {
+        error: error instanceof Error ? error.message : String(error),
+        projectId,
+      });
+      throw error;
+    }
+  }
+
+  async getProjectMetricsInsights(orgId:string, projectId: string, environment:string, deploymentId:string, team:string, timeRange: string): Promise<ProjectInsightsResponse> {
+    try {
+      const dateRanges = this.calculateDateRanges(timeRange);
+
+      this.logger.info('Fetching metrics Insights', {
+        projectId: projectId,
+        timeRange: timeRange,
+      });
+
+      const response = await this.client.projectMetricsInsights({
+        orgSlug: orgId,
+        projectSlug: projectId,
+        environment: environment,
+        deploymentSlug: deploymentId,
+        teamSlug: team,
+        metricTypes: ['metrics'],
+        currentRangeStart: dateRanges.currentRangeStart,
+        currentRangeEnd: dateRanges.currentRangeEnd,
+        previousRangeStart: dateRanges.previousRangeStart,
+        previousRangeEnd: dateRanges.previousRangeEnd,
+      });
+
+      if (!response) {
+        throw new Error('No metrics Insights data available');
+      }
+
+      // Log the metrics for monitoring
+      this.logger.info('Retrieved metrics Insights');
+
+      return response;
+    } catch (error) {
+      this.logger.error('Failed to fetch metrics insights', {
         error: error instanceof Error ? error.message : String(error),
         projectId,
       });

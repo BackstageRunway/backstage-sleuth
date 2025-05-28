@@ -1,6 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { MetricType, Performance } from '../../../DORAMetricModel';
 import DetailsTable from './DetailsTable';
+import { MetricData } from '../summary/types';
 
 import { Grid } from '@material-ui/core';
 
@@ -20,13 +21,7 @@ const useStyles = makeStyles({
 });
 
 type Props = {
-    metrics: {
-        metricName: MetricType;
-        value: Performance;
-        previousValue: Performance;
-        percentageChange: number;
-        trend: 'improving' | 'ailing';
-    }[];
+    metrics: MetricData[];
 };
 
 export function DORAMetricsView({ metrics }: Props) {
