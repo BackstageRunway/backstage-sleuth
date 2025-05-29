@@ -34,7 +34,7 @@ export function DeploymentTrendCell({ metricType, percentageChange }: Props) {
     const classes = useStyles();
     
     const getTrendIcon = () => {
-        if (percentageChange === 0) {
+        if (isNaN(percentageChange) || percentageChange === 0) {
             return <TrendingFlatIcon className={classes.neutral} />;
         }
 
@@ -55,6 +55,7 @@ export function DeploymentTrendCell({ metricType, percentageChange }: Props) {
     };
 
     const formatPercentage = (value: number) => {
+        if (isNaN(value)) return '0%';
         const absValue = Math.abs(value);
         return `${absValue.toFixed(1)}%`;
     };

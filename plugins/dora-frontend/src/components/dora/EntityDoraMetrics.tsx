@@ -80,6 +80,11 @@ export const EntityDoraMetrics = () => {
     const environment = 'production';
     const deployment = 'application';
 
+    const calculateTrendChange = (current: number, previous: number): number => {
+        if (previous === 0) return 0;
+        return ((current - previous) / previous) * 100;
+    };
+
     const fetchMetrics = async (timeRange: TimeRange) => {
         setLoading(true);
         try {
@@ -187,13 +192,17 @@ export const EntityDoraMetrics = () => {
             // "MTTR" = Mttr
 
             const mappedInsights = result.project.insights
-                .filter((insight:any) => insight.__typename === 'MetricOffsetFromAverageInsightType')
+                .filter((insight:any) => 
+                    insight.__typename === 'MetricOffsetFromAverageInsightType' || 
+                    insight.__typename === 'TeamMetricLowInsightType'
+                )
                 .map((insight:any) => ({
                     message: insight.message,
                     icon: insight.icon,
                     isPositive: insight.isPositive,
-                    metricType: insight.insightMetricType === 'DEPLOYING' ? 'Frequency' : 
+                    metricType: insight.insightMetricType === 'DEPLOYING' || insight.insightMetricType === 'FREQUENCY' ? 'Frequency' : 
                               insight.insightMetricType === 'MTTR' ? 'Mttr' : 
+                              insight.insightMetricType === 'FAILURE_RATE' ? 'FailureRate' :
                               insight.insightMetricType
                 }));
 
