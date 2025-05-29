@@ -102,3 +102,37 @@ export interface DeploymentResponse {
     }>;
   };
 }
+
+export type InsightType = 'GreatTeamInsightType' | 'MetricOffsetFromAverageInsightType' | 'WorstDeployInsightType';
+
+export interface BaseInsight {
+    __typename: InsightType;
+}
+
+export interface MetricOffsetFromAverageInsight extends BaseInsight {
+    __typename: 'MetricOffsetFromAverageInsightType';
+    insightMetricType: 'FAILURE_RATE' | 'DEPLOYING' | 'LEAD_TIME' | 'MTTR';
+    offsetPercentage: number;
+    message: string;
+    icon: string;
+    isPositive: boolean;
+    insightLink: string;
+}
+
+export interface GreatTeamInsight extends BaseInsight {
+    __typename: 'GreatTeamInsightType';
+}
+
+export interface WorstDeployInsight extends BaseInsight {
+    __typename: 'WorstDeployInsightType';
+}
+
+export type Insight = MetricOffsetFromAverageInsight | GreatTeamInsight | WorstDeployInsight;
+
+export interface ProjectInsightsResponse {
+    data: {
+        project: {
+            insights: Insight[];
+        };
+    };
+}

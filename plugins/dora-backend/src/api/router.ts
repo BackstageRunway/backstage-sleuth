@@ -93,6 +93,63 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     }
   });
 
+   // Metrics endpoint - GET
+   router.get('/metrics-insights/:orgId/:projectId', async (req, res) => {
+    try {
+      const { orgId, projectId } = req.params;
+      const queryResult = MetricsQuerySchema.safeParse(req.query);
+
+      if (!queryResult.success) {
+        logger.warn('Invalid metrics insights request parameters', { 
+          errors: queryResult.error.errors.map(e => ({
+            path: e.path.join('.'),
+            message: e.message,
+          }))
+        });
+        return res.status(400).json({ 
+          error: 'Invalid request parameters',
+          details: queryResult.error.errors 
+        });
+      }
+
+      const { timeRange, environment, deploymentId } = queryResult.data;
+
+      logger.info('Received metrics insights request', {
+        orgId,
+        projectId,
+        timeRange,
+        environment,
+        deploymentId,
+        path: req.path,
+        url: req.url,
+        method: req.method,
+      });
+
+      const metrics = await metricsService.getProjectMetricsInsights(
+        orgId,
+        projectId,
+        environment,
+        deploymentId,
+        'backend',
+        timeRange
+      );
+
+      return res.json(metrics);
+    } catch (error) {
+      logger.error('Failed to fetch metrics', {
+        error: error instanceof Error ? error.message : String(error),
+        orgId: req.params.orgId,
+        projectId: req.params.projectId,
+      });
+      
+      if (error instanceof Error && error.message === 'No metrics insights data available') {
+        return res.status(404).json({ error: 'No metrics insights data available' });
+      }
+      
+      return res.status(500).json({ error: 'Failed to fetch metrics insights' });
+    }
+  });
+
  
 
   // Batch metrics endpoint

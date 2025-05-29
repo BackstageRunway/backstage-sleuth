@@ -1,21 +1,23 @@
 import { Card, CardContent, Typography, Tooltip, Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import { MetricData } from './types';
+import { MetricData, ApiInsight } from './types';
 import { getMetricDisplayValue, getMetricInsights } from './utils';
 import { DeploymentTrendCell } from '../shared/DeploymentTrendCell';
 import { METRIC_DESCRIPTIONS, METRIC_TARGETS } from './constants';
 import { useStyles } from './styles';
 
-type MetricCardProps = {
+type Props = {
     metric: MetricData;
+    insight?: ApiInsight;
 };
 
-export function MetricCard({ metric }: MetricCardProps) {
+export function MetricCard({ metric, insight }: Props) {
     const classes = useStyles();
     const insights = getMetricInsights(
         metric.metricName,
         metric.rawValue,
         metric.percentageChange,
-        classes
+        classes,
+        insight
     );
 
     return (

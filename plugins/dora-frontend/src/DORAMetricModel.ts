@@ -94,16 +94,12 @@ export const toMaxLimit = (value: number, limit = MAX_DISPLAY_VALUE): string | n
   value > limit ? `${limit}+` : Math.round(Math.abs(value));
 
 // Performance Calculation Functions
-export const getTrend = (
-  metricType: string, 
-  previous: number, 
-  current: number, 
-  invertFrequencyTrend = false
-): 'improving' | 'ailing' => {
-  if (metricType === MetricType.Frequency && !invertFrequencyTrend) {
-    return current >= previous ? 'improving' : 'ailing';
-  }
-  return current <= previous ? 'improving' : 'ailing';
+export const getTrend = (metricType: MetricType, current: number, previous: number): 'up' | 'down' | 'stable' => {
+    const change = calculateTrendChange(current, previous);
+    if (Math.abs(change) < 5) return 'stable';
+    
+    const isImprovement = metricType === MetricType.Frequency ? change > 0 : change < 0;
+    return isImprovement ? 'up' : 'down';
 };
 
 export const getLeadTimePerformance = (leadTime: number): Performance => {

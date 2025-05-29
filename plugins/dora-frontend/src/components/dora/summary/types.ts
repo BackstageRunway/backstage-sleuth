@@ -8,13 +8,23 @@ export interface DORASummaryContainerProps {
     };
 }
 
+export type InsightMetricType = 'FAILURE_RATE' | 'DEPLOYING' | 'LEAD_TIME' | 'MTTR';
+
+export interface ApiInsight {
+    message: string;
+    icon: string;
+    isPositive: boolean;
+    metricType:string;
+}
+
 export interface MetricData {
     metricName: MetricType;
     value: Performance;
     rawValue: number;
     previousValue: Performance;
     percentageChange: number;
-    trend: 'improving' | 'ailing';
+    trend: 'up' | 'down' | 'stable';
+    apiInsight?: ApiInsight;
 }
 
 export interface ProjectMetricsResponse {
@@ -30,6 +40,22 @@ export interface ProjectMetricsResponse {
             avgLeadTimeInSec: number;
             failureRatePercent: number;
             avgMttrDurationInSec: number;
+        };
+    };
+}
+
+export interface ProjectInsightsResponse {
+    data: {
+        project: {
+            insights: Array<{
+                __typename: 'GreatTeamInsightType' | 'MetricOffsetFromAverageInsightType' | 'WorstDeployInsightType';
+                insightMetricType?: InsightMetricType;
+                offsetPercentage?: number;
+                message?: string;
+                icon?: string;
+                isPositive?: boolean;
+                insightLink?: string;
+            }>;
         };
     };
 }
