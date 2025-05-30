@@ -106,6 +106,62 @@ export class MetricsService {
     }
   }
 
+  async getMultiProjectMetrics(
+    orgSlug: string,
+    projectSlugs: string[],
+    start: string,
+    end: string,
+    environmentName?: string,
+    labelSlugs?: string[],
+    teamSlugs?: string[],
+  ): Promise<any> {
+    try {
+      this.logger.info('Fetching multi-project metrics', {
+        orgSlug,
+        projectSlugs,
+        start,
+        end,
+        environmentName,
+        labelSlugs,
+        teamSlugs,
+      });
+
+      const response = await this.client.getProjectMetrics(
+        orgSlug,
+        projectSlugs,
+        start,
+        end,
+        environmentName,
+        labelSlugs,
+        teamSlugs,
+      );
+
+      if (!response?.data) {
+        throw new Error('No data received from Sleuth API');
+      }
+
+      this.logger.info('Retrieved multi-project metrics', {
+        projects: response.data.projects.map((p: any) => p.name),
+        metrics: {
+          totalDeploys: response.data.organization.metricsRecapWithQuarters.totalRecap.numOfDeploys,
+          deploysPerDay: response.data.organization.metricsRecapWithQuarters.totalRecap.numOfDeploysPerDay,
+        },
+      });
+
+      return {
+        projects: response.data.projects,
+        metrics: response.data.organization.metricsRecapWithQuarters,
+      };
+    } catch (error) {
+      this.logger.error('Failed to fetch multi-project metrics', {
+        error: error instanceof Error ? error.message : String(error),
+        orgSlug,
+        projectSlugs,
+      });
+      throw error;
+    }
+  }
+
   async getProjectMetricsInsights(orgId:string, projectId: string, environment:string, deploymentId:string, team:string, timeRange: string): Promise<ProjectInsightsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);

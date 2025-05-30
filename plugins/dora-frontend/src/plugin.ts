@@ -35,10 +35,11 @@ export const DoraFrontendPage = doraFrontendPlugin.provide(
   createRoutableExtension({
     name: 'DoraFrontendPage',
     component: () =>
-      import('./components/ExampleComponent').then(m => m.ExampleComponent),
+      import('./components/dora/elt/ELTDashboard').then(m => m.ELTDashboard),
     mountPoint: rootRouteRef,
   }),
 );
+
 
 // this is an embeddable exported component, can be embeded in any page or plugin like home, Entity
 export const DoraDashboard = doraFrontendPlugin.provide(

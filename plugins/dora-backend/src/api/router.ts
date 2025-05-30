@@ -36,6 +36,16 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     deploymentId: z.string().min(1, 'Deployment ID is required'),
   });
 
+  const MultiProjectMetricsQuerySchema = z.object({
+    orgSlug: z.string().min(1, 'Organization slug is required'),
+    projectSlugs: z.string().min(1, 'Project slugs are required'),
+    start: z.string().min(1, 'Start date is required'),
+    end: z.string().min(1, 'End date is required'),
+    environmentName: z.string().optional(),
+    labelSlugs: z.string().optional(),
+    teamSlugs: z.string().optional(),
+  });
+
   // Metrics endpoint - GET
   router.get('/metrics/:orgId/:projectId', async (req, res) => {
     try {
@@ -150,7 +160,68 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     }
   });
 
- 
+  // Multi-project metrics endpoint
+  router.get('/metrics/multi-project', async (req, res) => {
+    try {
+      const queryResult = MultiProjectMetricsQuerySchema.safeParse(req.query);
+
+      if (!queryResult.success) {
+        logger.warn('Invalid multi-project metrics request parameters', { 
+          errors: queryResult.error.errors.map(e => ({
+            path: e.path.join('.'),
+            message: e.message,
+          }))
+        });
+        return res.status(400).json({ 
+          error: 'Invalid request parameters',
+          details: queryResult.error.errors 
+        });
+      }
+
+      const {
+        orgSlug,
+        projectSlugs,
+        start,
+        end,
+        environmentName,
+        labelSlugs,
+        teamSlugs,
+      } = queryResult.data;
+
+      logger.info('Received multi-project metrics request', {
+        orgSlug,
+        projectSlugs,
+        start,
+        end,
+        environmentName,
+        labelSlugs,
+        teamSlugs,
+      });
+
+      const result = await metricsService.getMultiProjectMetrics(
+        orgSlug,
+        projectSlugs.split(','),
+        start,
+        end,
+        environmentName,
+        labelSlugs ? labelSlugs.split(',') : undefined,
+        teamSlugs ? teamSlugs.split(',') : undefined,
+      );
+
+      return res.json(result);
+    } catch (error) {
+      logger.error('Failed to fetch multi-project metrics', {
+        error: error instanceof Error ? error.message : String(error),
+        orgSlug: req.query.orgSlug,
+      });
+      
+      if (error instanceof Error && error.message === 'No data received from Sleuth API') {
+        return res.status(404).json({ error: 'No metrics data available' });
+      }
+      
+      return res.status(500).json({ error: 'Failed to fetch multi-project metrics' });
+    }
+  });
 
   // Batch metrics endpoint
   // router.post('/batch-metrics', async (req, res) => {
