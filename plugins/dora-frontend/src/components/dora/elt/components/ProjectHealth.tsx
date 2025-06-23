@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
+import { projects } from '../metricsData';
 
 const useStyles = makeStyles({
     card: {
@@ -95,39 +96,6 @@ const useStyles = makeStyles({
         fill: '#7f8c8d',
     },
 });
-
-const projects = [
-    {
-        name: 'Sleuth',
-        metrics: {
-            frequency: { value: 2.19, trend: 'up', change: '32%' },
-            leadTime: { value: 23.5, trend: 'down', change: '15%' },
-            failureRate: { value: 0, trend: 'stable', change: '0%' },
-            mttr: { value: 0, trend: 'stable', change: '0%' },
-        },
-        color: '#2ecc71',
-    },
-    {
-        name: 'Pulse',
-        metrics: {
-            frequency: { value: 1.8, trend: 'up', change: '25%' },
-            leadTime: { value: 18.5, trend: 'down', change: '10%' },
-            failureRate: { value: 0, trend: 'stable', change: '0%' },
-            mttr: { value: 0, trend: 'stable', change: '0%' },
-        },
-        color: '#3498db',
-    },
-    {
-        name: 'Project C',
-        metrics: {
-            frequency: { value: 1.5, trend: 'up', change: '20%' },
-            leadTime: { value: 30.0, trend: 'up', change: '5%' },
-            failureRate: { value: 0, trend: 'stable', change: '0%' },
-            mttr: { value: 0, trend: 'stable', change: '0%' },
-        },
-        color: '#9b59b6',
-    },
-];
 
 const getTrendIcon = (trend: string, classes: any) => {
     switch (trend) {

@@ -4,6 +4,7 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { projects } from '../metricsData';
 
 const useStyles = makeStyles({
     card: {
@@ -67,10 +68,16 @@ const data = [
 export const ExecutiveSummary = () => {
     const classes = useStyles();
 
+    // Calculate summary metrics from projects
+    const totalDeployments = projects.reduce((sum, p) => sum + p.metrics.frequency.value, 0);
+    const avgLeadTime = projects.reduce((sum, p) => sum + p.metrics.leadTime.value, 0) / projects.length;
+    const avgFailureRate = projects.reduce((sum, p) => sum + p.metrics.failureRate.value, 0) / projects.length;
+    const avgMTTR = projects.reduce((sum, p) => sum + p.metrics.mttr.value, 0) / projects.length;
+
     const metrics = [
         {
             label: 'Total Deployments',
-            value: '4.01/day',
+            value: `${totalDeployments.toFixed(2)}/day`,
             trend: 'up',
             change: '32%',
             color: '#2ecc71',
@@ -78,7 +85,7 @@ export const ExecutiveSummary = () => {
         },
         {
             label: 'Average Lead Time',
-            value: '25.5h',
+            value: `${avgLeadTime.toFixed(1)}h`,
             trend: 'down',
             change: '15%',
             color: '#3498db',
@@ -86,7 +93,7 @@ export const ExecutiveSummary = () => {
         },
         {
             label: 'Overall Failure Rate',
-            value: '0%',
+            value: `${avgFailureRate.toFixed(1)}%`,
             trend: 'stable',
             change: '0%',
             color: '#e74c3c',
@@ -94,7 +101,7 @@ export const ExecutiveSummary = () => {
         },
         {
             label: 'Average MTTR',
-            value: '0h',
+            value: `${avgMTTR.toFixed(1)}h`,
             trend: 'stable',
             change: '0%',
             color: '#f1c40f',
