@@ -55,6 +55,18 @@ const useStyles = makeStyles({
 export const TeamPerformance = () => {
     const classes = useStyles();
 
+    const trendLabels = {
+        up: 'Improving',
+        down: 'Declining',
+        stable: 'Stable',
+    };
+
+    const trendColors = {
+        up: '#e8f5e9', // light green
+        down: '#ffebee', // light red
+        stable: '#f5f5f5', // neutral
+    };
+
     const teams = [
         {
             name: 'Backend',
@@ -157,27 +169,80 @@ export const TeamPerformance = () => {
     const getTrendIcon = (trend: string) => {
         switch (trend) {
             case 'up':
-                return <TrendingUpIcon className={classes.improving} />;
+                return <TrendingUpIcon className={classes.improving} style={{ fontSize: '2rem' }} />;
             case 'down':
-                return <TrendingDownIcon className={classes.ailing} />;
+                return <TrendingDownIcon className={classes.ailing} style={{ fontSize: '2rem' }} />;
             default:
-                return <TrendingFlatIcon className={classes.neutral} />;
+                return <TrendingFlatIcon className={classes.neutral} style={{ fontSize: '2rem' }} />;
         }
     };
 
     return (
         <Grid container spacing={2}>
             {teams.map((team) => (
-                <Grid item xs={12} key={team.name}>
-                    <Box className={classes.teamCard}>
-                        <Box className={classes.teamHeader}>
-                            <Typography className={classes.teamName}>
-                                {team.name}
+                <Grid item xs={12} sm={6} md={4} key={team.name}>
+                    <Box className={classes.teamCard} style={{ backgroundColor: trendColors[team.trend] }}>
+                        {/* Card Header */}
+                        <Box className={classes.teamHeader} style={{ marginBottom: 8 }}>
+                            <Box display="flex" alignItems="center" gap={1}>
+                                <Typography className={classes.teamName} style={{ fontSize: '1.25rem' }}>
+                                    {team.name}
+                                </Typography>
+                                {getTrendIcon(team.trend)}
+                            </Box>
+                            <Typography variant="caption" style={{ color: '#888', fontWeight: 500 }}>
+                                {trendLabels[team.trend]}
                             </Typography>
-                            {getTrendIcon(team.trend)}
                         </Box>
+                        {/* Summary Row */}
+                        <Grid container spacing={2} style={{ marginBottom: 8 }}>
+                            <Grid item xs={6}>
+                                <Box>
+                                    <Typography variant="caption" className={classes.metricLabel}>
+                                        Deployment Frequency
+                                    </Typography>
+                                    <Typography style={{ fontWeight: 700, fontSize: '1.5rem', color: '#2c3e50' }}>
+                                        {team.metrics.deploymentFrequency}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Box>
+                                    <Typography variant="caption" className={classes.metricLabel}>
+                                        Lead Time
+                                    </Typography>
+                                    <Typography style={{ fontWeight: 700, fontSize: '1.5rem', color: '#3498db' }}>
+                                        {team.metrics.leadTime}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                        {/* Reliability Metrics */}
+                        <Grid container spacing={2} style={{ marginBottom: 8 }}>
+                            <Grid item xs={6}>
+                                <Box>
+                                    <Typography variant="caption" className={classes.metricLabel}>
+                                        Failure Rate
+                                    </Typography>
+                                    <Typography style={{ fontWeight: 600, color: '#e74c3c' }}>
+                                        {team.metrics.failureRate}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Box>
+                                    <Typography variant="caption" className={classes.metricLabel}>
+                                        MTTR
+                                    </Typography>
+                                    <Typography style={{ fontWeight: 600, color: '#f1c40f' }}>
+                                        {team.metrics.mttr}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                        {/* Team Health Metrics */}
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12}>
                                 <Box className={classes.metricContainer}>
                                     <Typography className={classes.metricLabel}>
                                         Collaboration Score
@@ -190,11 +255,12 @@ export const TeamPerformance = () => {
                                             variant="determinate" 
                                             value={team.metrics.collaborationScore}
                                             className={classes.progressBar}
+                                            style={{ backgroundColor: '#e3f2fd' }}
                                         />
                                     </Box>
                                 </Box>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12}>
                                 <Box className={classes.metricContainer}>
                                     <Typography className={classes.metricLabel}>
                                         Resource Utilization
@@ -207,48 +273,9 @@ export const TeamPerformance = () => {
                                             variant="determinate" 
                                             value={team.metrics.resourceUtilization}
                                             className={classes.progressBar}
+                                            style={{ backgroundColor: '#fff3e0' }}
                                         />
                                     </Box>
-                                </Box>
-                            </Grid>
-                            <Grid item xs={6} sm={3}>
-                                <Box className={classes.metricContainer}>
-                                    <Typography className={classes.metricLabel}>
-                                        Deployment Frequency
-                                    </Typography>
-                                    <Typography className={classes.metricValue}>
-                                        {team.metrics.deploymentFrequency}
-                                    </Typography>
-                                </Box>
-                            </Grid>
-                            <Grid item xs={6} sm={3}>
-                                <Box className={classes.metricContainer}>
-                                    <Typography className={classes.metricLabel}>
-                                        Lead Time
-                                    </Typography>
-                                    <Typography className={classes.metricValue}>
-                                        {team.metrics.leadTime}
-                                    </Typography>
-                                </Box>
-                            </Grid>
-                            <Grid item xs={6} sm={3}>
-                                <Box className={classes.metricContainer}>
-                                    <Typography className={classes.metricLabel}>
-                                        Failure Rate
-                                    </Typography>
-                                    <Typography className={classes.metricValue}>
-                                        {team.metrics.failureRate}
-                                    </Typography>
-                                </Box>
-                            </Grid>
-                            <Grid item xs={6} sm={3}>
-                                <Box className={classes.metricContainer}>
-                                    <Typography className={classes.metricLabel}>
-                                        MTTR
-                                    </Typography>
-                                    <Typography className={classes.metricValue}>
-                                        {team.metrics.mttr}
-                                    </Typography>
                                 </Box>
                             </Grid>
                         </Grid>
