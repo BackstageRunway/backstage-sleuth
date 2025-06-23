@@ -243,4 +243,73 @@ export class SleuthClient {
             );
         }
     }
-} 
+
+    async getProjectMetrics(
+        orgSlug: string,
+        projectSlugs: string[],
+        start: string,
+        end: string,
+        environmentName?: string,
+        labelSlugs?: string[],
+        teamSlugs?: string[],
+    ): Promise<any> {
+        const query = `
+            query GetProjectMetrics($orgSlug: ID!, $projectSlugs: [ID!], $labelSlugs: [ID!], $teamSlugs: [ID!], $environmentName: String, $start: DateTime!, $end: DateTime!) {
+                projects(orgSlug: $orgSlug) {
+                    slug
+                    name
+                    environments {
+                        name
+                        slug
+                    }
+                    defaultEnvironment {
+                        slug
+                    }
+                }
+                organization(orgSlug: $orgSlug) {
+                    metricsRecapWithQuarters(
+                        start: $start
+                        end: $end
+                        filters: {projectSlugs: $projectSlugs, labelSlugs: $labelSlugs, environmentName: $environmentName, teamSlugs: $teamSlugs}
+                    ) {
+                        totalRecap {
+                            numOfDeploys
+                            numOfDeploysPerDay
+                            avgLeadTimeInSec
+                            failureRatePercent
+                            avgMttrDurationInSec
+                        }
+                        quarters {
+                            startIncl
+                            endNotIncl
+                            numOfDeploysPerDay
+                            avgLeadTimeInSec
+                            failureRatePercent
+                            avgMttrDurationInSec
+                        }
+                    }
+                }
+            }
+        `;
+
+        const variables = {
+            orgSlug,
+            projectSlugs,
+            start,
+            end,
+            environmentName,
+            labelSlugs,
+            teamSlugs,
+        };
+
+        try {
+            return await this.client.request(query, variables);
+        } catch (error) {
+            throw new DoraMetricsError(
+                'Failed to query Sleuth API for project metrics',
+                'PROVIDER_ERROR',
+                error,
+            );
+        }
+    }
+}

@@ -110,6 +110,13 @@ export class DORABackendClientImpl implements DORABackendClient {
     return this.fetchWithAuth(url);
   }
 
+  async getTrendMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
+    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const url = `${baseUrl}/trend-metrics/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
+    console.log('Making request to:', url);
+    return this.fetchWithAuth(url);
+  }
+
   async getMetrics(
     projectId: string,
     timeRange: { start: string; end: string; [key: string]: any },

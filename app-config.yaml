@@ -3,7 +3,7 @@ app:
   baseUrl: http://localhost:3000
 
 organization:
-  name: Example Company
+  name: Backstage Runway
 
 dora:
   sleuth:
