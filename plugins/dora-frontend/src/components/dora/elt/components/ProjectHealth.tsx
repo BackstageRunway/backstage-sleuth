@@ -173,7 +173,7 @@ export const ProjectHealth = () => {
     return (
         <Grid container spacing={3}>
             {metrics.map((metric) => (
-                <Grid item xs={12} key={metric.title}>
+                <Grid item xs={12} sm={6} md={3} key={metric.title}>
                     <Card className={classes.card}>
                         <CardContent>
                             <Typography className={classes.metricTitle}>

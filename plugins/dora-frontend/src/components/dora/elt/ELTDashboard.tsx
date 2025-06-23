@@ -34,7 +34,7 @@ export const ELTDashboard = () => {
                     </Paper>
                 </Grid>
                 
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <Typography className={classes.title}>Project Health</Typography>
                         <ProjectHealth />

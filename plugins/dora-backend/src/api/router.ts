@@ -46,7 +46,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     teamSlugs: z.string().optional(),
   });
 
-  // Metrics endpoint - GET
+  // Metrics endpoint - GET - EntityDoraMetrics.tsx
   router.get('/metrics/:orgId/:projectId', async (req, res) => {
     try {
       const { orgId, projectId } = req.params;
