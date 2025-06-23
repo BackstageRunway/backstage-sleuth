@@ -181,28 +181,44 @@ export const ProjectHealth = () => {
                             <Grid container spacing={2} className={classes.comparisonContainer}>
                                 {projects.map((project) => (
                                     <Grid item xs={4} key={project.name}>
-                                        <Typography className={classes.projectName}>
-                                            {project.name}
-                                        </Typography>
-                                        <Typography className={classes.metricValue}>
-                                            {metric.format(project.metrics[metric.key as keyof typeof project.metrics].value)}{metric.unit}
-                                        </Typography>
-                                        <Box className={classes.trendContainer}>
-                                            {getTrendIcon(
-                                                project.metrics[metric.key as keyof typeof project.metrics].trend,
-                                                classes
-                                            )}
+                                        <Box display="flex" flexDirection="column" alignItems="center">
                                             <Typography
-                                                className={`${classes.changeValue} ${
-                                                    project.metrics[metric.key as keyof typeof project.metrics].trend === 'up'
-                                                        ? classes.improving
-                                                        : project.metrics[metric.key as keyof typeof project.metrics].trend === 'down'
-                                                        ? classes.improving
-                                                        : classes.neutral
-                                                }`}
+                                                className={classes.projectName}
+                                                style={{
+                                                    fontWeight: 400,
+                                                    fontSize: '0.85rem',
+                                                    height: '2.4em',
+                                                    lineHeight: '1.2em',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    textAlign: 'center',
+                                                    overflow: 'hidden',
+                                                    whiteSpace: 'pre-line',
+                                                }}
                                             >
-                                                {project.metrics[metric.key as keyof typeof project.metrics].change}
+                                                {project.name}
                                             </Typography>
+                                            <Typography className={classes.metricValue}>
+                                                {metric.format(project.metrics[metric.key as keyof typeof project.metrics].value)}{metric.unit}
+                                            </Typography>
+                                            <Box className={classes.trendContainer}>
+                                                {getTrendIcon(
+                                                    project.metrics[metric.key as keyof typeof project.metrics].trend,
+                                                    classes
+                                                )}
+                                                <Typography
+                                                    className={`${classes.changeValue} ${
+                                                        project.metrics[metric.key as keyof typeof project.metrics].trend === 'up'
+                                                            ? classes.improving
+                                                            : project.metrics[metric.key as keyof typeof project.metrics].trend === 'down'
+                                                            ? classes.improving
+                                                            : classes.neutral
+                                                    }`}
+                                                >
+                                                    {project.metrics[metric.key as keyof typeof project.metrics].change}
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     </Grid>
                                 ))}

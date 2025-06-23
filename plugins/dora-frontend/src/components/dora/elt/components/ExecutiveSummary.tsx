@@ -56,13 +56,37 @@ const useStyles = makeStyles({
     },
 });
 
-const data = [
+const deploymentsData = [
     { name: 'Jan', value: 2.1 },
-    { name: 'Feb', value: 2.3 },
-    { name: 'Mar', value: 2.5 },
-    { name: 'Apr', value: 2.2 },
-    { name: 'May', value: 2.4 },
-    { name: 'Jun', value: 2.6 },
+    { name: 'Feb', value: 2.7 },
+    { name: 'Mar', value: 1.9 },
+    { name: 'Apr', value: 2.4 },
+    { name: 'May', value: 2.0 },
+    { name: 'Jun', value: 2.8 },
+];
+const leadTimeData = [
+    { name: 'Jan', value: 25 },
+    { name: 'Feb', value: 22 },
+    { name: 'Mar', value: 28 },
+    { name: 'Apr', value: 24 },
+    { name: 'May', value: 27 },
+    { name: 'Jun', value: 23 },
+];
+const failureRateData = [
+    { name: 'Jan', value: 1.2 },
+    { name: 'Feb', value: 1.5 },
+    { name: 'Mar', value: 0.8 },
+    { name: 'Apr', value: 2.0 },
+    { name: 'May', value: 1.7 },
+    { name: 'Jun', value: 1.0 },
+];
+const mttrData = [
+    { name: 'Jan', value: 2.5 },
+    { name: 'Feb', value: 3.1 },
+    { name: 'Mar', value: 1.7 },
+    { name: 'Apr', value: 2.8 },
+    { name: 'May', value: 2.2 },
+    { name: 'Jun', value: 2.9 },
 ];
 
 export const ExecutiveSummary = () => {
@@ -71,8 +95,8 @@ export const ExecutiveSummary = () => {
     // Calculate summary metrics from projects
     const totalDeployments = projects.reduce((sum, p) => sum + p.metrics.frequency.value, 0);
     const avgLeadTime = projects.reduce((sum, p) => sum + p.metrics.leadTime.value, 0) / projects.length;
-    const avgFailureRate = projects.reduce((sum, p) => sum + p.metrics.failureRate.value, 0) / projects.length;
-    const avgMTTR = projects.reduce((sum, p) => sum + p.metrics.mttr.value, 0) / projects.length;
+    const avgFailureRate = failureRateData.reduce((sum, d) => sum + d.value, 0) / failureRateData.length;
+    const avgMTTR = mttrData.reduce((sum, d) => sum + d.value, 0) / mttrData.length;
 
     const metrics = [
         {
@@ -82,6 +106,7 @@ export const ExecutiveSummary = () => {
             change: '32%',
             color: '#2ecc71',
             description: 'Across all projects',
+            data: deploymentsData,
         },
         {
             label: 'Average Lead Time',
@@ -90,83 +115,107 @@ export const ExecutiveSummary = () => {
             change: '15%',
             color: '#3498db',
             description: 'Weighted average',
+            data: leadTimeData,
         },
         {
             label: 'Overall Failure Rate',
-            value: `${avgFailureRate.toFixed(1)}%`,
-            trend: 'stable',
-            change: '0%',
+            value: `${avgFailureRate > 0 ? avgFailureRate.toFixed(1) : '1.3'}%`,
+            trend: avgFailureRate > 1 ? 'up' : 'down',
+            change: avgFailureRate > 1 ? '+0.5%' : '-0.2%',
             color: '#e74c3c',
             description: 'Combined failures',
+            data: failureRateData,
         },
         {
             label: 'Average MTTR',
-            value: `${avgMTTR.toFixed(1)}h`,
-            trend: 'stable',
-            change: '0%',
+            value: `${avgMTTR > 0 ? avgMTTR.toFixed(1) : '2.2'}h`,
+            trend: avgMTTR > 2 ? 'up' : 'down',
+            change: avgMTTR > 2 ? '+0.3%' : '-0.1%',
             color: '#f1c40f',
             description: 'Mean time to recover',
+            data: mttrData,
         },
     ];
 
-    const getTrendIcon = (trend: string) => {
+    const getTrendIcon = (trend: string, colorOverride?: string) => {
         switch (trend) {
             case 'up':
-                return <TrendingUpIcon className={classes.improving} />;
+                return <TrendingUpIcon className={classes.improving} style={{ color: colorOverride || classes.improving.color }} />;
             case 'down':
-                return <TrendingDownIcon className={classes.improving} />;
+                return <TrendingDownIcon className={classes.improving} style={{ color: colorOverride || classes.improving.color }} />;
             default:
-                return <TrendingFlatIcon className={classes.neutral} />;
+                return <TrendingFlatIcon className={classes.neutral} style={{ color: colorOverride || classes.neutral.color }} />;
         }
     };
 
     return (
         <Grid container spacing={3}>
-            {metrics.map((metric) => (
-                <Grid item xs={12} sm={6} md={3} key={metric.label}>
-                    <Card className={classes.card}>
-                        <CardContent>
-                            <Typography className={classes.metricLabel}>
-                                {metric.label}
-                            </Typography>
-                            <Typography className={classes.metricValue}>
-                                {metric.value}
-                            </Typography>
-                            <Typography variant="caption" color="textSecondary">
-                                {metric.description}
-                            </Typography>
-                            <Box className={classes.trendContainer}>
-                                {getTrendIcon(metric.trend)}
-                                <Typography 
-                                    className={`${classes.changeValue} ${
-                                        metric.trend === 'up' ? classes.improving : 
-                                        metric.trend === 'down' ? classes.improving : 
-                                        classes.neutral
-                                    }`}
-                                >
-                                    {metric.change}
+            {metrics.map((metric) => {
+                // Determine color for value and line based on trend for failure rate and mttr
+                let valueColor = metric.color;
+                let lineColor = metric.color;
+                let changeColor = undefined;
+                let arrowColor = undefined;
+                if (metric.label === 'Overall Failure Rate' || metric.label === 'Average MTTR') {
+                    if (metric.trend === 'up') {
+                        valueColor = '#e74c3c';
+                        lineColor = '#e74c3c';
+                        changeColor = '#e74c3c';
+                        arrowColor = '#e74c3c';
+                    } else if (metric.trend === 'down') {
+                        valueColor = '#2ecc71';
+                        lineColor = '#2ecc71';
+                        changeColor = '#2ecc71';
+                        arrowColor = '#2ecc71';
+                    }
+                }
+                return (
+                    <Grid item xs={12} sm={6} md={3} key={metric.label}>
+                        <Card className={classes.card}>
+                            <CardContent>
+                                <Typography className={classes.metricLabel}>
+                                    {metric.label}
                                 </Typography>
-                            </Box>
-                            <Box className={classes.chartContainer}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={data}>
-                                        <Line 
-                                            type="monotone" 
-                                            dataKey="value" 
-                                            stroke={metric.color} 
-                                            strokeWidth={2} 
-                                            dot={true} 
-                                        />
-                                        <XAxis dataKey="name" hide />
-                                        <YAxis hide />
-                                        <Tooltip />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
+                                <Typography className={classes.metricValue} style={{ color: valueColor }}>
+                                    {metric.value}
+                                </Typography>
+                                <Typography variant="caption" color="textSecondary">
+                                    {metric.description}
+                                </Typography>
+                                <Box className={classes.trendContainer}>
+                                    {getTrendIcon(metric.trend, arrowColor)}
+                                    <Typography 
+                                        className={`${classes.changeValue} ${
+                                            metric.trend === 'up' ? classes.improving : 
+                                            metric.trend === 'down' ? classes.improving : 
+                                            classes.neutral
+                                        }`}
+                                        style={changeColor ? { color: changeColor } : {}}
+                                    >
+                                        {metric.change}
+                                    </Typography>
+                                </Box>
+                                <Box className={classes.chartContainer}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={metric.data}>
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="value" 
+                                                stroke={lineColor} 
+                                                strokeWidth={2} 
+                                                dot={true} 
+                                            />
+                                            <XAxis dataKey="name" hide />
+                                            <YAxis hide />
+                                            <Tooltip />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                );
+            })}
         </Grid>
     );
 }; 
