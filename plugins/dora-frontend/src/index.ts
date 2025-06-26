@@ -1,1 +1,1 @@
-export { doraFrontendPlugin, DoraFrontendPage } from './plugin';
+export { doraFrontendPlugin, DoraELTPage, DoraLeadPage } from './plugin';
