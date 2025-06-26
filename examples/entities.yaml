@@ -11,7 +11,7 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: Dora-website
+  name: sleuth-website
   annotations:
     sleuth.io/project-id: sleuth
 spec:
@@ -19,6 +19,48 @@ spec:
   lifecycle: experimental
   owner: guests
   system: examples
+  providesApis: [example-grpc-api]
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sleuth-clients
+  annotations:
+    sleuth.io/project-id: sleuth
+spec:
+  type: website
+  lifecycle: experimental
+  owner: guests
+  system: examples
+  providesApis: [example-grpc-api]
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sleuth
+  annotations:
+    sleuth.io/project-id: sleuth
+spec:
+  type: website
+  lifecycle: experimental
+  owner: guests
+  system: prd
+  providesApis: [example-grpc-api]
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: dora
+  annotations:
+    sleuth.io/project-id: sleuth
+spec:
+  type: website
+  lifecycle: experimental
+  owner: guests
+  system: aws
   providesApis: [example-grpc-api]
 ---
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-api
