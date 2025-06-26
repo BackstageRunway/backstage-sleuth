@@ -41,19 +41,19 @@ export const ELTDashboard = () => {
                     </Paper>
                 </Grid>
 
-                {/* <Grid item xs={12}>
+                 {/* <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <Typography className={classes.title}>Team Performance</Typography>
                         <TeamPerformance />
                     </Paper>
-                </Grid>
+                </Grid> */}
 
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <Typography className={classes.title}>Key Metrics</Typography>
                         <KeyMetrics />
                     </Paper>
-                </Grid> */}
+                </Grid>  */}
 
             </Grid>
         </div>

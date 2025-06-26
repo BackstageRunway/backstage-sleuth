@@ -31,11 +31,21 @@ export const doraFrontendPlugin = createPlugin({
 });
 
 // this is a routable page
-export const DoraFrontendPage = doraFrontendPlugin.provide(
+export const DoraELTPage = doraFrontendPlugin.provide(
   createRoutableExtension({
-    name: 'DoraFrontendPage',
+    name: 'DoraELTPage',
     component: () =>
       import('./components/dora/elt/ELTDashboard').then(m => m.ELTDashboard),
+    mountPoint: rootRouteRef,
+  }),
+);
+
+// this is a routable page
+export const DoraLeadPage = doraFrontendPlugin.provide(
+  createRoutableExtension({
+    name: 'DoraLeadPage',
+    component: () =>
+      import('./components/dora/lead/LeadDashboard').then(m => m.LeadDashboard),
     mountPoint: rootRouteRef,
   }),
 );

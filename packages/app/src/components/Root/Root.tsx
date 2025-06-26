@@ -77,7 +77,8 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
         <SidebarItem icon={ExtensionIcon} to="api-docs" text="APIs" />
         <SidebarItem icon={LibraryBooks} to="docs" text="Docs" />
         <SidebarItem icon={CreateComponentIcon} to="create" text="Create..." />
-        <SidebarItem icon={CreateComponentIcon} to="dora-frontend" text="Sleuth" />
+        <SidebarItem icon={CreateComponentIcon} to="dora-elt" text="Sleuth - ELT" />
+        <SidebarItem icon={CreateComponentIcon} to="dora-team" text="Sleuth - Team" />
         {/* End global nav */}
         <SidebarDivider />
         <SidebarScrollWrapper>
