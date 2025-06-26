@@ -64,11 +64,11 @@ export const getMetricInsights = (
                     severity: 'good'
                 });
             } else if (value >= 0.5) {
-                insights.push({
-                    icon: <WarningIcon className={styles.warningInsight} />,
-                    text: 'Consider increasing deployment frequency',
-                    severity: 'warning'
-                });
+                // insights.push({
+                //     icon: <WarningIcon className={styles.warningInsight} />,
+                //     text: 'Consider increasing deployment frequency',
+                //     severity: 'warning'
+                // });
             } else {
                 insights.push({
                     icon: <ErrorIcon className={styles.criticalInsight} />,

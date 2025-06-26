@@ -55,13 +55,13 @@ const useStyles = makeStyles({
 export const TeamPerformance = () => {
     const classes = useStyles();
 
-    const trendLabels = {
+    const trendLabels: { [key: string]: string } = {
         up: 'Improving',
         down: 'Declining',
         stable: 'Stable',
     };
 
-    const trendColors = {
+    const trendColors: { [key: string]: string } = {
         up: '#e8f5e9', // light green
         down: '#ffebee', // light red
         stable: '#f5f5f5', // neutral
@@ -184,7 +184,7 @@ export const TeamPerformance = () => {
                     <Box className={classes.teamCard} style={{ backgroundColor: trendColors[team.trend] }}>
                         {/* Card Header */}
                         <Box className={classes.teamHeader} style={{ marginBottom: 8 }}>
-                            <Box display="flex" alignItems="center" gap={1}>
+                            <Box display="flex" alignItems="center">
                                 <Typography className={classes.teamName} style={{ fontSize: '1.25rem' }}>
                                     {team.name}
                                 </Typography>
@@ -241,44 +241,7 @@ export const TeamPerformance = () => {
                             </Grid>
                         </Grid>
                         {/* Team Health Metrics */}
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <Box className={classes.metricContainer}>
-                                    <Typography className={classes.metricLabel}>
-                                        Collaboration Score
-                                    </Typography>
-                                    <Box className={classes.collaborationScore}>
-                                        <Typography className={classes.metricValue}>
-                                            {team.metrics.collaborationScore}%
-                                        </Typography>
-                                        <LinearProgress 
-                                            variant="determinate" 
-                                            value={team.metrics.collaborationScore}
-                                            className={classes.progressBar}
-                                            style={{ backgroundColor: '#e3f2fd' }}
-                                        />
-                                    </Box>
-                                </Box>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Box className={classes.metricContainer}>
-                                    <Typography className={classes.metricLabel}>
-                                        Resource Utilization
-                                    </Typography>
-                                    <Box className={classes.collaborationScore}>
-                                        <Typography className={classes.metricValue}>
-                                            {team.metrics.resourceUtilization}%
-                                        </Typography>
-                                        <LinearProgress 
-                                            variant="determinate" 
-                                            value={team.metrics.resourceUtilization}
-                                            className={classes.progressBar}
-                                            style={{ backgroundColor: '#fff3e0' }}
-                                        />
-                                    </Box>
-                                </Box>
-                            </Grid>
-                        </Grid>
+                        {/* Removed Collaboration Score and Resource Utilization */}
                     </Box>
                 </Grid>
             ))}
