@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Typography, Box, Card, CardContent, LinearProgress, Tooltip as MuiTooltip } from '@material-ui/core';
+import { Grid, Typography, Box, Card, CardContent } from '@material-ui/core';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';

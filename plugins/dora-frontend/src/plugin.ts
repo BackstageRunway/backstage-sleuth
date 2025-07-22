@@ -61,6 +61,7 @@ export const DoraDashboard = doraFrontendPlugin.provide(
   }),
 );
 
+// this is an embeddable exported component, can be embeded in any page or plugin like home, Entity
 export const DoraPerformanceComponent = doraFrontendPlugin.provide(
   createComponentExtension({
     name: 'PerformanceComponent',

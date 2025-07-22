@@ -140,11 +140,11 @@ export const ExecutiveSummary = () => {
     const getTrendIcon = (trend: string, colorOverride?: string) => {
         switch (trend) {
             case 'up':
-                return <TrendingUpIcon className={classes.improving} style={{ color: colorOverride || classes.improving.color }} />;
+                return <TrendingUpIcon className={classes.improving} style={colorOverride ? { color: colorOverride } : undefined} />;
             case 'down':
-                return <TrendingDownIcon className={classes.improving} style={{ color: colorOverride || classes.improving.color }} />;
+                return <TrendingDownIcon className={classes.improving} style={colorOverride ? { color: colorOverride } : undefined} />;
             default:
-                return <TrendingFlatIcon className={classes.neutral} style={{ color: colorOverride || classes.neutral.color }} />;
+                return <TrendingFlatIcon className={classes.neutral} style={colorOverride ? { color: colorOverride } : undefined} />;
         }
     };
 

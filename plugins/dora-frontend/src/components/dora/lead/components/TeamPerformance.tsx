@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Typography, Box, LinearProgress, Card, CardContent, Fade, Chip } from '@material-ui/core';
+import { Grid, Typography, Box, Card, CardContent, Fade, Chip } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
@@ -66,17 +66,17 @@ export const TeamPerformance = () => {
     const [fadeIn, setFadeIn] = useState(false);
     useEffect(() => { setFadeIn(true); }, []);
 
-    const trendLabels: { [key: string]: string } = {
-        up: 'Improving',
-        down: 'Declining',
-        stable: 'Stable',
-    };
+    // const trendLabels: { [key: string]: string } = {
+    //     up: 'Improving',
+    //     down: 'Declining',
+    //     stable: 'Stable',
+    // };
 
-    const trendColors: { [key: string]: string } = {
-        up: '#e8f5e9', // light green
-        down: '#ffebee', // light red
-        stable: '#f5f5f5', // neutral
-    };
+    // const trendColors: { [key: string]: string } = {
+    //     up: '#e8f5e9', // light green
+    //     down: '#ffebee', // light red
+    //     stable: '#f5f5f5', // neutral
+    // };
 
     const teams = [
         {
@@ -289,7 +289,7 @@ export const TeamPerformance = () => {
     return (
         <>
             <Grid container spacing={3} style={{ marginBottom: 24 }}>
-                {donutCharts.map((chart, i) => (
+                {donutCharts.map((chart) => (
                     <Grid item xs={12} sm={6} md={3} key={chart.title}>
                         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" position="relative" style={{ height: 260 }}>
                             <ResponsiveContainer width={240} height={240}>
@@ -307,11 +307,11 @@ export const TeamPerformance = () => {
                                         isAnimationActive={true}
                                         label={false}
                                     >
-                                        {chart.data.map((entry, idx) => (
+                                        {chart.data.map((entry) => (
                                             <Cell key={`cell-${entry.name}`} fill={entry.color} />
                                         ))}
                                     </Pie>
-                                    <RechartsTooltip formatter={(v, n, props) => [`${Number(v).toFixed(2)}${chart.tooltipUnit}`, props.payload.name]} />
+                                    <RechartsTooltip formatter={(v, props) => [`${Number(v).toFixed(2)}${chart.tooltipUnit}`, props.payload.name]} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>

@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { MetricType, Performance } from '../../../DORAMetricModel';
+//import { MetricType, Performance } from '../../../DORAMetricModel';
 import DetailsTable from './DetailsTable';
 import { MetricData } from '../summary/types';
 

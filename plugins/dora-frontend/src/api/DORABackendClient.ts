@@ -6,7 +6,7 @@ import {
   IdentityApi,
 } from '@backstage/core-plugin-api';
 import { IProjectMetricResponse } from '../DORAMetricModel';
-import { DoraMetricsResult } from '../types/DoraMetrics';
+//import { DoraMetricsResult } from '../types/DoraMetrics';
 
 const API_PATHS = {
   PERMISSION: '/permission/',
@@ -23,25 +23,24 @@ export interface DORABackendClient {
   // getTeamDORAMetrics(team: string, dateRange: string): Promise<ITeamMetricResponse | null>;
   getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<IProjectMetricResponse | null>;
   getProjectDORAMetricsInsights(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<any>;
-  // getProjectDORAMetricsInsights(project: string, env: string, deployment: string, dateRange: string): Promise<IProjectMetricInsights | null>;
   
   // New DORA metrics method
-  getMetrics(projectId: string, timeRange: { start: string; end: string; [key: string]: any }): Promise<DoraMetricsResult>;
-  getDeployments(request: {
-    orgSlug: string;
-    teamSlugs?: string[];
-    projectSlugs: string[];
-    environmentSlugs: string[];
-    deploymentSlugs: string[];
-    start: string;
-    end: string;
-    page: number;
-    deploymentType: string[];
-    size: string[];
-    healthTimes: string[];
-    onlyFailedDeploys?: boolean;
-    orderBy?: string | null;
-  }): Promise<any>;
+  //getMetrics(projectId: string, timeRange: { start: string; end: string; [key: string]: any }): Promise<DoraMetricsResult>;
+  // getDeployments(request: {
+  //   orgSlug: string;
+  //   teamSlugs?: string[];
+  //   projectSlugs: string[];
+  //   environmentSlugs: string[];
+  //   deploymentSlugs: string[];
+  //   start: string;
+  //   end: string;
+  //   page: number;
+  //   deploymentType: string[];
+  //   size: string[];
+  //   healthTimes: string[];
+  //   onlyFailedDeploys?: boolean;
+  //   orderBy?: string | null;
+  // }): Promise<any>;
 }
 
 export type Options = {
@@ -90,11 +89,12 @@ export class DORABackendClientImpl implements DORABackendClient {
     return this.fetchWithAuth(`${this.baseUrl}${API_PATHS.PERMISSION}`);
   }
 
-  async getTeamDORAMetrics(team: string, dateRange: string) {
-    const baseUrl =  await this.discoveryApi.getBaseUrl('dora-backend');
-    const url = `${baseUrl}${API_PATHS.TEAM_METRICS}?team=${team}&dateRange=${dateRange}`;
-    return this.fetchWithAuth(url);
-  }
+  // async getTeamDORAMetrics(team: string, dateRange: string) {
+  //   const baseUrl =  await this.discoveryApi.getBaseUrl('dora-backend');
+  //   const url = `${baseUrl}/metrics/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
+  //   console.log('Making request to:', url);
+  //   return this.fetchWithAuth(url);
+  // }
 
   async getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
@@ -110,62 +110,62 @@ export class DORABackendClientImpl implements DORABackendClient {
     return this.fetchWithAuth(url);
   }
 
-  async getTrendMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
-    const url = `${baseUrl}/trend-metrics/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-    console.log('Making request to:', url);
-    return this.fetchWithAuth(url);
-  }
+  // async getTrendMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
+  //   const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+  //   const url = `${baseUrl}/trend-metrics/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
+  //   console.log('Making request to:', url);
+  //   return this.fetchWithAuth(url);
+  // }
 
-  async getMetrics(
-    projectId: string,
-    timeRange: { start: string; end: string; [key: string]: any },
-  ): Promise<DoraMetricsResult> {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
-    const params = new URLSearchParams({
-      start: timeRange.start,
-      end: timeRange.end,
-      ...Object.entries(timeRange)
-        .filter(([key]) => !['start', 'end'].includes(key))
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: String(value) }), {}),
-    });
+  // async getMetrics(
+  //   projectId: string,
+  //   timeRange: { start: string; end: string; [key: string]: any },
+  // ): Promise<DoraMetricsResult> {
+  //   const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+  //   const params = new URLSearchParams({
+  //     start: timeRange.start,
+  //     end: timeRange.end,
+  //     ...Object.entries(timeRange)
+  //       .filter(([key]) => !['start', 'end'].includes(key))
+  //       .reduce((acc, [key, value]) => ({ ...acc, [key]: String(value) }), {}),
+  //   });
 
-    return this.fetchWithAuth(
-      `${baseUrl}${API_PATHS.DORA_METRICS}/${projectId}?${params.toString()}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-  }
+  //   return this.fetchWithAuth(
+  //     `${baseUrl}${API_PATHS.DORA_METRICS}/${projectId}?${params.toString()}`,
+  //     {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     },
+  //   );
+  // }
 
-  async getDeployments(request: {
-    orgSlug: string;
-    teamSlugs?: string[];
-    projectSlugs: string[];
-    environmentSlugs: string[];
-    deploymentSlugs: string[];
-    start: string;
-    end: string;
-    page: number;
-    deploymentType: string[];
-    size: string[];
-    healthTimes: string[];
-    onlyFailedDeploys?: boolean;
-    orderBy?: string | null;
-  }): Promise<any> {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
-    return this.fetchWithAuth(
-      `${baseUrl}${API_PATHS.DEPLOYMENTS}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      },
-    );
-  }
+  // async getDeployments(request: {
+  //   orgSlug: string;
+  //   teamSlugs?: string[];
+  //   projectSlugs: string[];
+  //   environmentSlugs: string[];
+  //   deploymentSlugs: string[];
+  //   start: string;
+  //   end: string;
+  //   page: number;
+  //   deploymentType: string[];
+  //   size: string[];
+  //   healthTimes: string[];
+  //   onlyFailedDeploys?: boolean;
+  //   orderBy?: string | null;
+  // }): Promise<any> {
+  //   const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+  //   return this.fetchWithAuth(
+  //     `${baseUrl}${API_PATHS.DEPLOYMENTS}`,
+  //     {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(request),
+  //     },
+  //   );
+  // }
 }

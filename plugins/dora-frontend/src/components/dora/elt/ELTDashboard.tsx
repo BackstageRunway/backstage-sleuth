@@ -2,8 +2,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { ExecutiveSummary } from './components/ExecutiveSummary';
 import { ProjectHealth } from './components/ProjectHealth';
-import { TeamPerformance } from './components/TeamPerformance';
-import { KeyMetrics } from './components/KeyMetrics';
+//import { TeamPerformance } from './components/TeamPerformance';
+//import { KeyMetrics } from './components/KeyMetrics';
 
 
 const useStyles = makeStyles({

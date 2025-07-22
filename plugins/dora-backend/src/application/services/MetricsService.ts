@@ -1,10 +1,10 @@
-import { DatabaseService, LoggerService } from '@backstage/backend-plugin-api';
+import { LoggerService } from '@backstage/backend-plugin-api';
 import { DeploymentRequest, DeploymentResponse, ProjectInsightsResponse, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
 import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {
   constructor(
-    private readonly database: DatabaseService,
+    //private readonly database: DatabaseService,
     private readonly client: SleuthClient,
     private readonly logger: LoggerService,
   ) {}

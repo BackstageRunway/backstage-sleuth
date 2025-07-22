@@ -3,8 +3,8 @@ import { TableRow, TableCell } from '@material-ui/core';
 import { MetricType, Performance, getPerformanceDescription } from '../../../DORAMetricModel';
 import { DeploymentTrendCell } from '../shared/DeploymentTrendCell';
 import { MetricStatusMarker } from '../shared/MetricStatusMarker';
-import TrendingUpIcon from '@material-ui/icons/TrendingUp';
-import TrendingDownIcon from '@material-ui/icons/TrendingDown';
+//import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+//import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
 interface DetailsTableRowProps {
     metricName: MetricType;
@@ -38,17 +38,18 @@ const DetailsTableRow = ({
 }: DetailsTableRowProps) => {
     const classes = useStyles();
     const performanceDescription = getPerformanceDescription(metricName);
+    console.log(trend);
 
-    const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
-        switch (trend) {
-            case 'up':
-                return <TrendingUpIcon className={classes.trendUp} />;
-            case 'down':
-                return <TrendingDownIcon className={classes.trendDown} />;
-            default:
-                return null;
-        }
-    };
+    // const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
+    //     switch (trend) {
+    //         case 'up':
+    //             return <TrendingUpIcon className={classes.trendUp} />;
+    //         case 'down':
+    //             return <TrendingDownIcon className={classes.trendDown} />;
+    //         default:
+    //             return null;
+    //     }
+    // };
 
     return (
         <TableRow>
