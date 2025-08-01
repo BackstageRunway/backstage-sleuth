@@ -2,11 +2,17 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { ExecutiveSummary } from './components/ExecutiveSummary';
 import { ProjectHealth } from './components/ProjectHealth';
-//import { TeamPerformance } from './components/TeamPerformance';
-//import { KeyMetrics } from './components/KeyMetrics';
+import { useOrganizationTrendMetrics } from '../hooks/useOrganizationTrendMetrics';
+import { TimeRangeSelector } from '../TimeRangeSelector';
+
+import { Alert } from '@material-ui/lab';
+
 
 
 const useStyles = makeStyles({
+    error: {
+        marginBottom: '1rem',
+    },
     container: {
         padding: '1rem',
     },
@@ -23,14 +29,48 @@ const useStyles = makeStyles({
 
 export const ELTDashboard = () => {
     const classes = useStyles();
+   
+    const {
+        data,
+        loading,
+        error,
+        selectedTimeRange,
+        setSelectedTimeRange
+    } = useOrganizationTrendMetrics()
+   
+    
+    // Extract the metrics data from the response
+    const metricsData = data?.organization?.metricsRecapWithQuarters;
+
+    if (error) {
+        return (
+            <div className={classes.container}>
+                <Alert severity="error" className={classes.error}>
+                    {error}
+                </Alert>
+            </div>
+        );
+    }
 
     return (
         <div className={classes.container}>
+            <TimeRangeSelector 
+                selectedRange={selectedTimeRange}
+                onRangeChange={setSelectedTimeRange}
+            />
+            {loading && <div>Loading organization trend metrics...</div>}
+            {error && <div style={{color: 'red'}}>Error: {error}</div>}
+            {/* {data && (
+                <Paper className={classes.paper}>
+                    <Typography className={classes.title}>Organization Trend Metrics (Raw)</Typography>
+                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                </Paper>
+            )} */}
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <Typography className={classes.title}>Executive Dashboard</Typography>
-                        <ExecutiveSummary />
+                         <ExecutiveSummary metricsData={metricsData} />
                     </Paper>
                 </Grid>
                 
@@ -40,21 +80,6 @@ export const ELTDashboard = () => {
                         <ProjectHealth />
                     </Paper>
                 </Grid>
-
-                 {/* <Grid item xs={12}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.title}>Team Performance</Typography>
-                        <TeamPerformance />
-                    </Paper>
-                </Grid> */}
-
-                {/* <Grid item xs={12}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.title}>Key Metrics</Typography>
-                        <KeyMetrics />
-                    </Paper>
-                </Grid>  */}
-
             </Grid>
         </div>
     );

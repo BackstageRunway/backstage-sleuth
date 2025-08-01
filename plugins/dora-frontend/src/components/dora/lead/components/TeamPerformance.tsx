@@ -61,7 +61,11 @@ const useStyles = makeStyles({
     },
 });
 
-export const TeamPerformance = () => {
+interface TeamPerformanceProps {
+    selectedTeam?: string | null;
+}
+
+export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }) => {
     const classes = useStyles();
     const [fadeIn, setFadeIn] = useState(false);
     useEffect(() => { setFadeIn(true); }, []);
@@ -78,7 +82,7 @@ export const TeamPerformance = () => {
     //     stable: '#f5f5f5', // neutral
     // };
 
-    const teams = [
+    const allTeams = [
         {
             name: 'Backend',
             metrics: {
@@ -177,8 +181,17 @@ export const TeamPerformance = () => {
         },
     ];
 
+    // Filter teams based on selectedTeam
+    const filteredTeams = selectedTeam 
+        ? allTeams.filter(team => team.name === selectedTeam)
+        : allTeams;
+
+    // Debug info
+    console.log('Selected team:', selectedTeam);
+    console.log('Filtered teams:', filteredTeams);
+
     // Sort teams so that declining teams appear first
-    const sortedTeams = [...teams].sort((a, b) => {
+    const sortedTeams = [...filteredTeams].sort((a, b) => {
         if (a.trend === 'down' && b.trend !== 'down') return -1;
         if (a.trend !== 'down' && b.trend === 'down') return 1;
         return 0;
@@ -331,6 +344,16 @@ export const TeamPerformance = () => {
                     </Box>
                 ))}
             </Box>
+            {sortedTeams.length === 0 && (
+                <Box textAlign="center" py={4}>
+                    <Typography variant="h6" color="textSecondary">
+                        {selectedTeam 
+                            ? `No teams found matching "${selectedTeam}"`
+                            : 'No teams available'
+                        }
+                    </Typography>
+                </Box>
+            )}
             <Grid container spacing={2}>
                 {sortedTeams.map((team, idx) => (
                     <Fade in={fadeIn} style={{ transitionDelay: `${idx * 100}ms` }} key={team.name}>

@@ -49,13 +49,13 @@ const useStyles = makeStyles({
 export const EntityDoraMetrics = () => {
     const classes = useStyles();
     const { entity } = useEntity();
-    const projectId = entity.metadata.annotations?.['sleuth.io/project-id'];
+    const projectSlug = entity.metadata.annotations?.['sleuth.io/project-slug'];
 
     // return if projectId is missing
-    if (!projectId) {
+    if (!projectSlug) {
         return (
             <Alert severity="warning" className={classes.error}>
-                No Sleuth project ID found in entity annotations. Add the 'sleuth.io/project-id' annotation to view DORA metrics.
+                No Sleuth project Slug found in entity annotations. Add the 'sleuth.io/project-slug' annotation to view DORA metrics.
                 <br />
                 Available annotations: {JSON.stringify(entity.metadata.annotations, null, 2)}
             </Alert>

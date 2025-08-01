@@ -15,7 +15,7 @@ export function useDoraMetrics(entity: any) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
 
   // Get config from entity annotations or use defaults
-  const projectId = entity.metadata.annotations?.['sleuth.io/project-id'];
+  //const projectId = entity.metadata.annotations?.['sleuth.io/project-id'];
   const orgId = entity.metadata.annotations?.['sleuth.io/org-id'] || 'sleuth';
   const projectSlug = entity.metadata.annotations?.['sleuth.io/project-slug'] || 'sleuth';
   const environment = entity.metadata.annotations?.['sleuth.io/environment'] || 'production';

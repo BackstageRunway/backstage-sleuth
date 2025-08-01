@@ -7,7 +7,6 @@ export interface ProjectMetricsRequest {
   projectSlug: string;
   environment: string;
   deploymentSlug: string;
-  teamSlug: string;
   metricTypes: MetricType[];
   currentRangeEnd: string;
   currentRangeStart: string;

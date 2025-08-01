@@ -13,7 +13,7 @@ kind: Component
 metadata:
   name: sleuth-website
   annotations:
-    sleuth.io/project-id: sleuth
+    sleuth.io/project-slug: sleuth-marketing-site
 spec:
   type: website
   lifecycle: experimental
@@ -27,7 +27,7 @@ kind: Component
 metadata:
   name: sleuth-clients
   annotations:
-    sleuth.io/project-id: sleuth
+    sleuth.io/project-slug: sleuth-clients
 spec:
   type: website
   lifecycle: experimental
@@ -41,7 +41,7 @@ kind: Component
 metadata:
   name: sleuth
   annotations:
-    sleuth.io/project-id: sleuth
+    sleuth.io/project-slug: sleuth
 spec:
   type: website
   lifecycle: experimental
@@ -55,7 +55,7 @@ kind: Component
 metadata:
   name: dora
   annotations:
-    sleuth.io/project-id: sleuth
+    sleuth.io/project-slug: sleuth
 spec:
   type: website
   lifecycle: experimental

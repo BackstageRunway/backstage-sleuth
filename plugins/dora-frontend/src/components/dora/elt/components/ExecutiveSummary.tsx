@@ -4,7 +4,29 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { projects } from '../metricsData';
+
+// Define the type for the metrics data
+interface MetricsData {
+    totalRecap: {
+        numOfDeploys: number;
+        numOfDeploysPerDay: number;
+        avgLeadTimeInSec: number;
+        failureRatePercent: number;
+        avgMttrDurationInSec: number;
+    };
+    quarters: Array<{
+        startIncl: string;
+        endNotIncl: string;
+        numOfDeploysPerDay: number;
+        avgLeadTimeInSec: number;
+        failureRatePercent: number;
+        avgMttrDurationInSec: number;
+    }>;
+}
+
+interface ExecutiveSummaryProps {
+    metricsData?: MetricsData;
+}
 
 const useStyles = makeStyles({
     card: {
@@ -54,121 +76,190 @@ const useStyles = makeStyles({
         fontSize: '0.875rem',
         fontWeight: 600,
     },
+    loadingContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '200px',
+        color: '#7f8c8d',
+    },
 });
 
-const deploymentsData = [
-    { name: 'Jan', value: 2.1 },
-    { name: 'Feb', value: 2.7 },
-    { name: 'Mar', value: 1.9 },
-    { name: 'Apr', value: 2.4 },
-    { name: 'May', value: 2.0 },
-    { name: 'Jun', value: 2.8 },
-];
-const leadTimeData = [
-    { name: 'Jan', value: 25 },
-    { name: 'Feb', value: 22 },
-    { name: 'Mar', value: 28 },
-    { name: 'Apr', value: 24 },
-    { name: 'May', value: 27 },
-    { name: 'Jun', value: 23 },
-];
-const failureRateData = [
-    { name: 'Jan', value: 1.2 },
-    { name: 'Feb', value: 1.5 },
-    { name: 'Mar', value: 0.8 },
-    { name: 'Apr', value: 2.0 },
-    { name: 'May', value: 1.7 },
-    { name: 'Jun', value: 1.0 },
-];
-const mttrData = [
-    { name: 'Jan', value: 2.5 },
-    { name: 'Feb', value: 3.1 },
-    { name: 'Mar', value: 1.7 },
-    { name: 'Apr', value: 2.8 },
-    { name: 'May', value: 2.2 },
-    { name: 'Jun', value: 2.9 },
-];
+// Helper function to convert seconds to hours
+const secondsToHours = (seconds: number): number => {
+    return seconds / 3600;
+};
 
-export const ExecutiveSummary = () => {
+// Helper function to calculate trend and change percentage
+const calculateTrend = (quarters: any[], metricKey: string): { trend: string, change: string, isImproving: boolean } => {
+    if (quarters.length < 2) return { trend: 'flat', change: '0%', isImproving: false };
+    
+    // Calculate average of first half vs second half for more stable comparison
+    const midPoint = Math.floor(quarters.length / 2);
+    const firstHalf = quarters.slice(0, midPoint);
+    const secondHalf = quarters.slice(midPoint);
+    
+    const firstHalfAvg = firstHalf.reduce((sum, q) => sum + q[metricKey], 0) / firstHalf.length;
+    const secondHalfAvg = secondHalf.reduce((sum, q) => sum + q[metricKey], 0) / secondHalf.length;
+    
+    // Avoid division by zero
+    if (firstHalfAvg === 0) {
+        if (secondHalfAvg === 0) {
+            return { trend: 'flat', change: '0%', isImproving: false };
+        } else {
+            return { trend: 'up', change: '+∞%', isImproving: true };
+        }
+    }
+    
+    const percentageChange = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100);
+    
+    // Round the percentage: if decimal >= 0.5, round up; otherwise round down
+    const roundedPercentage = Math.round(percentageChange);
+    
+    switch (metricKey) {
+        case 'numOfDeploysPerDay':
+            // For deployments, higher is better
+            if (secondHalfAvg > firstHalfAvg) {
+                return { trend: 'up', change: `+${roundedPercentage}%`, isImproving: true };
+            } else if (secondHalfAvg < firstHalfAvg) {
+                return { trend: 'down', change: `${roundedPercentage}%`, isImproving: false };
+            }
+            break;
+            
+        case 'avgLeadTimeInSec':
+            // For lead time, lower is better
+            if (secondHalfAvg < firstHalfAvg) {
+                return { trend: 'down', change: `${Math.abs(roundedPercentage)}%`, isImproving: true };
+            } else if (secondHalfAvg > firstHalfAvg) {
+                return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
+            }
+            break;
+            
+        case 'failureRatePercent':
+            // For failure rate, lower is better
+            if (secondHalfAvg < firstHalfAvg) {
+                return { trend: 'down', change: `${Math.abs(roundedPercentage)}%`, isImproving: true };
+            } else if (secondHalfAvg > firstHalfAvg) {
+                return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
+            }
+            break;
+            
+        case 'avgMttrDurationInSec':
+            // For MTTR, lower is better
+            if (secondHalfAvg < firstHalfAvg) {
+                return { trend: 'down', change: `${Math.abs(roundedPercentage)}%`, isImproving: true };
+            } else if (secondHalfAvg > firstHalfAvg) {
+                return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
+            }
+            break;
+    }
+    
+    return { trend: 'flat', change: '0%', isImproving: false };
+};
+
+export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
     const classes = useStyles();
 
-    // Calculate summary metrics from projects
-    const totalDeployments = projects.reduce((sum, p) => sum + p.metrics.frequency.value, 0);
-    const avgLeadTime = projects.reduce((sum, p) => sum + p.metrics.leadTime.value, 0) / projects.length;
-    const avgFailureRate = failureRateData.reduce((sum, d) => sum + d.value, 0) / failureRateData.length;
-    const avgMTTR = mttrData.reduce((sum, d) => sum + d.value, 0) / mttrData.length;
+    // Show loading state if no data
+    if (!metricsData) {
+        return (
+            <div className={classes.loadingContainer}>
+                <Typography>No metrics data available</Typography>
+            </div>
+        );
+    }
+
+    // Transform quarters data for charts
+    const deploymentsData = metricsData.quarters.map((quarter, index) => ({
+        name: `Q${index + 1}`,
+        value: quarter.numOfDeploysPerDay
+    }));
+
+    const leadTimeData = metricsData.quarters.map((quarter, index) => ({
+        name: `Q${index + 1}`,
+        value: secondsToHours(quarter.avgLeadTimeInSec)
+    }));
+
+    const failureRateData = metricsData.quarters.map((quarter, index) => ({
+        name: `Q${index + 1}`,
+        value: quarter.failureRatePercent
+    }));
+
+    const mttrData = metricsData.quarters.map((quarter, index) => ({
+        name: `Q${index + 1}`,
+        value: secondsToHours(quarter.avgMttrDurationInSec)
+    }));
+
+    // Calculate trends with improvement indicators
+    const deploymentsTrend = calculateTrend(metricsData.quarters, 'numOfDeploysPerDay');
+    const leadTimeTrend = calculateTrend(metricsData.quarters, 'avgLeadTimeInSec');
+    const failureRateTrend = calculateTrend(metricsData.quarters, 'failureRatePercent');
+    const mttrTrend = calculateTrend(metricsData.quarters, 'avgMttrDurationInSec');
 
     const metrics = [
         {
             label: 'Total Deployments',
-            value: `${totalDeployments.toFixed(2)}/day`,
-            trend: 'up',
-            change: '32%',
+            value: `${metricsData.totalRecap.numOfDeploysPerDay.toFixed(2)}/day`,
+            trend: deploymentsTrend.trend,
+            change: deploymentsTrend.change,
+            isImproving: deploymentsTrend.isImproving,
             color: '#2ecc71',
             description: 'Across all projects',
             data: deploymentsData,
         },
         {
             label: 'Average Lead Time',
-            value: `${avgLeadTime.toFixed(1)}h`,
-            trend: 'down',
-            change: '15%',
+            value: `${secondsToHours(metricsData.totalRecap.avgLeadTimeInSec).toFixed(1)}h`,
+            trend: leadTimeTrend.trend,
+            change: leadTimeTrend.change,
+            isImproving: leadTimeTrend.isImproving,
             color: '#3498db',
             description: 'Weighted average',
             data: leadTimeData,
         },
         {
             label: 'Overall Failure Rate',
-            value: `${avgFailureRate > 0 ? avgFailureRate.toFixed(1) : '1.3'}%`,
-            trend: avgFailureRate > 1 ? 'up' : 'down',
-            change: avgFailureRate > 1 ? '+0.5%' : '-0.2%',
+            value: `${metricsData.totalRecap.failureRatePercent.toFixed(1)}%`,
+            trend: failureRateTrend.trend,
+            change: failureRateTrend.change,
+            isImproving: failureRateTrend.isImproving,
             color: '#e74c3c',
             description: 'Combined failures',
             data: failureRateData,
         },
         {
             label: 'Average MTTR',
-            value: `${avgMTTR > 0 ? avgMTTR.toFixed(1) : '2.2'}h`,
-            trend: avgMTTR > 2 ? 'up' : 'down',
-            change: avgMTTR > 2 ? '+0.3%' : '-0.1%',
+            value: `${Math.round(metricsData.totalRecap.avgMttrDurationInSec / 60)}m`,
+            trend: mttrTrend.trend,
+            change: mttrTrend.change,
+            isImproving: mttrTrend.isImproving,
             color: '#f1c40f',
             description: 'Mean time to recover',
             data: mttrData,
         },
     ];
 
-    const getTrendIcon = (trend: string, colorOverride?: string) => {
+    const getTrendIcon = (trend: string, isImproving: boolean) => {
+        const color = isImproving ? '#2ecc71' : '#e74c3c';
+        
         switch (trend) {
             case 'up':
-                return <TrendingUpIcon className={classes.improving} style={colorOverride ? { color: colorOverride } : undefined} />;
+                return <TrendingUpIcon style={{ color }} />;
             case 'down':
-                return <TrendingDownIcon className={classes.improving} style={colorOverride ? { color: colorOverride } : undefined} />;
+                return <TrendingDownIcon style={{ color }} />;
             default:
-                return <TrendingFlatIcon className={classes.neutral} style={colorOverride ? { color: colorOverride } : undefined} />;
+                return <TrendingFlatIcon className={classes.neutral} />;
         }
     };
 
     return (
         <Grid container spacing={3}>
             {metrics.map((metric) => {
-                // Determine color for value and line based on trend for failure rate and mttr
-                let valueColor = metric.color;
-                let lineColor = metric.color;
-                let changeColor = undefined;
-                let arrowColor = undefined;
-                if (metric.label === 'Overall Failure Rate' || metric.label === 'Average MTTR') {
-                    if (metric.trend === 'up') {
-                        valueColor = '#e74c3c';
-                        lineColor = '#e74c3c';
-                        changeColor = '#e74c3c';
-                        arrowColor = '#e74c3c';
-                    } else if (metric.trend === 'down') {
-                        valueColor = '#2ecc71';
-                        lineColor = '#2ecc71';
-                        changeColor = '#2ecc71';
-                        arrowColor = '#2ecc71';
-                    }
-                }
+                // Determine colors based on whether the trend is improving
+                const valueColor = metric.isImproving ? '#2ecc71' : '#e74c3c';
+                const lineColor = metric.isImproving ? '#2ecc71' : '#e74c3c';
+                const changeColor = metric.isImproving ? '#2ecc71' : '#e74c3c';
+                
                 return (
                     <Grid item xs={12} sm={6} md={3} key={metric.label}>
                         <Card className={classes.card}>
@@ -183,14 +274,10 @@ export const ExecutiveSummary = () => {
                                     {metric.description}
                                 </Typography>
                                 <Box className={classes.trendContainer}>
-                                    {getTrendIcon(metric.trend, arrowColor)}
+                                    {getTrendIcon(metric.trend, metric.isImproving)}
                                     <Typography 
-                                        className={`${classes.changeValue} ${
-                                            metric.trend === 'up' ? classes.improving : 
-                                            metric.trend === 'down' ? classes.improving : 
-                                            classes.neutral
-                                        }`}
-                                        style={changeColor ? { color: changeColor } : {}}
+                                        className={classes.changeValue}
+                                        style={{ color: changeColor }}
                                     >
                                         {metric.change}
                                     </Typography>
@@ -218,4 +305,4 @@ export const ExecutiveSummary = () => {
             })}
         </Grid>
     );
-}; 
+};
