@@ -5,6 +5,7 @@ import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import { TeamMetricsData } from '../../hooks/useAllTeamsMetrics';
 
 const useStyles = makeStyles({
     teamCard: {
@@ -63,132 +64,21 @@ const useStyles = makeStyles({
 
 interface TeamPerformanceProps {
     selectedTeam?: string | null;
+    allTeamsData?: TeamMetricsData[];
 }
 
-export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }) => {
+export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam, allTeamsData }) => {
     const classes = useStyles();
     const [fadeIn, setFadeIn] = useState(false);
     useEffect(() => { setFadeIn(true); }, []);
 
-    // const trendLabels: { [key: string]: string } = {
-    //     up: 'Improving',
-    //     down: 'Declining',
-    //     stable: 'Stable',
-    // };
-
-    // const trendColors: { [key: string]: string } = {
-    //     up: '#e8f5e9', // light green
-    //     down: '#ffebee', // light red
-    //     stable: '#f5f5f5', // neutral
-    // };
-
-    const allTeams = [
-        {
-            name: 'Backend',
-            metrics: {
-                deploymentFrequency: '2.5/day',
-                leadTime: '16.2h',
-                failureRate: '1.2%',
-                mttr: '2.5h',
-                collaborationScore: 85,
-                resourceUtilization: 92,
-            },
-            trend: 'up',
-        },
-        {
-            name: 'Frontend',
-            metrics: {
-                deploymentFrequency: '1.8/day',
-                leadTime: '20.5h',
-                failureRate: '2.0%',
-                mttr: '3.1h',
-                collaborationScore: 78,
-                resourceUtilization: 88,
-            },
-            trend: 'stable',
-        },
-        {
-            name: 'SRE',
-            metrics: {
-                deploymentFrequency: '1.2/day',
-                leadTime: '28.5h',
-                failureRate: '0.8%',
-                mttr: '1.7h',
-                collaborationScore: 92,
-                resourceUtilization: 95,
-            },
-            trend: 'up',
-        },
-        {
-            name: 'Product Dev',
-            metrics: {
-                deploymentFrequency: '0.8/day',
-                leadTime: '32.5h',
-                failureRate: '2.5%',
-                mttr: '4.2h',
-                collaborationScore: 75,
-                resourceUtilization: 82,
-            },
-            trend: 'down',
-        },
-        {
-            name: 'Platform',
-            metrics: {
-                deploymentFrequency: '1.5/day',
-                leadTime: '22.5h',
-                failureRate: '1.5%',
-                mttr: '2.2h',
-                collaborationScore: 88,
-                resourceUtilization: 90,
-            },
-            trend: 'up',
-        },
-        {
-            name: 'Infrastructure',
-            metrics: {
-                deploymentFrequency: '1.0/day',
-                leadTime: '26.5h',
-                failureRate: '1.7%',
-                mttr: '2.9h',
-                collaborationScore: 90,
-                resourceUtilization: 93,
-            },
-            trend: 'stable',
-        },
-        {
-            name: 'Security',
-            metrics: {
-                deploymentFrequency: '0.5/day',
-                leadTime: '30.5h',
-                failureRate: '1.0%',
-                mttr: '2.0h',
-                collaborationScore: 85,
-                resourceUtilization: 87,
-            },
-            trend: 'up',
-        },
-        {
-            name: 'Quality Assurance',
-            metrics: {
-                deploymentFrequency: '0.3/day',
-                leadTime: '35.5h',
-                failureRate: '1.3%',
-                mttr: '2.7h',
-                collaborationScore: 82,
-                resourceUtilization: 85,
-            },
-            trend: 'stable',
-        },
-    ];
+    // Use provided data or fallback to empty array, and filter out invalid entries
+    const allTeams = (allTeamsData || []).filter(team => team && team.name && team.metrics);
 
     // Filter teams based on selectedTeam
     const filteredTeams = selectedTeam 
         ? allTeams.filter(team => team.name === selectedTeam)
         : allTeams;
-
-    // Debug info
-    console.log('Selected team:', selectedTeam);
-    console.log('Filtered teams:', filteredTeams);
 
     // Sort teams so that declining teams appear first
     const sortedTeams = [...filteredTeams].sort((a, b) => {
@@ -196,6 +86,12 @@ export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }
         if (a.trend !== 'down' && b.trend === 'down') return 1;
         return 0;
     });
+
+    // Debug info
+    console.log('Selected team:', selectedTeam);
+    console.log('All teams data:', allTeamsData);
+    console.log('Filtered teams:', filteredTeams);
+    console.log('Sorted teams:', sortedTeams);
 
     const getTrendChip = (trend: string) => {
         switch (trend) {
@@ -240,30 +136,37 @@ export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }
     const colorPalette = [
         '#2ecc71', '#3498db', '#f1c40f', '#e67e22', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e'
     ];
+    
+    // Helper function to safely parse metric values
+    const safeParseFloat = (value: string, defaultValue: number = 0) => {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? defaultValue : parsed;
+    };
+    
     const deploymentDonutData = sortedTeams.map((team, idx) => ({
-        name: team.name,
-        value: parseFloat(team.metrics.deploymentFrequency),
+        name: team.name || 'Unknown Team',
+        value: safeParseFloat(team.metrics.deploymentFrequency),
         color: colorPalette[idx % colorPalette.length],
     }));
     const leadTimeDonutData = sortedTeams.map((team, idx) => ({
-        name: team.name,
-        value: parseFloat(team.metrics.leadTime),
+        name: team.name || 'Unknown Team',
+        value: safeParseFloat(team.metrics.leadTime),
         color: colorPalette[idx % colorPalette.length],
     }));
     const mttrDonutData = sortedTeams.map((team, idx) => ({
-        name: team.name,
-        value: parseFloat(team.metrics.mttr),
+        name: team.name || 'Unknown Team',
+        value: safeParseFloat(team.metrics.mttr),
         color: colorPalette[idx % colorPalette.length],
     }));
     const failureRateDonutData = sortedTeams.map((team, idx) => ({
-        name: team.name,
-        value: parseFloat(team.metrics.failureRate),
+        name: team.name || 'Unknown Team',
+        value: safeParseFloat(team.metrics.failureRate),
         color: colorPalette[idx % colorPalette.length],
     }));
     const totalDeployments = deploymentDonutData.reduce((sum, t) => sum + t.value, 0);
-    const avgLeadTime = leadTimeDonutData.reduce((sum, t) => sum + t.value, 0) / leadTimeDonutData.length;
-    const avgMTTR = mttrDonutData.reduce((sum, t) => sum + t.value, 0) / mttrDonutData.length;
-    const avgFailureRate = failureRateDonutData.reduce((sum, t) => sum + t.value, 0) / failureRateDonutData.length;
+    const avgLeadTime = leadTimeDonutData.length > 0 ? leadTimeDonutData.reduce((sum, t) => sum + t.value, 0) / leadTimeDonutData.length : 0;
+    const avgMTTR = mttrDonutData.length > 0 ? mttrDonutData.reduce((sum, t) => sum + t.value, 0) / mttrDonutData.length : 0;
+    const avgFailureRate = failureRateDonutData.length > 0 ? failureRateDonutData.reduce((sum, t) => sum + t.value, 0) / failureRateDonutData.length : 0;
 
     const donutCharts = [
         {
@@ -299,6 +202,20 @@ export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }
     // Add a helper to determine if a team is declining
     const isDeclining = (trend: string) => trend === 'down';
 
+    // Don't render if no valid data
+    if (sortedTeams.length === 0) {
+        return (
+            <Box textAlign="center" py={4}>
+                <Typography variant="h6" color="textSecondary">
+                    {selectedTeam 
+                        ? `No teams found matching "${selectedTeam}"`
+                        : 'No teams available'
+                    }
+                </Typography>
+            </Box>
+        );
+    }
+
     return (
         <>
             <Grid container spacing={3} style={{ marginBottom: 24 }}>
@@ -324,7 +241,10 @@ export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }
                                             <Cell key={`cell-${entry.name}`} fill={entry.color} />
                                         ))}
                                     </Pie>
-                                    <RechartsTooltip formatter={(v, props) => [`${Number(v).toFixed(2)}${chart.tooltipUnit}`, props.payload.name]} />
+                                    <RechartsTooltip formatter={(v, props) => {
+                                        const teamName = props?.payload?.name || 'Unknown Team';
+                                        return [`${Number(v).toFixed(2)}${chart.tooltipUnit}`, teamName];
+                                    }} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
@@ -344,16 +264,6 @@ export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam }
                     </Box>
                 ))}
             </Box>
-            {sortedTeams.length === 0 && (
-                <Box textAlign="center" py={4}>
-                    <Typography variant="h6" color="textSecondary">
-                        {selectedTeam 
-                            ? `No teams found matching "${selectedTeam}"`
-                            : 'No teams available'
-                        }
-                    </Typography>
-                </Box>
-            )}
             <Grid container spacing={2}>
                 {sortedTeams.map((team, idx) => (
                     <Fade in={fadeIn} style={{ transitionDelay: `${idx * 100}ms` }} key={team.name}>

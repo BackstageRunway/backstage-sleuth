@@ -24,7 +24,7 @@ metadata:
   name: user1
   description: Frontend Developer
 spec:
-  memberOf: [frontend, platform-infrastructure]
+  memberOf: [frontend, backend, sre, engineering, security, the-friday-deploy-team-2]
   profile:
     displayName: User One
     email: user1@example.com
@@ -102,12 +102,12 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: platform-infrastructure
-  description: Platform Infrastructure Team
+  name: engineering
+  description: Engineering Team
 spec:
   type: team
   profile:
-    displayName: Platform Infrastructure Team
+    displayName: Engineering Team
     description: Responsible for platform infrastructure and tooling
   children: []
 ---
@@ -120,5 +120,17 @@ spec:
   type: team
   profile:
     displayName: Security Team
+    description: Responsible for application and infrastructure security
+  children: [] 
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: the-friday-deploy-team-2
+  description: The friday deploy team
+spec:
+  type: team
+  profile:
+    displayName: the-friday-deploy-team-2 Team
     description: Responsible for application and infrastructure security
   children: [] 
