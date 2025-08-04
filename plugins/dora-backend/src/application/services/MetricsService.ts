@@ -1,5 +1,5 @@
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { ProjectInsightsResponse, ProjectMetricsResponse, TeamMetricsRequest, TeamMetricsResponse, TeamMetricsInsightsRequest } from '../../domain/models/SleuthBatchTypes';
+import { ProjectInsightsResponse, ProjectMetricsResponse, TeamMetricsRequest, TeamMetricsResponse } from '../../domain/models/SleuthBatchTypes';
 import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {
@@ -171,7 +171,7 @@ export class MetricsService {
     }
   }
 
-  async getTeamMetrics(orgId:string, teamSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<TeamMetricsResponse> {
+  async getTeamMetrics(orgId:string, teamSlug: string, environment:string, timeRange: string): Promise<TeamMetricsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
