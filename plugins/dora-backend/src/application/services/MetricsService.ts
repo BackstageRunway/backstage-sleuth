@@ -1,10 +1,10 @@
-import { DatabaseService, LoggerService } from '@backstage/backend-plugin-api';
-import { DeploymentRequest, DeploymentResponse, ProjectInsightsResponse, ProjectMetricsResponse } from '../../domain/models/SleuthBatchTypes';
+import { LoggerService } from '@backstage/backend-plugin-api';
+import { ProjectInsightsResponse, ProjectMetricsResponse, TeamMetricsRequest, TeamMetricsResponse } from '../../domain/models/SleuthBatchTypes';
 import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {
   constructor(
-    private readonly database: DatabaseService,
+    //private readonly database: DatabaseService,
     private readonly client: SleuthClient,
     private readonly logger: LoggerService,
   ) {}
@@ -26,22 +26,22 @@ export class MetricsService {
     // Get number of days from the range string (e.g., "last7days" -> 7)
     const days = this.parseDateRange(dateRange);
     
-    // Calculate current period
-    const currentEnd = new Date();
-    currentEnd.setHours(23, 59, 59, 999); // End of the day
+    // Calculate current period - match Sleuth's behavior exactly
+    const now = new Date();
+    // End date should be next day at 00:00:00 (representing end of current day)
+    const currentEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0));
     
+    // For "last X days", we want to go back (X-1) days from today
+    // So for last 7 days: today + 6 days back = 7 days total
     const currentStart = new Date(currentEnd);
-    currentStart.setDate(currentStart.getDate() - days);
-    currentStart.setHours(0, 0, 0, 0); // Start of the day
+    currentStart.setUTCDate(currentStart.getUTCDate() - days);
     
     // Previous period ends where current period starts
     const previousEnd = new Date(currentStart);
-    previousEnd.setHours(23, 59, 59, 999);
     
     // Previous period starts by subtracting the same number of days
     const previousStart = new Date(previousEnd);
-    previousStart.setDate(previousStart.getDate() - days);
-    previousStart.setHours(0, 0, 0, 0);
+    previousStart.setUTCDate(previousStart.getUTCDate() - days);
 
     return {
       currentRangeStart: currentStart.toISOString(),
@@ -51,21 +51,20 @@ export class MetricsService {
     };
   }
 
-  async getProjectMetrics(orgId:string, projectId: string, environment:string, deploymentId:string, team:string, timeRange: string): Promise<ProjectMetricsResponse> {
+  async getProjectMetrics(orgId:string, projectSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectMetricsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
       this.logger.info('Fetching metrics', {
-        projectId: projectId,
+        projectSlug: projectSlug,
         timeRange: timeRange,
       });
 
       const response = await this.client.projectMetrics({
         orgSlug: orgId,
-        projectSlug: projectId,
+        projectSlug: projectSlug,
         environment: environment,
         deploymentSlug: deploymentId,
-        teamSlug: team,
         metricTypes: ['metrics'],
         currentRangeStart: dateRanges.currentRangeStart,
         currentRangeEnd: dateRanges.currentRangeEnd,
@@ -79,7 +78,7 @@ export class MetricsService {
 
       // Log the metrics for monitoring
       this.logger.info('Retrieved metrics', {
-        projectId,
+        projectSlug,
         currentRange: {
           avgLeadTimeInSec: response.project.currentRange.avgLeadTimeInSec,
           numOfDeploys: response.project.currentRange.numOfDeploys,
@@ -100,83 +99,27 @@ export class MetricsService {
     } catch (error) {
       this.logger.error('Failed to fetch metrics', {
         error: error instanceof Error ? error.message : String(error),
-        projectId,
+        projectSlug,
       });
       throw error;
     }
   }
 
-  async getMultiProjectMetrics(
-    orgSlug: string,
-    projectSlugs: string[],
-    start: string,
-    end: string,
-    environmentName?: string,
-    labelSlugs?: string[],
-    teamSlugs?: string[],
-  ): Promise<any> {
-    try {
-      this.logger.info('Fetching multi-project metrics', {
-        orgSlug,
-        projectSlugs,
-        start,
-        end,
-        environmentName,
-        labelSlugs,
-        teamSlugs,
-      });
 
-      const response = await this.client.getProjectMetrics(
-        orgSlug,
-        projectSlugs,
-        start,
-        end,
-        environmentName,
-        labelSlugs,
-        teamSlugs,
-      );
-
-      if (!response?.data) {
-        throw new Error('No data received from Sleuth API');
-      }
-
-      this.logger.info('Retrieved multi-project metrics', {
-        projects: response.data.projects.map((p: any) => p.name),
-        metrics: {
-          totalDeploys: response.data.organization.metricsRecapWithQuarters.totalRecap.numOfDeploys,
-          deploysPerDay: response.data.organization.metricsRecapWithQuarters.totalRecap.numOfDeploysPerDay,
-        },
-      });
-
-      return {
-        projects: response.data.projects,
-        metrics: response.data.organization.metricsRecapWithQuarters,
-      };
-    } catch (error) {
-      this.logger.error('Failed to fetch multi-project metrics', {
-        error: error instanceof Error ? error.message : String(error),
-        orgSlug,
-        projectSlugs,
-      });
-      throw error;
-    }
-  }
-
-  async getProjectMetricsInsights(orgId:string, projectId: string, environment:string, deploymentId:string, team:string, timeRange: string): Promise<ProjectInsightsResponse> {
+  async getProjectMetricsInsights(orgId:string, projectSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
       this.logger.info('Fetching metrics Insights', {
-        projectId: projectId,
+        projectSlug: projectSlug,
         timeRange: timeRange,
       });
 
       const response = await this.client.projectMetricsInsights({
         orgSlug: orgId,
-        projectSlug: projectId,
+        projectSlug: projectSlug,
         environment: environment,
         deploymentSlug: deploymentId,
-        teamSlug: team,
         metricTypes: ['metrics'],
         currentRangeStart: dateRanges.currentRangeStart,
         currentRangeEnd: dateRanges.currentRangeEnd,
@@ -195,28 +138,177 @@ export class MetricsService {
     } catch (error) {
       this.logger.error('Failed to fetch metrics insights', {
         error: error instanceof Error ? error.message : String(error),
-        projectId,
+        projectSlug,
       });
       throw error;
     }
   }
 
-
-  async getDeployments(request: DeploymentRequest): Promise<DeploymentResponse> {
+  async getOrganizationTrendMetrics(
+    orgId: string,
+    timeRange: string,
+  ): Promise<any> {
     try {
-      this.logger.info('Fetching deployments', {
-        orgSlug: request.orgSlug,
-        projectSlugs: request.projectSlugs,
-        start: request.start,
-        end: request.end,
+      this.logger.info('Fetching organization trend metrics', {
+        orgId,
+        timeRange,
       });
 
-      return await this.client.getDeployments(request);
+      const dateRanges = this.calculateDateRanges(timeRange);
+      const organization = await this.client.getTrendMetrics(
+        orgId,
+        dateRanges.currentRangeStart,
+        dateRanges.currentRangeEnd,
+      );
+      this.logger.info('Retrieved organization trend metrics', { organization });
+      return organization;
     } catch (error) {
-      this.logger.error('Failed to fetch deployments', {
+      this.logger.error('Failed to fetch organization trend metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgSlug: request.orgSlug,
-        projectSlugs: request.projectSlugs,
+        orgId,
+      });
+      throw error;
+    }
+  }
+
+  async getTeamMetrics(orgId:string, teamSlug: string, environment:string, timeRange: string): Promise<TeamMetricsResponse> {
+    try {
+      const dateRanges = this.calculateDateRanges(timeRange);
+
+      this.logger.info('Fetching team metrics', {
+        teamSlug: teamSlug,
+        timeRange: timeRange,
+      });
+
+      const response = await this.client.teamMetrics({
+        orgSlug: orgId,
+        teamSlug: teamSlug,
+        environment: environment,
+        currentRangeStart: dateRanges.currentRangeStart,
+        currentRangeEnd: dateRanges.currentRangeEnd,
+        previousRangeStart: dateRanges.previousRangeStart,
+        previousRangeEnd: dateRanges.previousRangeEnd,
+      });
+
+      if (!response.team?.currentRange || !response.team?.previousRange) {
+        throw new Error('No team metrics data available');
+      }
+
+      // Log the metrics for monitoring
+      this.logger.info('Retrieved team metrics', {
+        teamSlug,
+        teamName: response.team.name,
+        currentRange: {
+          avgLeadTimeInSec: response.team.currentRange.avgLeadTimeInSec,
+          numOfDeploys: response.team.currentRange.numOfDeploys,
+          numOfDeploysPerDay: response.team.currentRange.numOfDeploysPerDay,
+          failureRatePercent: response.team.currentRange.failureRatePercent,
+          avgMttrDurationInSec: response.team.currentRange.avgMttrDurationInSec,
+        },
+        previousRange: {
+          avgLeadTimeInSec: response.team.previousRange.avgLeadTimeInSec,
+          numOfDeploys: response.team.previousRange.numOfDeploys,
+          numOfDeploysPerDay: response.team.previousRange.numOfDeploysPerDay,
+          failureRatePercent: response.team.previousRange.failureRatePercent,
+          avgMttrDurationInSec: response.team.previousRange.avgMttrDurationInSec,
+        }
+      });
+
+      return response;
+    } catch (error) {
+      this.logger.error('Failed to fetch team metrics', {
+        error: error instanceof Error ? error.message : String(error),
+        teamSlug,
+        timeRange,
+      });
+      throw error;
+    }
+  }
+
+  async getTeamMetricsInsights(orgId:string, teamSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
+    try {
+      const dateRanges = this.calculateDateRanges(timeRange);
+
+      this.logger.info('Fetching team metrics insights', {
+        teamSlug: teamSlug,
+        timeRange: timeRange,
+      });
+
+      const response = await this.client.teamMetricsInsights({
+        orgSlug: orgId,
+        teamSlug: teamSlug,
+        environment: environment,
+        deploymentSlug: deploymentId,
+        currentRangeStart: dateRanges.currentRangeStart,
+        currentRangeEnd: dateRanges.currentRangeEnd,
+        previousRangeStart: dateRanges.previousRangeStart,
+        previousRangeEnd: dateRanges.previousRangeEnd,
+      });
+
+      if (!response.data?.project?.insights) {
+        throw new Error('No team metrics insights data available');
+      }
+
+      // Log the insights for monitoring
+      this.logger.info('Retrieved team metrics insights', {
+        teamSlug,
+        insightsCount: response.data.project.insights.length,
+      });
+
+      return response;
+    } catch (error) {
+      this.logger.error('Failed to fetch team metrics insights', {
+        error: error instanceof Error ? error.message : String(error),
+        teamSlug,
+        timeRange,
+      });
+      throw error;
+    }
+  }
+
+  async getBatchTeamMetrics(orgId: string, teamSlugs: string[], environment: string, deploymentId: string, timeRange: string): Promise<{ teams: any[] }> {
+    try {
+      const dateRanges = this.calculateDateRanges(timeRange);
+
+      this.logger.info('Fetching batch team metrics', {
+        orgId,
+        teamSlugs,
+        timeRange,
+        environment,
+        deploymentId,
+      });
+
+      // Create TeamMetricsRequest array for each team
+      const teamRequests: TeamMetricsRequest[] = teamSlugs.map(teamSlug => ({
+        orgSlug: orgId,
+        teamSlug: teamSlug,
+        environment: environment,
+        currentRangeStart: dateRanges.currentRangeStart,
+        currentRangeEnd: dateRanges.currentRangeEnd,
+        previousRangeStart: dateRanges.previousRangeStart,
+        previousRangeEnd: dateRanges.previousRangeEnd,
+      }));
+
+      const response = await this.client.batchTeamMetrics(teamRequests);
+
+      if (!response.teams || response.teams.length === 0) {
+        throw new Error('No batch team metrics data available');
+      }
+
+      // Log the metrics for monitoring
+      this.logger.info('Retrieved batch team metrics', {
+        orgId,
+        teamCount: response.teams.length,
+        teamSlugs: response.teams.map(team => team.name),
+      });
+
+      return response;
+    } catch (error) {
+      this.logger.error('Failed to fetch batch team metrics', {
+        error: error instanceof Error ? error.message : String(error),
+        orgId,
+        teamSlugs,
+        timeRange,
       });
       throw error;
     }

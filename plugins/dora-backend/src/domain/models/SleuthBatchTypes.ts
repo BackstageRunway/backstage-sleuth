@@ -7,8 +7,29 @@ export interface ProjectMetricsRequest {
   projectSlug: string;
   environment: string;
   deploymentSlug: string;
-  teamSlug: string;
   metricTypes: MetricType[];
+  currentRangeEnd: string;
+  currentRangeStart: string;
+  previousRangeEnd: string;
+  previousRangeStart: string;
+  teamSlug?: string;
+}
+
+export interface TeamMetricsRequest {
+  orgSlug: string;
+  teamSlug: string;
+  environment: string;
+  currentRangeEnd: string;
+  currentRangeStart: string;
+  previousRangeEnd: string;
+  previousRangeStart: string;
+}
+
+export interface TeamMetricsInsightsRequest {
+  orgSlug: string;
+  teamSlug: string;
+  environment: string;
+  deploymentSlug: string;
   currentRangeEnd: string;
   currentRangeStart: string;
   previousRangeEnd: string;
@@ -30,6 +51,14 @@ export interface MetricRecap {
 
 export interface ProjectMetricsResponse {
   project: {
+    previousRange: MetricRecap;
+    currentRange: MetricRecap;
+  };
+}
+
+export interface TeamMetricsResponse {
+  team: {
+    name: string;
     previousRange: MetricRecap;
     currentRange: MetricRecap;
   };

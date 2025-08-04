@@ -15,3 +15,122 @@ metadata:
 spec:
   type: team
   children: []
+
+---
+# Users
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user1
+  description: Frontend Developer
+spec:
+  memberOf: [frontend, backend, sre, engineering, security, the-friday-deploy-team-2]
+  profile:
+    displayName: User One
+    email: user1@example.com
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user2
+  description: Backend Developer
+spec:
+  memberOf: [backend, security]
+  profile:
+    displayName: User Two
+    email: user2@example.com
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user3
+  description: SRE Engineer
+spec:
+  memberOf: [sre, platform-infrastructure]
+  profile:
+    displayName: User Three
+    email: user3@example.com
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user4
+  description: Security Engineer
+spec:
+  memberOf: [security, backend]
+  profile:
+    displayName: User Four
+    email: user4@example.com
+---
+# Teams
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: frontend
+  description: Frontend Development Team
+spec:
+  type: team
+  profile:
+    displayName: Frontend Team
+    description: Responsible for frontend development and UI/UX
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: backend
+  description: Backend Development Team
+spec:
+  type: team
+  profile:
+    displayName: Backend Team
+    description: Responsible for backend services and APIs
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: sre
+  description: Site Reliability Engineering Team
+spec:
+  type: team
+  profile:
+    displayName: SRE Team
+    description: Responsible for infrastructure reliability and monitoring
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: engineering
+  description: Engineering Team
+spec:
+  type: team
+  profile:
+    displayName: Engineering Team
+    description: Responsible for platform infrastructure and tooling
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: security
+  description: Security Team
+spec:
+  type: team
+  profile:
+    displayName: Security Team
+    description: Responsible for application and infrastructure security
+  children: [] 
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: the-friday-deploy-team-2
+  description: The friday deploy team
+spec:
+  type: team
+  profile:
+    displayName: the-friday-deploy-team-2 Team
+    description: Responsible for application and infrastructure security
+  children: [] 

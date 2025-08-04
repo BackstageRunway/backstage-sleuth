@@ -1,124 +1,45 @@
-import { GraphQLClient } from 'graphql-request';
+import { ApolloClient, InMemoryCache, HttpLink, gql, NormalizedCacheObject } from '@apollo/client/core';
+import { BatchHttpLink } from '@apollo/client/link/batch-http';
+import fetch from 'cross-fetch';
 import { DoraMetricsError } from '../../domain/models/DoraMetrics';
-import { DeploymentRequest, DeploymentResponse, ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse } from '../../domain/models/SleuthBatchTypes';
+import { ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse, TeamMetricsRequest, TeamMetricsResponse, TeamMetricsInsightsRequest } from '../../domain/models/SleuthBatchTypes';
 
 export class SleuthClient {
-  private readonly client: GraphQLClient;
-
+  private readonly client: ApolloClient<NormalizedCacheObject>;
+  private readonly batchClient: ApolloClient<NormalizedCacheObject>;
+  private readonly apiKey: string;
+  
   constructor(apiKey: string) {
-    this.client = new GraphQLClient('https://app.sleuth.io/graphql', {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
+    this.apiKey = apiKey;
+    this.client = new ApolloClient({
+      link: new HttpLink({
+        uri: 'https://app.sleuth.io/graphql',
+        fetch,
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Cookie: '__Host-sessionid=f7xr8j59258nzt0zgy3a9atjhx3aypc2',	
+        },
+      }),
+      cache: new InMemoryCache(),
+      //defaultOptions: { query: { fetchPolicy: 'no-cache' } },
+    });
+    
+    this.batchClient = new ApolloClient({
+      link: new BatchHttpLink({
+        uri: 'https://app.sleuth.io/graphql-batch',
+        fetch,
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Cookie: '__Host-sessionid=f7xr8j59258nzt0zgy3a9atjhx3aypc2',	
+        },
+        batchMax: 5,
+        batchInterval: 10,
+      }),
+      cache: new InMemoryCache(),
+      //defaultOptions: { query: { fetchPolicy: 'no-cache' } },
     });
   }
 
-  async query<T>(query: string, variables: Record<string, unknown>): Promise<T> {
-    try {
-      return await this.client.request<T>(query, variables);
-    } catch (error) {
-      throw new DoraMetricsError(
-        'Failed to query Sleuth API',
-        'PROVIDER_ERROR',
-        error,
-      );
-    }
-  }
-
-  async getDeployments(request: DeploymentRequest): Promise<DeploymentResponse> {
-    const query = `
-      query GetProjectDeploys(
-        $orgSlug: ID!
-        $teamSlugs: [ID!]
-        $projectSlugs: [ID!]!
-        $environmentSlugs: [ID!]!
-        $deploymentSlugs: [ID!]!
-        $start: DateTime!
-        $end: DateTime!
-        $page: Int!
-        $deploymentType: [String!]!
-        $size: [String]!
-        $healthTimes: [String]!
-        $onlyFailedDeploys: Boolean
-        $orderBy: OrderByType
-      ) {
-        orgDeploys: orgChanges(
-          orgSlug: $orgSlug
-          projectSlugs: $projectSlugs
-          deploymentSlugs: $deploymentSlugs
-          environmentSlugs: $environmentSlugs
-          page: $page
-          start: $start
-          end: $end
-          deploymentType: $deploymentType
-          size: $size
-          healthTimes: $healthTimes
-          orderBy: $orderBy
-          onlyFailedDeploys: $onlyFailedDeploys
-          teamSlugs: $teamSlugs
-        ) {
-          page
-          pages
-          count
-          hasNext
-          hasPrev
-          objects {
-            __typename
-            on
-            slug
-            deploymentSlug
-            deploymentName
-            projectName
-            summary
-            healthManuallySet
-            magnitude
-            trackingType
-            deploymentTrackingType
-            deploymentCollectImpact
-            environment {
-              name
-              slug
-            }
-            commits {
-              revision
-            }
-            numOfAllPullRequests
-            numOfIgnoredPullRequests
-            authors {
-              name
-            }
-            tags
-            deploymentType: changeSourceType
-            compareUrl
-            approvalStatuses
-            changeLeadTime
-            healthTimeBreakdown {
-              healthy
-              ailing
-              unhealthy
-              rolledBack
-              incident
-            }
-            nextDeploy {
-              on
-            }
-            workingHoursUsedForCltCalculation
-          }
-        }
-      }
-    `;
-  
-    try {
-      const response = await this.client.request<DeploymentResponse>(query, request as unknown as Record<string, unknown>);
-      return response;
-    } catch (error) {
-      throw new DoraMetricsError(
-        'Failed to query Sleuth API for deployments',
-        'PROVIDER_ERROR',
-        error,
-      );
-    }
-  }
 
   async projectMetrics(request: ProjectMetricsRequest): Promise<ProjectMetricsResponse> {
     const query = `
@@ -169,17 +90,19 @@ export class SleuthClient {
       orgSlug: request.orgSlug,
       projectSlug: request.projectSlug,
       environmentSlug: request.environment,
-      deploymentSlugs: ['application'],
+      deploymentSlugs: [],
       currentRangeStartDate: request.currentRangeStart,
       currentRangeEndDate: request.currentRangeEnd,
       previousRangeStartDate: request.previousRangeStart,
       previousRangeEndDate: request.previousRangeEnd,
-      teamSlug: request.teamSlug,
      };
 
     try {
-      const response = await this.client.request<ProjectMetricsResponse>(query, variables);
-      return response;
+      const result = await this.client.query({
+        query: gql`${query}`,
+        variables,
+      });
+      return result.data as ProjectMetricsResponse;
     } catch (error) {
       throw new DoraMetricsError(
         'Failed to query Sleuth API',
@@ -227,14 +150,17 @@ export class SleuthClient {
       orgSlug: request.orgSlug,
       projectSlug: request.projectSlug,
       environmentSlug: request.environment,
-      deploymentSlugs: ['application'],
+      deploymentSlugs: [],
       startDate: request.currentRangeStart,
       endDate: request.currentRangeEnd,
      };
 
         try {
-            const response = await this.client.request<ProjectInsightsResponse>(query, variables);
-            return response;
+            const result = await this.client.query({
+              query: gql`${query}`,
+              variables,
+            });
+            return result.data as ProjectInsightsResponse;
         } catch (error) {
             throw new DoraMetricsError(
                 'Failed to query Sleuth API for insights',
@@ -244,72 +170,261 @@ export class SleuthClient {
         }
     }
 
-    async getProjectMetrics(
-        orgSlug: string,
-        projectSlugs: string[],
-        start: string,
-        end: string,
-        environmentName?: string,
-        labelSlugs?: string[],
-        teamSlugs?: string[],
-    ): Promise<any> {
-        const query = `
-            query GetProjectMetrics($orgSlug: ID!, $projectSlugs: [ID!], $labelSlugs: [ID!], $teamSlugs: [ID!], $environmentName: String, $start: DateTime!, $end: DateTime!) {
-                projects(orgSlug: $orgSlug) {
-                    slug
-                    name
-                    environments {
-                        name
-                        slug
-                    }
-                    defaultEnvironment {
-                        slug
-                    }
+    async getTrendMetrics(
+      orgId: string,
+      start: string,
+      end: string,
+  ): Promise<any> {
+      const trendQuery = `
+          query GetTrendMetrics($orgSlug: ID!, $projectSlugs: [ID!], $labelSlugs: [ID!], $teamSlugs: [ID!], $environmentName: String, $start: DateTime!, $end: DateTime!) {
+            organization(orgSlug: $orgSlug) {
+              metricsRecapWithQuarters(
+                start: $start
+                end: $end
+                filters: {projectSlugs: $projectSlugs, labelSlugs: $labelSlugs, environmentName: $environmentName, teamSlugs: $teamSlugs}
+              ) {
+                totalRecap {
+                  numOfDeploys
+                  numOfDeploysPerDay
+                  avgLeadTimeInSec
+                  failureRatePercent
+                  avgMttrDurationInSec
                 }
-                organization(orgSlug: $orgSlug) {
-                    metricsRecapWithQuarters(
-                        start: $start
-                        end: $end
-                        filters: {projectSlugs: $projectSlugs, labelSlugs: $labelSlugs, environmentName: $environmentName, teamSlugs: $teamSlugs}
-                    ) {
-                        totalRecap {
-                            numOfDeploys
-                            numOfDeploysPerDay
-                            avgLeadTimeInSec
-                            failureRatePercent
-                            avgMttrDurationInSec
-                        }
-                        quarters {
-                            startIncl
-                            endNotIncl
-                            numOfDeploysPerDay
-                            avgLeadTimeInSec
-                            failureRatePercent
-                            avgMttrDurationInSec
-                        }
-                    }
+                quarters {
+                  startIncl       
+                  endNotIncl
+                  numOfDeploysPerDay
+                  avgLeadTimeInSec
+                  failureRatePercent
+                  avgMttrDurationInSec
                 }
+              }
             }
-        `;
+          }
+      `;
 
-        const variables = {
-            orgSlug,
-            projectSlugs,
-            start,
-            end,
-            environmentName,
-            labelSlugs,
-            teamSlugs,
-        };
+      const variables = {
+          orgSlug : orgId,
+          start,
+          end,
+      };
 
-        try {
-            return await this.client.request(query, variables);
-        } catch (error) {
-            throw new DoraMetricsError(
-                'Failed to query Sleuth API for project metrics',
-                'PROVIDER_ERROR',
-                error,
-            );
+
+      try {
+           const result = await this.batchClient.query({
+            query: gql`${trendQuery}`,
+            variables,
+          });
+          return result.data;
+      } catch (error) {
+          throw new DoraMetricsError(
+              'Failed to query Sleuth API for trend metrics',
+              'PROVIDER_ERROR',
+              error,
+          );
+      }
+  }
+
+
+  async teamMetrics(request: TeamMetricsRequest): Promise<TeamMetricsResponse> {
+    const query = `
+      query GetTeamMetrics(
+        $orgSlug: ID!
+        $teamSlug: ID!
+        $previousRangeStart: DateTime!
+        $previousRangeEnd: DateTime!
+        $currentRangeStart: DateTime!
+        $currentRangeEnd: DateTime!
+      ) {
+        team(orgSlug: $orgSlug, teamSlug: $teamSlug) {
+          name
+          currentRange: metricRecap(
+            start: $currentRangeStart
+            end: $currentRangeEnd
+          ) {
+            avgLeadTimeInSec
+            numOfDeploys
+            numOfDeploysPerDay
+            failureRatePercent
+            avgMttrDurationInSec
+          }
+          previousRange: metricRecap(
+            start: $previousRangeStart
+            end: $previousRangeEnd
+          ) {
+            avgLeadTimeInSec
+            numOfDeploys
+            numOfDeploysPerDay
+            failureRatePercent
+            avgMttrDurationInSec
+          }
         }
+      }
+    `;
+
+    const variables = {
+      orgSlug: request.orgSlug,
+      teamSlug: request.teamSlug,
+      currentRangeStart: request.currentRangeStart,
+      currentRangeEnd: request.currentRangeEnd,
+      previousRangeStart: request.previousRangeStart,
+      previousRangeEnd: request.previousRangeEnd,
+     };
+
+    try {
+      const result = await this.batchClient.query({
+        query: gql`${query}`,
+        variables,
+      });
+      
+      // Return the team metrics response
+      return result.data as TeamMetricsResponse;
+    } catch (error) {
+      throw new DoraMetricsError(
+        'Failed to query Sleuth API for team metrics',
+        'PROVIDER_ERROR',
+        error,
+      );
     }
+  }
+
+  async teamMetricsInsights(request: TeamMetricsInsightsRequest): Promise<ProjectInsightsResponse> {
+    const query = `
+      query GetTeamMetricsInsights(
+        $orgSlug: ID!
+        $projectSlug: ID!
+        $deploymentSlugs: [ID!]!
+        $environmentSlug: ID!
+        $startDate: DateTime!
+        $endDate: DateTime!
+        $teamSlug: ID
+      ) {
+        project(orgSlug: $orgSlug, projectSlug: $projectSlug) {
+          insights(
+            environmentSlug: $environmentSlug
+            deploymentSlugs: $deploymentSlugs
+            start: $startDate
+            end: $endDate
+            teamSlug: $teamSlug
+          ) {
+            __typename
+            ... on MetricOffsetFromAverageInsightType {
+              insightMetricType
+              offsetPercentage
+              message
+              icon
+              isPositive
+              insightLink
+            }
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      orgSlug: request.orgSlug,
+      teamSlug: request.teamSlug,
+      environmentSlug: request.environment,
+      deploymentSlugs: [],
+      startDate: request.currentRangeStart,
+      endDate: request.currentRangeEnd,
+     };
+
+    try {
+      const result = await this.client.query({
+        query: gql`${query}`,
+        variables,
+      });
+      return result.data as ProjectInsightsResponse;
+    } catch (error) {
+      throw new DoraMetricsError(
+        'Failed to query Sleuth API for team metrics insights',
+        'PROVIDER_ERROR',
+        error,
+      );
+    }
+  }
+
+  async batchTeamMetrics(requests: TeamMetricsRequest[]): Promise<{ teams: any[] }> {
+    // Use the existing teamMetrics query from the single team method
+    const TEAM_METRICS_QUERY = `
+      query GetTeamMetrics(
+        $orgSlug: ID!
+        $teamSlug: ID!
+        $previousRangeStart: DateTime!
+        $previousRangeEnd: DateTime!
+        $currentRangeStart: DateTime!
+        $currentRangeEnd: DateTime!
+      ) {
+        team(orgSlug: $orgSlug, teamSlug: $teamSlug) {
+          name
+          currentRange: metricRecap(
+            start: $currentRangeStart
+            end: $currentRangeEnd
+          ) {
+            avgLeadTimeInSec
+            numOfDeploys
+            numOfDeploysPerDay
+            failureRatePercent
+            avgMttrDurationInSec
+          }
+          previousRange: metricRecap(
+            start: $previousRangeStart
+            end: $previousRangeEnd
+          ) {
+            avgLeadTimeInSec
+            numOfDeploys
+            numOfDeploysPerDay
+            failureRatePercent
+            avgMttrDurationInSec
+          }
+        }
+      }
+    `;
+
+    // Create batch queries using TeamMetricsRequest array
+    const batchQueries = requests.map(request => ({
+      query: TEAM_METRICS_QUERY,
+      variables: {
+        orgSlug: request.orgSlug,
+        teamSlug: request.teamSlug,
+        currentRangeStart: request.currentRangeStart,
+        currentRangeEnd: request.currentRangeEnd,
+        previousRangeStart: request.previousRangeStart,
+        previousRangeEnd: request.previousRangeEnd,
+      }
+    }));
+
+    try {
+      // Send each team query individually - BatchHttpLink will automatically batch them
+      const teamPromises = batchQueries.map(async (batchQuery) => {
+        try {
+          const result = await this.batchClient.query({
+            query: gql`${batchQuery.query}`,
+            variables: batchQuery.variables
+          });
+          return result.data.team;
+        } catch (error) {
+          console.error(`Failed to fetch metrics for team: ${batchQuery.variables.teamSlug}`, error);
+          return null;
+        }
+      });
+
+      // Wait for all queries to complete
+      const teamResults = await Promise.all(teamPromises);
+      
+      // Filter out any failed requests
+      const teams = teamResults.filter((team: any) => team !== null && team !== undefined);
+
+      return { teams };
+    } catch (error) {
+      throw new DoraMetricsError(
+        'Failed to query Sleuth API for batch team metrics',
+        'PROVIDER_ERROR',
+        error,
+      );
+    }
+  }
 }
+
+

@@ -1,10 +1,10 @@
 import { createDevApp } from '@backstage/dev-utils';
-import { doraFrontendPlugin, DoraFrontendPage } from '../src/plugin';
+import { doraFrontendPlugin, DoraPerformanceComponent } from '../src/plugin';
 
 createDevApp()
   .registerPlugin(doraFrontendPlugin)
   .addPage({
-    element: <DoraFrontendPage />,
+    element: <DoraPerformanceComponent />,
     title: 'Root Page',
     path: '/dora-frontend',
   })

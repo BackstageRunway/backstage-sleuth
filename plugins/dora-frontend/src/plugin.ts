@@ -35,7 +35,17 @@ export const DoraELTPage = doraFrontendPlugin.provide(
   createRoutableExtension({
     name: 'DoraELTPage',
     component: () =>
-      import('./components/dora/elt/ELTDashboard').then(m => m.ELTDashboard),
+      import('./components/dora/ExecutiveDashboard').then(m => m.ExecutiveDashboard),
+    mountPoint: rootRouteRef,
+  }),
+);
+
+// this is a routable page
+export const DoraLeadPage = doraFrontendPlugin.provide(
+  createRoutableExtension({
+    name: 'DoraLeadPage',
+    component: () =>
+      import('./components/dora/LeadDashboard/LeadDashboard').then(m => m.LeadDashboard),
     mountPoint: rootRouteRef,
   }),
 );
@@ -61,11 +71,12 @@ export const DoraDashboard = doraFrontendPlugin.provide(
   }),
 );
 
+// this is an embeddable exported component, can be embeded in any page or plugin like home, Entity
 export const DoraPerformanceComponent = doraFrontendPlugin.provide(
   createComponentExtension({
     name: 'PerformanceComponent',
     component: {
-      lazy: () => import('./components/dora/EntityDoraMetrics').then(m => m.EntityDoraMetrics),
+      lazy: () => import('./components/dora/EntityDashboard').then(m => m.EntityDashboard),
     },
   }),
 );
