@@ -50,6 +50,16 @@ export const DoraLeadPage = doraFrontendPlugin.provide(
   }),
 );
 
+// this is a routable page
+export const DoraLeadPage = doraFrontendPlugin.provide(
+  createRoutableExtension({
+    name: 'DoraLeadPage',
+    component: () =>
+      import('./components/dora/lead/LeadDashboard').then(m => m.LeadDashboard),
+    mountPoint: rootRouteRef,
+  }),
+);
+
 
 // this is an embeddable exported component, can be embeded in any page or plugin like home, Entity
 export const DoraDashboard = doraFrontendPlugin.provide(
