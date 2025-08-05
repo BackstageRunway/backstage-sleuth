@@ -1,6 +1,6 @@
 import { MetricData, MetricType } from '../../common/types/metrics';
 import { ApiInsight } from '../../common/types/api';
-import { getMetricDisplayValue, getMetricInsights } from '../utils';
+import { formatMetricValue, getMetricInsights } from '../../common';
 import { TrendCell } from './TrendCell';
 import { METRIC_DESCRIPTIONS, METRIC_TARGETS } from '../constants';
 import { useStyles } from '../styles';
@@ -33,7 +33,7 @@ export function MetricSummaryCard({ metric, insight }: Props) {
                     </Tooltip>
                 </div>
                 <Typography className={classes.metricValue}>
-                    {getMetricDisplayValue(metric.metricName, metric.rawValue)}
+                    {formatMetricValue(metric.rawValue, metric.metricName)}
                 </Typography>
                 <div className={classes.metricInfo}>
                     <TrendCell

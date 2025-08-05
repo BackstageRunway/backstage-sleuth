@@ -68,7 +68,7 @@ interface TeamPerformanceProps {
     isLoading?: boolean;
 }
 
-export const TeamPerformance: React.FC<TeamPerformanceProps> = ({ selectedTeam, allTeamsData, isLoading = false }) => {
+export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false }: TeamPerformanceProps) => {
     const classes = useStyles();
     const [fadeIn, setFadeIn] = useState(false);
     useEffect(() => { setFadeIn(true); }, []);

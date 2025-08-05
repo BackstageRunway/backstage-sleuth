@@ -12,7 +12,6 @@ import { DEFAULT_ENTITY_VALUES } from '../constants/annotations';
  * Default configuration values for DORA plugin
  */
 export const DORA_DEFAULT_CONFIG: DoraConfig = {
-  orgId: DEFAULT_ENTITY_VALUES.ORG_ID,
   environment: DEFAULT_ENTITY_VALUES.ENVIRONMENT,
   deployment: DEFAULT_ENTITY_VALUES.DEPLOYMENT,
   defaultTimeRange: 'last28days' as TimeRange,
@@ -27,7 +26,6 @@ export const useDoraConfig = () => {
     const configApi = useApi(configApiRef);
     
     return {
-      orgId: configApi.getOptionalString(DORA_CONFIG_KEYS.ORG_ID) || DORA_DEFAULT_CONFIG.orgId,
       environment: configApi.getOptionalString(DORA_CONFIG_KEYS.ENVIRONMENT) || DORA_DEFAULT_CONFIG.environment,
       deployment: configApi.getOptionalString(DORA_CONFIG_KEYS.DEPLOYMENT) || DORA_DEFAULT_CONFIG.deployment,
       defaultTimeRange: configApi.getOptionalString(DORA_CONFIG_KEYS.DEFAULT_TIME_RANGE) || DORA_DEFAULT_CONFIG.defaultTimeRange,
@@ -47,7 +45,6 @@ export const useDoraConfig = () => {
  */
 export const getEntityConfig = (entity: BackstageEntity, config: ReturnType<typeof useDoraConfig>): EntityConfig => {
   return {
-    orgId: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.ORG_ID] || config.orgId,
     projectSlug: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.PROJECT_SLUG] || DEFAULT_ENTITY_VALUES.PROJECT_SLUG,
     environment: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.ENVIRONMENT] || config.environment,
     deployment: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.DEPLOYMENT] || config.deployment,

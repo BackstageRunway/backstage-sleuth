@@ -36,9 +36,9 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
 
   // Metrics endpoint - GET - EntityDoraMetrics.tsx
-  router.get('/metrics/:orgId/:projectSlug', async (req, res) => {
+  router.get('/metrics/:projectSlug', async (req, res) => {
     try {
-      const { orgId, projectSlug } = req.params;
+      const { projectSlug } = req.params;
       const queryResult = MetricsQuerySchema.safeParse(req.query);
 
       if (!queryResult.success) {
@@ -57,7 +57,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       const { timeRange, environment, deploymentId } = queryResult.data;
 
       logger.info('Received metrics request', {
-        orgId,
         projectSlug,
         timeRange,
         environment,
@@ -68,7 +67,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       });
 
       const metrics = await metricsService.getProjectMetrics(
-        orgId,
+        
         projectSlug,
         environment,
         deploymentId,
@@ -79,8 +78,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     } catch (error) {
       logger.error('Failed to fetch metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgId: req.params.orgId,
-        projectId: req.params.projectSlug,
+         projectId: req.params.projectSlug,
       });
       
       if (error instanceof Error && error.message === 'No metrics data available') {
@@ -92,9 +90,9 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
   });
 
    // Metrics endpoint - GET
-   router.get('/metrics-insights/:orgId/:projectId', async (req, res) => {
+   router.get('/metrics-insights/:projectId', async (req, res) => {
     try {
-      const { orgId, projectId } = req.params;
+      const { projectId } = req.params;
       const queryResult = MetricsQuerySchema.safeParse(req.query);
 
       if (!queryResult.success) {
@@ -113,7 +111,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       const { timeRange, environment, deploymentId } = queryResult.data;
 
       logger.info('Received metrics insights request', {
-        orgId,
         projectId,
         timeRange,
         environment,
@@ -124,7 +121,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       });
 
       const metrics = await metricsService.getProjectMetricsInsights(
-        orgId,
         projectId,
         environment,
         deploymentId,
@@ -135,7 +131,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     } catch (error) {
       logger.error('Failed to fetch metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgId: req.params.orgId,
         projectId: req.params.projectId,
       });
       
@@ -149,11 +144,10 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
  
   // Organization trend metrics endpoint
-  router.get('/org-trend-metrics/:orgId', async (req, res) => {
+  router.get('/org-trend-metrics', async (req, res) => {
 
       try {
-        const { orgId } = req.params;
-       
+        
         const queryResult = OrgTrendMetricsQuerySchema.safeParse(req.query);
 
         if (!queryResult.success) {
@@ -173,7 +167,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
   
         logger.info('Received Org Trend metrics request', {
-          orgId,
           timeRange,
           path: req.path,
           url: req.url,
@@ -181,7 +174,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         });
   
         const result = await metricsService.getOrganizationTrendMetrics(
-          orgId,
           timeRange
         );
 
@@ -189,7 +181,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     } catch (error) {
       logger.error('Failed to fetch organization trend metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgSlug: req.query.orgSlug,
       });
       return res.status(500).json({ error: 'Failed to fetch organization trend metrics' });
     }
@@ -197,9 +188,9 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
 
   // Team metrics endpoint - GET
-  router.get('/team-metrics/:orgId/:teamSlug', async (req, res) => {
+  router.get('/team-metrics/:teamSlug', async (req, res) => {
     try {
-      const { orgId, teamSlug } = req.params;
+      const { teamSlug } = req.params;
       const queryResult = MetricsQuerySchema.safeParse(req.query);
 
       if (!queryResult.success) {
@@ -218,7 +209,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       const { timeRange, environment, deploymentId } = queryResult.data;
 
       logger.info('Received team metrics request', {
-        orgId,
         teamSlug,
         timeRange,
         environment,
@@ -229,7 +219,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       });
 
       const metrics = await metricsService.getTeamMetrics(
-        orgId,
         teamSlug,
         environment,
         timeRange
@@ -239,7 +228,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     } catch (error) {
       logger.error('Failed to fetch team metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgId: req.params.orgId,
         teamSlug: req.params.teamSlug,
       });
       
@@ -252,9 +240,9 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
   });
 
   // Team metrics insights endpoint - GET
-  router.get('/team-metrics-insights/:orgId/:teamSlug', async (req, res) => {
+  router.get('/team-metrics-insights/:teamSlug', async (req, res) => {
     try {
-      const { orgId, teamSlug } = req.params;
+      const { teamSlug } = req.params;
       const queryResult = MetricsQuerySchema.safeParse(req.query);
 
       if (!queryResult.success) {
@@ -273,7 +261,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       const { timeRange, environment, deploymentId } = queryResult.data;
 
       logger.info('Received team metrics insights request', {
-        orgId,
         teamSlug,
         timeRange,
         environment,
@@ -284,7 +271,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       });
 
       const metrics = await metricsService.getTeamMetricsInsights(
-        orgId,
         teamSlug,
         environment,
         deploymentId,
@@ -295,7 +281,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     } catch (error) {
       logger.error('Failed to fetch team metrics insights', {
         error: error instanceof Error ? error.message : String(error),
-        orgId: req.params.orgId,
         teamSlug: req.params.teamSlug,
       });
       
@@ -308,9 +293,8 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
   });
 
   // Batch team metrics endpoint - POST
-  router.post('/batch-team-metrics/:orgId', async (req, res) => {
+  router.post('/batch-team-metrics', async (req, res) => {
     try {
-      const { orgId } = req.params;
       const { teamSlugs, timeRange, environment, deploymentId } = req.body;
 
       // Validate required fields
@@ -327,7 +311,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       }
 
       logger.info('Received batch team metrics request', {
-        orgId,
         teamSlugs,
         timeRange,
         environment,
@@ -338,7 +321,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       });
 
       const metrics = await metricsService.getBatchTeamMetrics(
-        orgId,
         teamSlugs,
         environment,
         deploymentId,
@@ -349,7 +331,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     } catch (error) {
       logger.error('Failed to fetch batch team metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgId: req.params.orgId,
         teamSlugs: req.body.teamSlugs,
       });
       

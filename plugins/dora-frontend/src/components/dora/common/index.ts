@@ -13,6 +13,7 @@ export * from './utils/calculations';
 export * from './utils/formatters';
 export * from './utils/processors';
 export * from './utils/config';
+export * from './utils/insights';
 
 // Constants
 export * from './constants/metrics';

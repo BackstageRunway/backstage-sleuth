@@ -37,25 +37,3 @@ export const DEFAULT_ENTITY_VALUES = {
   SERVICE: 'default',
 } as const;
 
-/**
- * Valid environment values
- */
-export const VALID_ENVIRONMENTS = [
-  'production',
-  'staging',
-  'development',
-  'testing',
-  'qa',
-] as const;
-
-/**
- * Valid deployment types
- */
-export const VALID_DEPLOYMENT_TYPES = [
-  'application',
-  'service',
-  'microservice',
-  'api',
-  'frontend',
-  'backend',
-] as const; 

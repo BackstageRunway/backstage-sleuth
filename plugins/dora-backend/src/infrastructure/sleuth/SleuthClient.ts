@@ -7,14 +7,17 @@ import { ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse,
 export class SleuthClient {
   private readonly client: ApolloClient<NormalizedCacheObject>;
   private readonly batchClient: ApolloClient<NormalizedCacheObject>;
-  
-  constructor(apiKey: string) {
+  private readonly organizationId: string;
+   
+  constructor(apiKey: string, apiUrl: string, organizationId: string) {
+    this.organizationId = organizationId;
     this.client = new ApolloClient({
       link: new HttpLink({
-        uri: 'https://app.sleuth.io/graphql',
+        uri: `${apiUrl}/graphql`,
         fetch,
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `apikey ${apiKey}`,
+          'Content-Type': 'application/json',
           Cookie: '__Host-sessionid=f7xr8j59258nzt0zgy3a9atjhx3aypc2',	
         },
       }),
@@ -24,10 +27,11 @@ export class SleuthClient {
     
     this.batchClient = new ApolloClient({
       link: new BatchHttpLink({
-        uri: 'https://app.sleuth.io/graphql-batch',
+        uri: `${apiUrl}/graphql-batch`,
         fetch,
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `apikey ${apiKey}`,
+          'Content-Type': 'application/json',
           Cookie: '__Host-sessionid=f7xr8j59258nzt0zgy3a9atjhx3aypc2',	
         },
         batchMax: 5,
@@ -85,7 +89,7 @@ export class SleuthClient {
     `;
 
     const variables = {
-      orgSlug: request.orgSlug,
+      orgSlug: this.organizationId,
       projectSlug: request.projectSlug,
       environmentSlug: request.environment,
       deploymentSlugs: [],
@@ -145,7 +149,7 @@ export class SleuthClient {
 
 
     const variables = {
-      orgSlug: request.orgSlug,
+      orgSlug: this.organizationId,
       projectSlug: request.projectSlug,
       environmentSlug: request.environment,
       deploymentSlugs: [],
@@ -169,7 +173,6 @@ export class SleuthClient {
     }
 
     async getTrendMetrics(
-      orgId: string,
       start: string,
       end: string,
   ): Promise<any> {
@@ -201,11 +204,11 @@ export class SleuthClient {
           }
       `;
 
-      const variables = {
-          orgSlug : orgId,
-          start,
-          end,
-      };
+             const variables = {
+           orgSlug : this.organizationId,
+           start,
+           end,
+       };
 
 
       try {
@@ -261,7 +264,7 @@ export class SleuthClient {
     `;
 
     const variables = {
-      orgSlug: request.orgSlug,
+      orgSlug: this.organizationId,
       teamSlug: request.teamSlug,
       currentRangeStart: request.currentRangeStart,
       currentRangeEnd: request.currentRangeEnd,
@@ -320,7 +323,7 @@ export class SleuthClient {
     `;
 
     const variables = {
-      orgSlug: request.orgSlug,
+      orgSlug: this.organizationId,
       teamSlug: request.teamSlug,
       environmentSlug: request.environment,
       deploymentSlugs: [],
@@ -381,17 +384,17 @@ export class SleuthClient {
     `;
 
     // Create batch queries using TeamMetricsRequest array
-    const batchQueries = requests.map(request => ({
-      query: TEAM_METRICS_QUERY,
-      variables: {
-        orgSlug: request.orgSlug,
-        teamSlug: request.teamSlug,
-        currentRangeStart: request.currentRangeStart,
-        currentRangeEnd: request.currentRangeEnd,
-        previousRangeStart: request.previousRangeStart,
-        previousRangeEnd: request.previousRangeEnd,
-      }
-    }));
+          const batchQueries = requests.map(request => ({
+        query: TEAM_METRICS_QUERY,
+        variables: {
+          orgSlug: this.organizationId,
+          teamSlug: request.teamSlug,
+          currentRangeStart: request.currentRangeStart,
+          currentRangeEnd: request.currentRangeEnd,
+          previousRangeStart: request.previousRangeStart,
+          previousRangeEnd: request.previousRangeEnd,
+        }
+      }));
 
     try {
       // Send each team query individually - BatchHttpLink will automatically batch them

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { 
   FormControl, 
   InputLabel, 
@@ -27,10 +27,10 @@ interface TeamSelectorProps {
   onTeamChange: (team: string | null) => void;
 }
 
-export const TeamSelector: React.FC<TeamSelectorProps> = ({ 
+export const TeamSelector = ({ 
   selectedTeam, 
   onTeamChange 
-}) => {
+}: TeamSelectorProps) => {
   const classes = useStyles();
   const { teams, loading, error } = useUserTeams();
 

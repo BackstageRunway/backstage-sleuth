@@ -17,7 +17,9 @@ export const doraBackendPlugin = createBackendPlugin({
       },
       async init({httpRouter, logger, config }) {
         const sleuthApiKey = config.getString('dora.sleuth.apiKey');
-        const client = new SleuthClient(sleuthApiKey);
+        const sleuthApiUrl = config.getString('dora.sleuth.apiUrl');
+        const organizationId = config.getString('dora.sleuth.organizationId');
+        const client = new SleuthClient(sleuthApiKey, sleuthApiUrl, organizationId);
         const metricsService = new MetricsService(client, logger);
 
       

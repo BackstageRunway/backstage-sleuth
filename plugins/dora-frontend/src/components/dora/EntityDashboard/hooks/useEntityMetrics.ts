@@ -17,7 +17,7 @@ export function useEntityMetrics(entity: any) {
 
   // Get configuration from Backstage config API and entity annotations
   const baseConfig = useDoraConfig();
-  const { orgId, projectSlug, environment, deployment } = getEntityConfig(entity, baseConfig);
+  const { projectSlug, environment, deployment } = getEntityConfig(entity, baseConfig);
 
 
 
@@ -25,7 +25,6 @@ export function useEntityMetrics(entity: any) {
     setLoading(true);
     try {
       const result = await doraApi.getProjectDORAMetrics(
-        orgId,
         projectSlug,
         environment,
         deployment,
@@ -46,13 +45,12 @@ export function useEntityMetrics(entity: any) {
     } finally {
       setLoading(false);
     }
-  }, [doraApi, orgId, projectSlug, environment, deployment]);
+  }, [doraApi, projectSlug, environment, deployment]);
 
   const fetchMetricsInsights = useCallback(async (timeRange: TimeRange) => {
     setLoading(true);
     try {
       const result = await doraApi.getProjectDORAMetricsInsights(
-        orgId,
         projectSlug,
         environment,
         deployment,
@@ -71,7 +69,7 @@ export function useEntityMetrics(entity: any) {
     } finally {
       setLoading(false);
     }
-  }, [doraApi, orgId, projectSlug, environment, deployment]);
+  }, [doraApi, projectSlug, environment, deployment]);
 
   useEffect(() => {
     fetchMetrics(selectedTimeRange);

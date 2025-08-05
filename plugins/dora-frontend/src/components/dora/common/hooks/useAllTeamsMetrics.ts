@@ -29,7 +29,6 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
   const config = useMemo(() => {
     const baseConfig = useDoraConfig();
     return {
-      orgId: baseConfig.orgId,
       environment: baseConfig.environment,
       deployment: baseConfig.deployment,
     };
@@ -104,7 +103,6 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
     try {
       // Make batch request for all teams
       const result = await doraApi.getBatchTeamDORAMetrics(
-        config.orgId,
         teamSlugs,
         config.environment,
         config.deployment,
