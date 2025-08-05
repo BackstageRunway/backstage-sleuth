@@ -71,8 +71,12 @@ export const ExecutiveDashboard = () => {
                 
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <Typography className={classes.title}>Project Health</Typography>
-                        <ProjectHealth />
+                        <Typography className={classes.title}>Quaterly Health</Typography>
+                        <ProjectHealth 
+                            data={data}
+                            loading={loading}
+                            error={error}
+                        />
                     </Paper>
                 </Grid>
             </Grid>

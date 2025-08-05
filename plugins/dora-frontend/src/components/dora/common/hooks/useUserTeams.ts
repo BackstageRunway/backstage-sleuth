@@ -25,7 +25,7 @@ export function useUserTeams() {
         // Get the current user entity - try with default namespace
         const userEntities = await catalogApi.getEntitiesByRefs({entityRefs: ['user:default/user1']});
 
-        // Access the first (and likely only) user entity
+        // Access the first user entity
         const userEntity = userEntities.items[0] as UserEntity;
 
         if (!userEntity) {
