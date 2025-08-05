@@ -10,6 +10,9 @@ dora:
     organizationId: 'sleuth'
     apiUrl: 'https://app.sleuth.io'
     apiKey: 'your-sleuth-api-key-here'
+    environment: 'production'
+    deployment: 'application'
+    defaultTimeRange: 'last28days'
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
