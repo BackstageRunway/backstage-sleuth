@@ -1,4 +1,4 @@
-import { MetricType } from '../../../DORAMetricModel';
+import { MetricType } from '../common/types/metrics';
 
 export const METRIC_DESCRIPTIONS: Record<MetricType, string> = {
     [MetricType.Frequency]: 'How often an organization successfully releases to production',

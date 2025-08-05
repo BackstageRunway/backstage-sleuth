@@ -1,5 +1,6 @@
 import { Grid } from '@material-ui/core';
-import { MetricData, ApiInsight } from '../../shared/components/types';
+import { MetricData } from '../../common/types/metrics';
+import { ApiInsight } from '../../common/types/api';
 import { useStyles } from '../styles';
 import { MetricSummaryCard } from './MetricSummaryCard';
 

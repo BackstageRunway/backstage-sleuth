@@ -60,12 +60,7 @@ export const ExecutiveDashboard = () => {
             />
             {loading && <div>Loading organization trend metrics...</div>}
             {error && <div style={{color: 'red'}}>Error: {error}</div>}
-            {/* {data && (
-                <Paper className={classes.paper}>
-                    <Typography className={classes.title}>Organization Trend Metrics (Raw)</Typography>
-                    <pre>{JSON.stringify(data, null, 2)}</pre>
-                </Paper>
-            )} */}
+         
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
@@ -76,8 +71,12 @@ export const ExecutiveDashboard = () => {
                 
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <Typography className={classes.title}>Project Health</Typography>
-                        <ProjectHealth />
+                        <Typography className={classes.title}>Quaterly Health</Typography>
+                        <ProjectHealth 
+                            data={data}
+                            loading={loading}
+                            error={error}
+                        />
                     </Paper>
                 </Grid>
             </Grid>

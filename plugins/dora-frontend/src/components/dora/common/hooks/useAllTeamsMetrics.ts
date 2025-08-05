@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApi } from '@backstage/core-plugin-api';
 import { doraBackendApiRef } from '../../../../api/DORABackendClient';
-import { MetricType } from '../../../../DORAMetricModel';
-
-export type TimeRange = 'last7days' | 'last14days' | 'last28days' | 'last90days';
+import { MetricType, TimeRange } from '../types/metrics';
+import { useDoraConfig } from '../utils/config';
+import { determineTrend, determineOverallTrend } from '../utils/calculations';
+import { formatMetricValue } from '../utils/formatters';
 
 export interface TeamMetricsData {
   name: string;
@@ -24,59 +25,23 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
   const [overallLoading, setOverallLoading] = useState(true);
   const [overallError, setOverallError] = useState<string | null>(null);
 
-  // Default configuration - memoized to prevent recreation
-  const config = useMemo(() => ({
-    orgId: 'sleuth',
-    environment: 'production',
-    deployment: 'application',
-  }), []);
+  // Get configuration from Backstage config API - memoized to prevent recreation
+  const config = useMemo(() => {
+    const baseConfig = useDoraConfig();
+    return {
+      environment: baseConfig.environment,
+      deployment: baseConfig.deployment,
+    };
+  }, []);
 
-  const calculateTrendChange = (current: number, previous: number): number => {
-    if (previous === 0) return 0;
-    return ((current - previous) / previous) * 100;
-  };
 
-  const determineTrend = (current: number, previous: number, metricType: MetricType): 'up' | 'down' | 'stable' => {
-    const change = calculateTrendChange(current, previous);
-    
-    // For lead time and MTTR, lower is better (down trend is positive)
-    if (metricType === MetricType.LeadTime || metricType === MetricType.Mttr) {
-      return change <= -5 ? 'up' : change >= 5 ? 'down' : 'stable';
-    }
-    
-    // For frequency and failure rate, higher frequency is better, lower failure rate is better
-    if (metricType === MetricType.Frequency) {
-      return change >= 5 ? 'up' : change <= -5 ? 'down' : 'stable';
-    }
-    
-    if (metricType === MetricType.FailureRate) {
-      return change <= -5 ? 'up' : change >= 5 ? 'down' : 'stable';
-    }
-    
-    return 'stable';
-  };
 
-  const formatMetricValue = (value: number, metricType: MetricType): string => {
-    switch (metricType) {
-      case MetricType.Frequency:
-        return `${value.toFixed(2)}/day`;
-      case MetricType.LeadTime:
-        const hours = value / 3600;
-        return hours >= 1 ? `${hours.toFixed(1)}h` : `${(value / 60).toFixed(1)}m`;
-      case MetricType.FailureRate:
-        return `${value.toFixed(1)}%`;
-      case MetricType.Mttr:
-        const minutes = value / 60;
-        return minutes >= 1 ? `${minutes.toFixed(1)}m` : `${value}s`;
-      default:
-        return value.toString();
-    }
-  };
+
 
   const transformTeamData = (teamResponse: any): TeamMetricsData => {
     const { name, currentRange, previousRange } = teamResponse;
     
-    // Calculate overall trend based on key metrics
+    // Calculate individual metric trends
     const frequencyTrend = determineTrend(
       currentRange.numOfDeploysPerDay,
       previousRange.numOfDeploysPerDay,
@@ -95,13 +60,8 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
       MetricType.FailureRate
     );
     
-    // Determine overall trend (prioritize negative trends)
-    let overallTrend: 'up' | 'down' | 'stable' = 'stable';
-    if (failureRateTrend === 'down' || leadTimeTrend === 'down') {
-      overallTrend = 'down';
-    } else if (frequencyTrend === 'up') {
-      overallTrend = 'up';
-    }
+    // Determine overall trend using utility function
+    const overallTrend = determineOverallTrend(frequencyTrend, leadTimeTrend, failureRateTrend);
 
     return {
       name,
@@ -143,7 +103,6 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
     try {
       // Make batch request for all teams
       const result = await doraApi.getBatchTeamDORAMetrics(
-        config.orgId,
         teamSlugs,
         config.environment,
         config.deployment,

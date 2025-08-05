@@ -1,24 +1,22 @@
-import { MetricType } from '../../../DORAMetricModel';
-import { ApiInsight, MetricInsight, InsightMetricType } from '../shared/components/types';
+/**
+ * Insight generation utilities for DORA metrics
+ */
+
+import { MetricType } from '../types/metrics';
+import { ApiInsight, MetricInsight } from '../types/api';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import WarningIcon from '@material-ui/icons/Warning';
 import ErrorIcon from '@material-ui/icons/Error';
 
-export function getMetricDisplayValue(metricName: MetricType, value: number): string {
-    switch (metricName) {
-        case MetricType.Frequency:
-            return `${value.toFixed(2)}/day`;
-        case MetricType.LeadTime:
-            return `${(value / 3600).toFixed(1)}h`;
-        case MetricType.Mttr:
-            return `${(value / 3600).toFixed(1)}h`;
-        case MetricType.FailureRate:
-            return `${value.toFixed(1)}%`;
-        default:
-            return value.toString();
-    }
-}
-
+/**
+ * Generates metric-specific insights based on values and trends
+ * @param metricType - Type of metric
+ * @param value - Current metric value
+ * @param percentageChange - Percentage change from previous period
+ * @param styles - CSS styles object for icons
+ * @param apiInsight - Optional API-provided insight
+ * @returns Array of metric insights
+ */
 export function getMetricInsights(
     metricType: MetricType,
     value: number,
@@ -161,34 +159,4 @@ export function getMetricInsights(
     }
 
     return insights;
-}
-
-export const formatMetricValue = (metricName: MetricType, value: number): string => {
-    switch (metricName) {
-        case MetricType.Frequency:
-            return `${value.toFixed(2)}/day`;
-        case MetricType.LeadTime:
-            return `${(value / 3600).toFixed(1)}h`;
-        case MetricType.FailureRate:
-            return `${value.toFixed(1)}%`;
-        case MetricType.Mttr:
-            return `${(value / 3600).toFixed(1)}h`;
-        default:
-            return value.toString();
-    }
-};
-
-export const mapApiMetricTypeToInternal = (apiType: InsightMetricType): MetricType => {
-    switch (apiType) {
-        case 'FAILURE_RATE':
-            return MetricType.FailureRate;
-        case 'DEPLOYING':
-            return MetricType.Frequency;
-        case 'LEAD_TIME':
-            return MetricType.LeadTime;
-        case 'MTTR':
-            return MetricType.Mttr;
-        default:
-            throw new Error(`Unknown API metric type: ${apiType}`);
-    }
-}; 
+} 

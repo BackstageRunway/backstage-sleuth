@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles';
 
 import DetailsTable from './MetricsPerformanceTable';
-import { MetricData } from '../../shared/components/types';
+import { MetricData } from '../../common/types/metrics';
 
 import { Grid } from '@material-ui/core';
 

@@ -51,7 +51,7 @@ export class MetricsService {
     };
   }
 
-  async getProjectMetrics(orgId:string, projectSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectMetricsResponse> {
+  async getProjectMetrics(projectSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectMetricsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
@@ -61,7 +61,6 @@ export class MetricsService {
       });
 
       const response = await this.client.projectMetrics({
-        orgSlug: orgId,
         projectSlug: projectSlug,
         environment: environment,
         deploymentSlug: deploymentId,
@@ -106,7 +105,7 @@ export class MetricsService {
   }
 
 
-  async getProjectMetricsInsights(orgId:string, projectSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
+  async getProjectMetricsInsights( projectSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
@@ -116,7 +115,6 @@ export class MetricsService {
       });
 
       const response = await this.client.projectMetricsInsights({
-        orgSlug: orgId,
         projectSlug: projectSlug,
         environment: environment,
         deploymentSlug: deploymentId,
@@ -145,18 +143,15 @@ export class MetricsService {
   }
 
   async getOrganizationTrendMetrics(
-    orgId: string,
     timeRange: string,
   ): Promise<any> {
     try {
       this.logger.info('Fetching organization trend metrics', {
-        orgId,
         timeRange,
       });
 
       const dateRanges = this.calculateDateRanges(timeRange);
       const organization = await this.client.getTrendMetrics(
-        orgId,
         dateRanges.currentRangeStart,
         dateRanges.currentRangeEnd,
       );
@@ -165,13 +160,12 @@ export class MetricsService {
     } catch (error) {
       this.logger.error('Failed to fetch organization trend metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgId,
       });
       throw error;
     }
   }
 
-  async getTeamMetrics(orgId:string, teamSlug: string, environment:string, timeRange: string): Promise<TeamMetricsResponse> {
+  async getTeamMetrics(teamSlug: string, environment:string, timeRange: string): Promise<TeamMetricsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
@@ -181,7 +175,6 @@ export class MetricsService {
       });
 
       const response = await this.client.teamMetrics({
-        orgSlug: orgId,
         teamSlug: teamSlug,
         environment: environment,
         currentRangeStart: dateRanges.currentRangeStart,
@@ -225,7 +218,7 @@ export class MetricsService {
     }
   }
 
-  async getTeamMetricsInsights(orgId:string, teamSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
+  async getTeamMetricsInsights(teamSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
@@ -235,7 +228,6 @@ export class MetricsService {
       });
 
       const response = await this.client.teamMetricsInsights({
-        orgSlug: orgId,
         teamSlug: teamSlug,
         environment: environment,
         deploymentSlug: deploymentId,
@@ -266,12 +258,11 @@ export class MetricsService {
     }
   }
 
-  async getBatchTeamMetrics(orgId: string, teamSlugs: string[], environment: string, deploymentId: string, timeRange: string): Promise<{ teams: any[] }> {
+  async getBatchTeamMetrics(teamSlugs: string[], environment: string, deploymentId: string, timeRange: string): Promise<{ teams: any[] }> {
     try {
       const dateRanges = this.calculateDateRanges(timeRange);
 
       this.logger.info('Fetching batch team metrics', {
-        orgId,
         teamSlugs,
         timeRange,
         environment,
@@ -280,7 +271,6 @@ export class MetricsService {
 
       // Create TeamMetricsRequest array for each team
       const teamRequests: TeamMetricsRequest[] = teamSlugs.map(teamSlug => ({
-        orgSlug: orgId,
         teamSlug: teamSlug,
         environment: environment,
         currentRangeStart: dateRanges.currentRangeStart,
@@ -297,7 +287,6 @@ export class MetricsService {
 
       // Log the metrics for monitoring
       this.logger.info('Retrieved batch team metrics', {
-        orgId,
         teamCount: response.teams.length,
         teamSlugs: response.teams.map(team => team.name),
       });
@@ -306,7 +295,6 @@ export class MetricsService {
     } catch (error) {
       this.logger.error('Failed to fetch batch team metrics', {
         error: error instanceof Error ? error.message : String(error),
-        orgId,
         teamSlugs,
         timeRange,
       });

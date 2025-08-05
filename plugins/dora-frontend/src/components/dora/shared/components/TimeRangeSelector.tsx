@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { Chip } from '@material-ui/core';
+import { TimeRange } from '../../common/types/metrics';
 
 const useStyles = makeStyles({
     container: {
@@ -16,7 +17,7 @@ const useStyles = makeStyles({
     },
 });
 
-type TimeRange = 'last7days' | 'last14days' | 'last28days' | 'last90days';
+
 
 type Props = {
     selectedRange: TimeRange;

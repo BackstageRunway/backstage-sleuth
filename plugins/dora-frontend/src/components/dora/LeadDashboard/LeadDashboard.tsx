@@ -1,7 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Paper, Typography, Box, CircularProgress } from '@material-ui/core';
+import { Grid, Paper, Typography, Box } from '@material-ui/core';
 import { useState } from 'react';
 import { Alert } from '@material-ui/lab';
+import { TimeRange } from '../common/types/metrics';
 
 import { TeamPerformance } from './components/TeamPerformance';
 import { TeamSelector } from './components/TeamSelector';
@@ -35,7 +36,7 @@ const useStyles = makeStyles({
 export const LeadDashboard = () => {
     const classes = useStyles();
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
-    const [selectedTimeRange, setSelectedTimeRange] = useState<'last7days' | 'last14days' | 'last28days' | 'last90days'>('last7days');
+    const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last7days');
 
     // Get user's teams from Backstage catalog
     const { teams: userTeams, loading: userTeamsLoading, error: userTeamsError } = useUserTeams();

@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { Tooltip } from '@material-ui/core';
-import { MetricType, Performance } from '../../../../DORAMetricModel';
+import { MetricType, Performance } from '../../common/types/metrics';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import EmojiEventsIcon from '@material-ui/icons/EmojiEvents';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';

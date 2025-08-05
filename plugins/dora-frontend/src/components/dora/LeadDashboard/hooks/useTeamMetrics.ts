@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useApi } from '@backstage/core-plugin-api';
 import { doraBackendApiRef } from '../../../../api/DORABackendClient';
-import { ApiInsight, MetricData } from '../../shared/components/types';
-import { MetricType, getMetricPerformance, getTrend } from '../../../../DORAMetricModel';
-
-export type TimeRange = 'last7days' | 'last14days' | 'last28days' | 'last90days';
+import { ApiInsight } from '../../common/types/api';
+import { MetricData, TimeRange } from '../../common/types/metrics';
+import { processMetricsResponse } from '../../common/utils/processors';
+import { useDoraConfig } from '../../common/utils/config';
 
 export function useTeamMetrics(teamSlug: string | null) {
   const doraApi = useApi(doraBackendApiRef);
@@ -14,15 +14,10 @@ export function useTeamMetrics(teamSlug: string | null) {
   const [error, setError] = useState<string | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
 
-  // Default configuration for team metrics
-  const orgId = 'sleuth';
-  const environment = 'production';
-  const deployment = 'application';
+  // Get configuration from Backstage config API
+  const { environment, deployment } = useDoraConfig();
 
-  const calculateTrendChange = (current: number, previous: number): number => {
-    if (previous === 0) return 0;
-    return ((current - previous) / previous) * 100;
-  };
+
 
   const fetchMetrics = useCallback(async (timeRange: TimeRange) => {
     if (!teamSlug) {
@@ -35,7 +30,6 @@ export function useTeamMetrics(teamSlug: string | null) {
     setLoading(true);
     try {
       const result = await doraApi.getTeamDORAMetrics(
-        orgId,
         teamSlug,
         environment,
         deployment,
@@ -47,68 +41,7 @@ export function useTeamMetrics(teamSlug: string | null) {
       }
 
       const team = result.team;
-      const metricsData: MetricData[] = [
-        {
-          metricName: MetricType.Frequency,
-          value: getMetricPerformance(MetricType.Frequency, team.currentRange.numOfDeploysPerDay),
-          rawValue: team.currentRange.numOfDeploysPerDay,
-          previousValue: getMetricPerformance(MetricType.Frequency, team.previousRange.numOfDeploysPerDay),
-          percentageChange: calculateTrendChange(
-            team.currentRange.numOfDeploysPerDay,
-            team.previousRange.numOfDeploysPerDay
-          ),
-          trend: getTrend(
-            MetricType.Frequency,
-            team.currentRange.numOfDeploysPerDay,
-            team.previousRange.numOfDeploysPerDay
-          ),
-        },
-        {
-          metricName: MetricType.LeadTime,
-          value: getMetricPerformance(MetricType.LeadTime, team.currentRange.avgLeadTimeInSec),
-          rawValue: team.currentRange.avgLeadTimeInSec,
-          previousValue: getMetricPerformance(MetricType.LeadTime, team.previousRange.avgLeadTimeInSec),
-          percentageChange: calculateTrendChange(
-            team.currentRange.avgLeadTimeInSec,
-            team.previousRange.avgLeadTimeInSec
-          ),
-          trend: getTrend(
-            MetricType.LeadTime,
-            team.currentRange.avgLeadTimeInSec,
-            team.previousRange.avgLeadTimeInSec
-          ),
-        },
-        {
-          metricName: MetricType.FailureRate,
-          value: getMetricPerformance(MetricType.FailureRate, team.currentRange.failureRatePercent),
-          rawValue: team.currentRange.failureRatePercent,
-          previousValue: getMetricPerformance(MetricType.FailureRate, team.previousRange.failureRatePercent),
-          percentageChange: calculateTrendChange(
-            team.currentRange.failureRatePercent,
-            team.previousRange.failureRatePercent
-          ),
-          trend: getTrend(
-            MetricType.FailureRate,
-            team.currentRange.failureRatePercent,
-            team.previousRange.failureRatePercent
-          ),
-        },
-        {
-          metricName: MetricType.Mttr,
-          value: getMetricPerformance(MetricType.Mttr, team.currentRange.avgMttrDurationInSec),
-          rawValue: team.currentRange.avgMttrDurationInSec,
-          previousValue: getMetricPerformance(MetricType.Mttr, team.previousRange.avgMttrDurationInSec),
-          percentageChange: calculateTrendChange(
-            team.currentRange.avgMttrDurationInSec,
-            team.previousRange.avgMttrDurationInSec
-          ),
-          trend: getTrend(
-            MetricType.Mttr,
-            team.currentRange.avgMttrDurationInSec,
-            team.previousRange.avgMttrDurationInSec
-          ),
-        },
-      ];
+      const metricsData = processMetricsResponse(team, false);
 
       setMetrics(metricsData);
       setError(null);
@@ -117,7 +50,7 @@ export function useTeamMetrics(teamSlug: string | null) {
     } finally {
       setLoading(false);
     }
-  }, [doraApi, teamSlug, orgId, environment, deployment]);
+  }, [doraApi, teamSlug, environment, deployment]);
 
   const fetchInsights = useCallback(async (timeRange: TimeRange) => {
     if (!teamSlug) {
@@ -127,7 +60,6 @@ export function useTeamMetrics(teamSlug: string | null) {
 
     try {
       const result = await doraApi.getTeamDORAMetricsInsights(
-        orgId,
         teamSlug,
         environment,
         deployment,
@@ -144,7 +76,7 @@ export function useTeamMetrics(teamSlug: string | null) {
       console.error('Failed to fetch team insights:', err);
       setInsights([]);
     }
-  }, [doraApi, teamSlug, orgId, environment, deployment]);
+  }, [doraApi, teamSlug, environment, deployment]);
 
   useEffect(() => {
     fetchMetrics(selectedTimeRange);

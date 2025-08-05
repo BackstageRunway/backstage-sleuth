@@ -3,7 +3,6 @@
 export type MetricType = 'metrics';
 
 export interface ProjectMetricsRequest {
-  orgSlug: string;
   projectSlug: string;
   environment: string;
   deploymentSlug: string;
@@ -16,7 +15,6 @@ export interface ProjectMetricsRequest {
 }
 
 export interface TeamMetricsRequest {
-  orgSlug: string;
   teamSlug: string;
   environment: string;
   currentRangeEnd: string;
@@ -26,7 +24,6 @@ export interface TeamMetricsRequest {
 }
 
 export interface TeamMetricsInsightsRequest {
-  orgSlug: string;
   teamSlug: string;
   environment: string;
   deploymentSlug: string;
@@ -65,7 +62,6 @@ export interface TeamMetricsResponse {
 }
 
 export interface DeploymentRequest {
-  orgSlug: string;
   teamSlugs?: string[];
   projectSlugs: string[];
   environmentSlugs: string[];
