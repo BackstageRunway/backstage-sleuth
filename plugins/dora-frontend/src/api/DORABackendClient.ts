@@ -5,8 +5,7 @@ import {
   DiscoveryApi,
   IdentityApi,
 } from '@backstage/core-plugin-api';
-import { IProjectMetricResponse } from '../DORAMetricModel';
-//import { DoraMetricsResult } from '../types/DoraMetrics';
+import { ProjectMetricsResponse } from '../components/dora/common/types/api';
 
 const API_PATHS = {
   PERMISSION: '/permission/',
@@ -20,12 +19,12 @@ const API_PATHS = {
 export interface DORABackendClient {
   // Existing Sleuth API methods
   // getUserAuthorization(): Promise<{ status: string; [key: string]: any }>;
-  getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<IProjectMetricResponse | null>;
+  getProjectDORAMetrics(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<ProjectMetricsResponse | null>;
   getProjectDORAMetricsInsights(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string): Promise<any>;
   getOrganizationTrendMetrics(orgId: string, timeRange: string): Promise<any>;
   
   // Team metrics methods
-  getTeamDORAMetrics(orgId: string, teamSlug: string, environment: string, deployment: string, timeRange: string): Promise<IProjectMetricResponse | null>;
+  getTeamDORAMetrics(orgId: string, teamSlug: string, environment: string, deployment: string, timeRange: string): Promise<ProjectMetricsResponse | null>;
   getTeamDORAMetricsInsights(orgId: string, teamSlug: string, environment: string, deployment: string, timeRange: string): Promise<any>;
   getBatchTeamDORAMetrics(orgId: string, teamSlugs: string[], environment: string, deployment: string, timeRange: string): Promise<any>;
 }
@@ -80,35 +79,30 @@ export class DORABackendClientImpl implements DORABackendClient {
   async getProjectDORAMetrics(orgId: string, projectSlug: string, environment: string, deployment: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
     const url = `${baseUrl}/metrics/${orgId}/${projectSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 
   async getProjectDORAMetricsInsights(orgId: string, projectId: string, environment: string, deployment: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
     const url = `${baseUrl}/metrics-insights/${orgId}/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 
   async getOrganizationTrendMetrics(orgId: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
     const url = `${baseUrl}/org-trend-metrics/${orgId}?timeRange=${timeRange}`;
-    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 
   async getTeamDORAMetrics(orgId: string, teamSlug: string, environment: string, deployment: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
     const url = `${baseUrl}/team-metrics/${orgId}/${teamSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 
   async getTeamDORAMetricsInsights(orgId: string, teamSlug: string, environment: string, deployment: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
     const url = `${baseUrl}/team-metrics-insights/${orgId}/${teamSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-    console.log('Making request to:', url);
     return this.fetchWithAuth(url);
   }
 
@@ -121,7 +115,6 @@ export class DORABackendClientImpl implements DORABackendClient {
       deploymentId: deployment,
       timeRange,
     };
-    console.log('Making batch request to:', url, body);
     return this.fetchWithAuth(url, {
       method: 'POST',
       headers: {

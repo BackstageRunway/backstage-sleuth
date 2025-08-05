@@ -7,10 +7,8 @@ import { ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse,
 export class SleuthClient {
   private readonly client: ApolloClient<NormalizedCacheObject>;
   private readonly batchClient: ApolloClient<NormalizedCacheObject>;
-  private readonly apiKey: string;
   
   constructor(apiKey: string) {
-    this.apiKey = apiKey;
     this.client = new ApolloClient({
       link: new HttpLink({
         uri: 'https://app.sleuth.io/graphql',

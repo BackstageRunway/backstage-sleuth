@@ -66,17 +66,7 @@ export const TeamPerformance = () => {
     const [fadeIn, setFadeIn] = useState(false);
     useEffect(() => { setFadeIn(true); }, []);
 
-    // const trendLabels: { [key: string]: string } = {
-    //     up: 'Improving',
-    //     down: 'Declining',
-    //     stable: 'Stable',
-    // };
 
-    // const trendColors: { [key: string]: string } = {
-    //     up: '#e8f5e9', // light green
-    //     down: '#ffebee', // light red
-    //     stable: '#f5f5f5', // neutral
-    // };
 
     const teams = [
         {

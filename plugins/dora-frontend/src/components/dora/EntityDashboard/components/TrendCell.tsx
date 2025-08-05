@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { MetricType } from '../../../../DORAMetricModel';
+import { MetricType } from '../../common/types/metrics';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';

@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 import DetailsTableRow from './MetricsPerformanceTableRow';
 
-import { MetricData } from '../../shared/components/types';
+import { MetricData } from '../../common/types/metrics';
 
 type Props = {
     metrics: MetricData[];

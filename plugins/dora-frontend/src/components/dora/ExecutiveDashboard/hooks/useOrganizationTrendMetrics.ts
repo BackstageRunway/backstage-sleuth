@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useApi } from '@backstage/core-plugin-api';
 import { doraBackendApiRef } from '../../../../api/DORABackendClient';
-
-export type TimeRange = 'last7days' | 'last14days' | 'last28days' | 'last90days';
+import { TimeRange } from '../../common/types/metrics';
+import { useDoraConfig } from '../../common/utils/config';
 
 
 export function useOrganizationTrendMetrics()
@@ -14,8 +14,8 @@ export function useOrganizationTrendMetrics()
   const [error, setError] = useState<string | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
   
-  // Get config from entity annotations or use defaults
-  const orgId = 'sleuth';
+  // Get configuration from Backstage config API
+  const { orgId } = useDoraConfig();
 
   const fetchOrgTrendMetrics = useCallback(async (timeRange: TimeRange) => {
     

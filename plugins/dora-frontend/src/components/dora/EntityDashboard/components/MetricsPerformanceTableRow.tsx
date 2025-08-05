@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { TableRow, TableCell } from '@material-ui/core';
-import { MetricType, Performance, getPerformanceDescription } from '../../../../DORAMetricModel';
+import { MetricType, Performance, getPerformanceDescription } from '../../common/types/metrics';
 import { TrendCell } from './TrendCell';
 import { MetricPerformanceStatusMarker } from './MetricPerformanceStatusMarker';
 //import TrendingUpIcon from '@material-ui/icons/TrendingUp';
@@ -34,22 +34,12 @@ const MetricsPerformanceTableRow = ({
     value,
     previousValue,
     percentageChange,
-    trend,
+
 }: MetricsPerformanceTableRowProps) => {
     const classes = useStyles();
-    const performanceDescription = getPerformanceDescription(metricName);
-    console.log(trend);
+    const performanceDescription = getPerformanceDescription(value);
 
-    // const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
-    //     switch (trend) {
-    //         case 'up':
-    //             return <TrendingUpIcon className={classes.trendUp} />;
-    //         case 'down':
-    //             return <TrendingDownIcon className={classes.trendDown} />;
-    //         default:
-    //             return null;
-    //     }
-    // };
+
 
     return (
         <TableRow>
@@ -63,47 +53,47 @@ const MetricsPerformanceTableRow = ({
             <TableCell className={classes.cell}>
                 <MetricPerformanceStatusMarker
                     iconStyle="checkedCircle"
-                    checked={value === Performance.low}
-                    previousChecked={previousValue === Performance.low}
+                    checked={value === Performance.Low}
+                    previousChecked={previousValue === Performance.Low}
                     width={100}
                     metricName={metricName}
-                    performance={Performance.low}
-                    toolTip={performanceDescription[Performance.low]}
+                    performance={Performance.Low}
+                    toolTip={performanceDescription}
                 />
             </TableCell>
             <TableCell />
             <TableCell className={classes.cell}>
                 <MetricPerformanceStatusMarker
                     iconStyle="checkedCircle"
-                    checked={value === Performance.medium}
-                    previousChecked={previousValue === Performance.medium}
+                    checked={value === Performance.Medium}
+                    previousChecked={previousValue === Performance.Medium}
                     width={100}
                     metricName={metricName}
-                    performance={Performance.medium}
-                    toolTip={performanceDescription[Performance.medium]}
+                    performance={Performance.Medium}
+                    toolTip={performanceDescription}
                 />
             </TableCell>
             <TableCell />
             <TableCell className={classes.cell}>
                 <MetricPerformanceStatusMarker
                     iconStyle="checkedCircle"
-                    checked={value === Performance.high}
-                    previousChecked={previousValue === Performance.high}
+                    checked={value === Performance.High}
+                    previousChecked={previousValue === Performance.High}
                     width={100}
                     metricName={metricName}
-                    performance={Performance.high}
-                    toolTip={performanceDescription[Performance.high]}
+                    performance={Performance.High}
+                    toolTip={performanceDescription}
                 />
             </TableCell>
             <TableCell className={classes.cell}>
                 <MetricPerformanceStatusMarker
                     iconStyle="trophy"
-                    checked={value === Performance.elite}
-                    previousChecked={previousValue === Performance.elite}
+                    checked={value === Performance.Elite}
+                    previousChecked={previousValue === Performance.Elite}
                     width={100}
                     metricName={metricName}
-                    performance={Performance.elite}
-                    toolTip={performanceDescription[Performance.elite]}
+                    performance={Performance.Elite}
+                    toolTip={performanceDescription}
                 />
             </TableCell>
         </TableRow>

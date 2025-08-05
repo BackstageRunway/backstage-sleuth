@@ -15,12 +15,12 @@ export const doraBackendPlugin = createBackendPlugin({
         logger: coreServices.logger,
         config: coreServices.rootConfig,
       },
-      async init({httpAuth, httpRouter, logger, config }) {
+      async init({httpRouter, logger, config }) {
         const sleuthApiKey = config.getString('dora.sleuth.apiKey');
         const client = new SleuthClient(sleuthApiKey);
         const metricsService = new MetricsService(client, logger);
 
-        console.log(httpAuth);
+      
         httpRouter.use(
           await createRouter({
             metricsService,

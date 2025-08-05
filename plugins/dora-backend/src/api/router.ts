@@ -21,12 +21,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
    /**
    * Helper method to extract the userEntityRef from the request.
    */
-  //  const getUserEntityRef = async (req: Request): Promise<string> => {
-  //   const credentials = await httpAuth.credentials(req, {
-  //     allow: ['user'],
-  //   });
-  //   return credentials.principal.userEntityRef;
-  // };
+
 
 
   // Input validation schemas
@@ -39,8 +34,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
   const OrgTrendMetricsQuerySchema = MetricsQuerySchema.pick({ timeRange: true });
 
 
-  //"http://localhost:7007/api/dora-backend/metrics/sleuth/sleuth?environment=production&deploymentId=application&timeRange=last28days"
-  //"http://localhost:7007/api/dora-backend/organization-trend-metrics/sleuth?timeRange=last28days"
+
   // Metrics endpoint - GET - EntityDoraMetrics.tsx
   router.get('/metrics/:orgId/:projectSlug', async (req, res) => {
     try {
@@ -238,7 +232,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         orgId,
         teamSlug,
         environment,
-        deploymentId,
         timeRange
       );
 
