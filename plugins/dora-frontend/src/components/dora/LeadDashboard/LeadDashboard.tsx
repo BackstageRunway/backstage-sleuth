@@ -7,8 +7,7 @@ import { TimeRange } from '../common/types/metrics';
 import { TeamPerformance } from './components/TeamPerformance';
 import { TeamSelector } from './components/TeamSelector';
 import { TimeRangeSelector } from '../shared/components/TimeRangeSelector';
-import { useTeamMetrics } from './hooks/useTeamMetrics';
-import { useAllTeamsMetrics } from '../common/hooks/useAllTeamsMetrics';
+import { useAllTeamsMetrics } from './hooks/useAllTeamsMetrics';
 import { useUserTeams } from '../common/hooks/useUserTeams';
 
 
@@ -35,27 +34,32 @@ const useStyles = makeStyles({
 
 export const LeadDashboard = () => {
     const classes = useStyles();
-    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+    const [selectedTeam, setSelectedTeam] = useState<string | null>(null); // null means "All Teams"
     const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last7days');
 
     // Get user's teams from Backstage catalog
     const { teams: userTeams, loading: userTeamsLoading, error: userTeamsError } = useUserTeams();
 
-    // Get all teams for the overview (using batch API)
+    // Get teams data (all teams or single team based on selection)
     const { teams: allTeamsData, loading: allTeamsLoading, error: allTeamsError } = useAllTeamsMetrics(
-        userTeams, // Use teams from useUserTeams hook
+        userTeams || [],
         selectedTimeRange
     );
 
-    // Use custom hook for individual team metrics data fetching and state
-    const {
-        loading: individualTeamLoading,
-        error: individualTeamError,
-    } = useTeamMetrics(selectedTeam);
-
     // Determine which loading and error states to use
-    const isLoading = userTeamsLoading || allTeamsLoading || individualTeamLoading;
-    const hasError = userTeamsError || allTeamsError || individualTeamError;
+    // If a specific team is selected, we only care about the teams data loading
+    // If no team is selected, we care about both user teams and all teams data loading
+    const isLoading = selectedTeam ? allTeamsLoading : (userTeamsLoading || allTeamsLoading);
+    
+    // Build error message
+    let errorMessage = null;
+    if (userTeamsError) {
+        errorMessage = `Failed to load user teams: ${userTeamsError}`;
+    } else if (allTeamsError) {
+        errorMessage = `Failed to load team metrics: ${allTeamsError}`;
+    } else if (userTeams && userTeams.length === 0) {
+        errorMessage = 'No teams found for your user account. Please check your entity relations.';
+    }
 
     return (
         <div className={classes.container}>
@@ -75,9 +79,9 @@ export const LeadDashboard = () => {
                 </Box>
             </Box>
 
-            {hasError && (
+            {errorMessage && (
                 <Alert severity="error" className={classes.error}>
-                    {hasError}
+                    {errorMessage}
                 </Alert>
             )}
             

@@ -58,16 +58,27 @@ export const TeamSelector = ({
     );
   }
 
+  // Debug logging
+  console.log('TeamSelector Debug:', {
+    selectedTeam,
+    dropdownValue: selectedTeam === null ? '__ALL_TEAMS__' : selectedTeam,
+    teams
+  });
+
   return (
     <FormControl className={classes.container}>
       <InputLabel id="team-selector-label">Select Team</InputLabel>
       <Select
         labelId="team-selector-label"
-        value={selectedTeam || ''}
-        onChange={(event) => onTeamChange(event.target.value as string || null)}
+        value={selectedTeam === null ? '__ALL_TEAMS__' : selectedTeam}
+        onChange={(event) => {
+          const value = event.target.value as string;
+          console.log('TeamSelector onChange:', { value, willSetTo: value === '__ALL_TEAMS__' ? null : value });
+          onTeamChange(value === '__ALL_TEAMS__' ? null : value);
+        }}
         label="Select Team"
       >
-        <MenuItem value="">
+        <MenuItem value="__ALL_TEAMS__">
           <em>All Teams</em>
         </MenuItem>
         {teams.map((team: string) => (
