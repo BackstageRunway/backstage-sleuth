@@ -5,7 +5,7 @@ import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
-import { TeamMetricsData } from '../../common/hooks/useAllTeamsMetrics';
+import { TeamMetricsData } from '../hooks/useAllTeamsMetrics';
 
 const useStyles = makeStyles({
     teamCard: {
@@ -78,8 +78,10 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
 
     // Filter teams based on selectedTeam
     const filteredTeams = selectedTeam 
-        ? allTeams.filter(team => team.name === selectedTeam)
+        ? allTeams.filter(team => team.name === selectedTeam || team.name?.toLowerCase() === selectedTeam?.toLowerCase())
         : allTeams;
+
+
 
     // Sort teams so that declining teams appear first
     const sortedTeams = [...filteredTeams].sort((a, b) => {
@@ -149,21 +151,25 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         value: safeParseFloat(team.metrics.deploymentFrequency),
         color: colorPalette[idx % colorPalette.length],
     }));
+    
     const leadTimeDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
         value: safeParseFloat(team.metrics.leadTime),
         color: colorPalette[idx % colorPalette.length],
     }));
+    
     const mttrDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
         value: safeParseFloat(team.metrics.mttr),
         color: colorPalette[idx % colorPalette.length],
     }));
+    
     const failureRateDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
         value: safeParseFloat(team.metrics.failureRate),
         color: colorPalette[idx % colorPalette.length],
     }));
+    
     const totalDeployments = deploymentDonutData.reduce((sum, t) => sum + t.value, 0);
     const avgLeadTime = leadTimeDonutData.length > 0 ? leadTimeDonutData.reduce((sum, t) => sum + t.value, 0) / leadTimeDonutData.length : 0;
     const avgMTTR = mttrDonutData.length > 0 ? mttrDonutData.reduce((sum, t) => sum + t.value, 0) / mttrDonutData.length : 0;
@@ -221,7 +227,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
             <Box textAlign="center" py={4}>
                 <Typography variant="h6" color="textSecondary">
                     {selectedTeam 
-                        ? `No teams found matching "${selectedTeam}"`
+                        ? `No data available for team "${selectedTeam}"`
                         : 'No teams available'
                     }
                 </Typography>

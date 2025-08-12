@@ -1,5 +1,5 @@
 // Hooks
-export { useAllTeamsMetrics } from './hooks/useAllTeamsMetrics';
+export { useAllTeamsMetrics } from '../LeadDashboard/hooks/useAllTeamsMetrics';
 export { useUserTeams } from './hooks/useUserTeams';
 
 // Types

@@ -25,10 +25,14 @@ export const useDoraConfig = () => {
   try {
     const configApi = useApi(configApiRef);
     
+    const environment = configApi.getOptionalString(DORA_CONFIG_KEYS.ENVIRONMENT) || DORA_DEFAULT_CONFIG.environment;
+    const deployment = configApi.getOptionalString(DORA_CONFIG_KEYS.DEPLOYMENT) || DORA_DEFAULT_CONFIG.deployment;
+    const defaultTimeRange = configApi.getOptionalString(DORA_CONFIG_KEYS.DEFAULT_TIME_RANGE) || DORA_DEFAULT_CONFIG.defaultTimeRange;
+    
     return {
-      environment: configApi.getOptionalString(DORA_CONFIG_KEYS.ENVIRONMENT) || DORA_DEFAULT_CONFIG.environment,
-      deployment: configApi.getOptionalString(DORA_CONFIG_KEYS.DEPLOYMENT) || DORA_DEFAULT_CONFIG.deployment,
-      defaultTimeRange: configApi.getOptionalString(DORA_CONFIG_KEYS.DEFAULT_TIME_RANGE) || DORA_DEFAULT_CONFIG.defaultTimeRange,
+      environment,
+      deployment,
+      defaultTimeRange,
     };
   } catch (error) {
     // Fallback to default values if config API is not available

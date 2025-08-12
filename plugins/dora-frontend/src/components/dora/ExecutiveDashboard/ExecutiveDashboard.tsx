@@ -7,8 +7,6 @@ import { TimeRangeSelector } from '../shared/components/TimeRangeSelector';
 
 import { Alert } from '@material-ui/lab';
 
-
-
 const useStyles = makeStyles({
     error: {
         marginBottom: '1rem',
