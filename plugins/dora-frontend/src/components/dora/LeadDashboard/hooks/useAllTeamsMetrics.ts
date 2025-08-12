@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useApi } from '@backstage/core-plugin-api';
 import { doraBackendApiRef } from '../../../../api/DORABackendClient';
 import { MetricType, TimeRange } from '../../common/types/metrics';
