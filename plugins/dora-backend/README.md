@@ -1,28 +1,104 @@
-# dora-backend
+# @nitin15j/plugin-dora-backend
 
-This plugin backend was templated using the Backstage CLI. You should replace this text with a description of your plugin backend.
+A Backstage backend plugin that provides DORA (DevOps Research and Assessment) metrics integration with Sleuth.io. This plugin fetches and serves DORA metrics data to the frontend components.
+
+## Features
+
+- **Sleuth.io Integration**: Connects to Sleuth.io API to fetch DORA metrics
+- **RESTful API**: Provides endpoints for retrieving metrics data
+- **Configurable**: Supports custom Sleuth.io organization and API configuration
+- **Authentication**: Integrates with Backstage's authentication system
+
+## Prerequisites
+
+- A Backstage application
+- A Sleuth.io account with API access
+- Your Sleuth.io API key and organization ID
 
 ## Installation
 
-This plugin is installed via the `@internal/plugin-dora-backend` package. To install it to your backend package, run the following command:
+1. Install the plugin in your backend package:
 
 ```bash
-# From your root directory
-yarn --cwd packages/backend add @internal/plugin-dora-backend
+cd packages/backend
+yarn add @nitin15j/plugin-dora-backend
 ```
 
-Then add the plugin to your backend in `packages/backend/src/index.ts`:
+2. Add the plugin to your backend:
 
-```ts
+```typescript
+// packages/backend/src/index.ts
+import { createBackend } from '@backstage/backend-defaults';
+
 const backend = createBackend();
-// ...
-backend.add(import('@internal/plugin-dora-backend'));
+
+// Add the DORA backend plugin
+backend.add(import('@nitin15j/plugin-dora-backend'));
+
+backend.start();
 ```
+
+## Configuration
+
+Add the following configuration to your `app-config.yaml`:
+
+```yaml
+dora:
+  sleuth:
+    organizationId: 'your-sleuth-organization-id'
+    apiUrl: 'https://app.sleuth.io'
+    apiKey: 'your-sleuth-api-key-here'
+```
+
+### Configuration Options
+
+- `organizationId`: Your Sleuth.io organization identifier
+- `apiUrl`: The Sleuth.io API base URL (default: https://app.sleuth.io)
+- `apiKey`: Your Sleuth.io API key for authentication
+
+## API Endpoints
+
+The plugin provides the following REST endpoints:
+
+- `GET /api/dora/metrics` - Retrieve DORA metrics for the organization
+- `GET /api/dora/metrics/teams` - Retrieve DORA metrics for specific teams
+- `GET /api/dora/metrics/entity` - Retrieve DORA metrics for a specific entity/project
 
 ## Development
 
-This plugin backend can be started in a standalone mode from directly in this
-package with `yarn start`. It is a limited setup that is most convenient when
-developing the plugin backend itself.
+### Running the Plugin Locally
 
-If you want to run the entire project, including the frontend, run `yarn start` from the root directory.
+1. Clone the repository
+2. Install dependencies: `yarn install`
+3. Configure your Sleuth.io credentials in `app-config.yaml`
+4. Start the backend: `yarn start`
+
+### Testing
+
+```bash
+yarn test
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **API Key Issues**: Ensure your Sleuth.io API key is valid and has the necessary permissions
+2. **Organization ID**: Verify your organization ID is correct in the configuration
+3. **Network Issues**: Check that your backend can reach the Sleuth.io API
+
+### Logs
+
+The plugin logs important events and errors. Check your backend logs for debugging information.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+This project is licensed under the Apache 2.0 License.

@@ -52,14 +52,14 @@ export const DoraLeadPage = doraFrontendPlugin.provide(
 
 
 // this is an embeddable exported component, can be embeded in any page or plugin like home, Entity
-export const DoraDashboard = doraFrontendPlugin.provide(
-  createComponentExtension({
-    name: 'Dashboard',
-    component: {
-      lazy: () => import('./components/DoraDashboard').then(m => m.DoraDashboard),
-    },
-  }),
-);
+// export const DoraDashboard = doraFrontendPlugin.provide(
+//   createComponentExtension({
+//     name: 'Dashboard',
+//     component: {
+//       lazy: () => import('./components/DoraDashboard').then(m => m.DoraDashboard),
+//     },
+//   }),
+// );
 
 // this is an embeddable exported component, can be embeded in any page or plugin like home, Entity
 export const DoraPerformanceComponent = doraFrontendPlugin.provide(
