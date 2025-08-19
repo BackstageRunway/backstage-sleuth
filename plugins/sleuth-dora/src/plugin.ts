@@ -11,7 +11,7 @@ import { doraBackendApiRef, DORABackendClientImpl } from './api/DORABackendClien
 import { innerRouteRef, rootRouteRef } from './routes';
 
 export const doraFrontendPlugin = createPlugin({
-  id: 'dora-frontend',
+  id: 'sleuth-dora',
   routes: {
     root: rootRouteRef,
     innerRoot: innerRouteRef,

@@ -41,7 +41,7 @@
     "@backstage/theme": "^0.6.5",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.9.1",
-    "@nitin15j/plugin-dora-frontend": "workspace:^",
+    "@nitin15j/plugin-sleuth-dora": "workspace:^",
     "react": "^18.0.2",
     "react-dom": "^18.0.2",
     "react-router": "^6.3.0",

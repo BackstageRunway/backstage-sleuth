@@ -1,4 +1,4 @@
-# @nitin15j/plugin-dora-backend
+# @nitin15j/plugin-sleuth-dora-backend
 
 A Backstage backend plugin that provides DORA (DevOps Research and Assessment) metrics integration with Sleuth.io. This plugin fetches and serves DORA metrics data to the frontend components.
 
@@ -21,7 +21,7 @@ A Backstage backend plugin that provides DORA (DevOps Research and Assessment) m
 
 ```bash
 cd packages/backend
-yarn add @nitin15j/plugin-dora-backend
+yarn add @nitin15j/plugin-sleuth-dora-backend
 ```
 
 2. Add the plugin to your backend:
@@ -33,7 +33,7 @@ import { createBackend } from '@backstage/backend-defaults';
 const backend = createBackend();
 
 // Add the DORA backend plugin
-backend.add(import('@nitin15j/plugin-dora-backend'));
+backend.add(import('@nitin15j/plugin-sleuth-dora-backend'));
 
 backend.start();
 ```

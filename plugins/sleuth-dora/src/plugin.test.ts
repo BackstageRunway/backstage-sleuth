@@ -1,6 +1,6 @@
 import { doraFrontendPlugin } from './plugin';
 
-describe('dora-frontend', () => {
+describe('sleuth-dora', () => {
   it('should export plugin', () => {
     expect(doraFrontendPlugin).toBeDefined();
   });

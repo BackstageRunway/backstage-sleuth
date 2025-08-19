@@ -5,7 +5,7 @@ import { SleuthClient } from './infrastructure/sleuth/SleuthClient';
 import { MetricsService } from './application/services/MetricsService';
 
 export const doraBackendPlugin = createBackendPlugin({
-  pluginId: 'dora-backend',
+  pluginId: 'sleuth-dora-backend',
   register(env) {
     env.registerInit({
       deps: {

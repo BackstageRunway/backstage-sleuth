@@ -1,4 +1,4 @@
-# @nitin15j/plugin-dora-frontend
+# @nitin15j/plugin-sleuth-dora
 
 A Backstage frontend plugin that provides DORA (DevOps Research and Assessment) metrics visualization with Sleuth.io integration. This plugin offers three different views for different user roles and use cases.
 
@@ -12,7 +12,7 @@ A Backstage frontend plugin that provides DORA (DevOps Research and Assessment) 
 
 ## Prerequisites
 
-- A Backstage application with the [@nitin15j/plugin-dora-backend](../dora-backend) installed and configured
+- A Backstage application with the [@nitin15j/plugin-sleuth-dora-backend](../dora-backend) installed and configured
 - Sleuth.io account with API access
 - Proper configuration in `app-config.yaml`
 
@@ -22,14 +22,14 @@ A Backstage frontend plugin that provides DORA (DevOps Research and Assessment) 
 
 ```bash
 cd packages/app
-yarn add @nitin15j/plugin-dora-frontend
+yarn add @nitin15j/plugin-sleuth-dora
 ```
 
 2. Install the backend plugin (required):
 
 ```bash
 cd packages/backend
-yarn add @nitin15j/plugin-dora-backend
+yarn add @nitin15j/plugin-sleuth-dora-backend
 ```
 
 3. Configure the backend plugin in `packages/backend/src/index.ts`:
@@ -40,7 +40,7 @@ import { createBackend } from '@backstage/backend-defaults';
 const backend = createBackend();
 
 // Add the DORA backend plugin
-backend.add(import('@nitin15j/plugin-dora-backend'));
+backend.add(import('@nitin15j/plugin-sleuth-dora-backend'));
 
 backend.start();
 ```
@@ -67,11 +67,15 @@ dora:
 - Organization-wide trend analysis
 - Time range selection for historical data
 
+![Executive Dashboard Main View](docs/screenshots/executive-dashboard-main.png)
+*Executive Dashboard showing organizational DORA metrics overview*
+
+
 **Installation**:
 
 ```typescript
 // packages/app/src/App.tsx
-import { DoraELTPage } from '@nitin15j/plugin-dora-frontend';
+import { DoraELTPage } from '@nitin15j/plugin-sleuth-dora';
 
 // Add the route
 <Route path="/dora-elt" element={<DoraELTPage />} />
@@ -96,11 +100,17 @@ import { CreateComponentIcon } from '@backstage/core-components';
 - Time range selection
 - User team filtering based on Backstage catalog
 
+![Lead Dashboard Team Selector](docs/screenshots/lead-dashboard-team-selector.png)
+*Team selector dropdown for comparing specific teams*
+
+![Lead Dashboard Performance](docs/screenshots/lead-dashboard-performance.png)
+*Team performance overview with metrics comparison*
+
 **Installation**:
 
 ```typescript
 // packages/app/src/App.tsx
-import { DoraLeadPage } from '@nitin15j/plugin-dora-frontend';
+import { DoraLeadPage } from '@nitin15j/plugin-sleuth-dora';
 
 // Add the route
 <Route path="/dora-lead" element={<DoraLeadPage />} />
@@ -125,11 +135,15 @@ import { CreateComponentIcon } from '@backstage/core-components';
 - Performance trends and insights
 - Embeddable component for any entity type
 
+![Entity Dashboard Sleuth Tab](docs/screenshots/entity-dashboard-sleuth-tab.png)
+*Entity page with Sleuth tab showing project-specific metrics*
+
+
 **Installation**:
 
 ```typescript
 // packages/app/src/components/catalog/EntityPage.tsx
-import { DoraPerformanceComponent } from '@nitin15j/plugin-dora-frontend/src/plugin';
+import { DoraPerformanceComponent } from '@nitin15j/plugin-sleuth-dora/src/plugin';
 
 // Add the component content
 const sleuthContent = (
@@ -165,11 +179,15 @@ spec:
 
 Here's a complete example of setting up all three views:
 
+![Sidebar Navigation](docs/screenshots/sidebar-navigation.png)
+*Sidebar navigation showing DORA menu items*
+
+
 ### 1. App.tsx Configuration
 
 ```typescript
 // packages/app/src/App.tsx
-import { DoraELTPage, DoraLeadPage } from '@nitin15j/plugin-dora-frontend';
+import { DoraELTPage, DoraLeadPage } from '@nitin15j/plugin-sleuth-dora';
 
 // Inside your Routes component
 <Routes>
@@ -194,7 +212,7 @@ import { CreateComponentIcon } from '@backstage/core-components';
 
 ```typescript
 // packages/app/src/components/catalog/EntityPage.tsx
-import { DoraPerformanceComponent } from '@nitin15j/plugin-dora-frontend/src/plugin';
+import { DoraPerformanceComponent } from '@nitin15j/plugin-sleuth-dora/src/plugin';
 
 // Add the component content
 const sleuthContent = (

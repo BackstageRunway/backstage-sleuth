@@ -58,7 +58,7 @@ import {
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
 
-import { DoraPerformanceComponent } from '@nitin15j/plugin-dora-frontend/src/plugin';
+import { DoraPerformanceComponent } from '@nitin15j/plugin-sleuth-dora/src/plugin';
 
 const techdocsContent = (
   <EntityTechdocsContent>
