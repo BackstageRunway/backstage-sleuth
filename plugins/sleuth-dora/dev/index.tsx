@@ -6,6 +6,6 @@ createDevApp()
   .addPage({
     element: <DoraPerformanceComponent />,
     title: 'Root Page',
-    path: '/dora-frontend',
+    path: '/sleuth-dora',
   })
   .render();

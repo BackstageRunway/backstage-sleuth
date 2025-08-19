@@ -77,37 +77,37 @@ export class DORABackendClientImpl implements DORABackendClient {
 
 
   async getProjectDORAMetrics(projectSlug: string, environment: string, deployment: string, timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
     const url = `${baseUrl}/metrics/${projectSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
   }
 
   async getProjectDORAMetricsInsights(projectId: string, environment: string, deployment: string, timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
     const url = `${baseUrl}/metrics-insights/${projectId}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
   }
 
   async getOrganizationTrendMetrics(timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
     const url = `${baseUrl}/org-trend-metrics?timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
   }
 
   async getTeamDORAMetrics(teamSlug: string, environment: string, deployment: string, timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
     const url = `${baseUrl}/team-metrics/${teamSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
   }
 
   async getTeamDORAMetricsInsights(teamSlug: string, environment: string, deployment: string, timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
     const url = `${baseUrl}/team-metrics-insights/${teamSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
   }
 
   async getBatchTeamDORAMetrics(teamSlugs: string[], environment: string, deployment: string, timeRange: string) {
-    const baseUrl = await this.discoveryApi.getBaseUrl('dora-backend');
+    const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
     const url = `${baseUrl}/batch-team-metrics`;
     const body = {
       teamSlugs,

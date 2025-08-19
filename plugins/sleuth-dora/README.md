@@ -1,4 +1,4 @@
-# @nitin15j/plugin-dora-frontend
+# @nitin15j/plugin-sleuth-dora
 
 A Backstage frontend plugin that provides DORA (DevOps Research and Assessment) metrics visualization with Sleuth.io integration. This plugin offers three different views for different user roles and use cases.
 
@@ -12,7 +12,7 @@ A Backstage frontend plugin that provides DORA (DevOps Research and Assessment) 
 
 ## Prerequisites
 
-- A Backstage application with the [@nitin15j/plugin-dora-backend](../dora-backend) installed and configured
+- A Backstage application with the [@nitin15j/plugin-sleuth-dora-backend](../dora-backend) installed and configured
 - Sleuth.io account with API access
 - Proper configuration in `app-config.yaml`
 
@@ -22,14 +22,14 @@ A Backstage frontend plugin that provides DORA (DevOps Research and Assessment) 
 
 ```bash
 cd packages/app
-yarn add @nitin15j/plugin-dora-frontend
+yarn add @nitin15j/plugin-sleuth-dora
 ```
 
 2. Install the backend plugin (required):
 
 ```bash
 cd packages/backend
-yarn add @nitin15j/plugin-dora-backend
+yarn add @nitin15j/plugin-sleuth-dora-backend
 ```
 
 3. Configure the backend plugin in `packages/backend/src/index.ts`:
@@ -40,7 +40,7 @@ import { createBackend } from '@backstage/backend-defaults';
 const backend = createBackend();
 
 // Add the DORA backend plugin
-backend.add(import('@nitin15j/plugin-dora-backend'));
+backend.add(import('@nitin15j/plugin-sleuth-dora-backend'));
 
 backend.start();
 ```
@@ -71,7 +71,7 @@ dora:
 
 ```typescript
 // packages/app/src/App.tsx
-import { DoraELTPage } from '@nitin15j/plugin-dora-frontend';
+import { DoraELTPage } from '@nitin15j/plugin-sleuth-dora';
 
 // Add the route
 <Route path="/dora-elt" element={<DoraELTPage />} />
@@ -100,7 +100,7 @@ import { CreateComponentIcon } from '@backstage/core-components';
 
 ```typescript
 // packages/app/src/App.tsx
-import { DoraLeadPage } from '@nitin15j/plugin-dora-frontend';
+import { DoraLeadPage } from '@nitin15j/plugin-sleuth-dora';
 
 // Add the route
 <Route path="/dora-lead" element={<DoraLeadPage />} />
@@ -129,7 +129,7 @@ import { CreateComponentIcon } from '@backstage/core-components';
 
 ```typescript
 // packages/app/src/components/catalog/EntityPage.tsx
-import { DoraPerformanceComponent } from '@nitin15j/plugin-dora-frontend/src/plugin';
+import { DoraPerformanceComponent } from '@nitin15j/plugin-sleuth-dora/src/plugin';
 
 // Add the component content
 const sleuthContent = (
@@ -169,7 +169,7 @@ Here's a complete example of setting up all three views:
 
 ```typescript
 // packages/app/src/App.tsx
-import { DoraELTPage, DoraLeadPage } from '@nitin15j/plugin-dora-frontend';
+import { DoraELTPage, DoraLeadPage } from '@nitin15j/plugin-sleuth-dora';
 
 // Inside your Routes component
 <Routes>
@@ -194,7 +194,7 @@ import { CreateComponentIcon } from '@backstage/core-components';
 
 ```typescript
 // packages/app/src/components/catalog/EntityPage.tsx
-import { DoraPerformanceComponent } from '@nitin15j/plugin-dora-frontend/src/plugin';
+import { DoraPerformanceComponent } from '@nitin15j/plugin-sleuth-dora/src/plugin';
 
 // Add the component content
 const sleuthContent = (
