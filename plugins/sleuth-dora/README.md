@@ -67,6 +67,10 @@ dora:
 - Organization-wide trend analysis
 - Time range selection for historical data
 
+![Executive Dashboard Main View](docs/screenshots/executive-dashboard-main.png)
+*Executive Dashboard showing organizational DORA metrics overview*
+
+
 **Installation**:
 
 ```typescript
@@ -96,6 +100,12 @@ import { CreateComponentIcon } from '@backstage/core-components';
 - Time range selection
 - User team filtering based on Backstage catalog
 
+![Lead Dashboard Team Selector](docs/screenshots/lead-dashboard-team-selector.png)
+*Team selector dropdown for comparing specific teams*
+
+![Lead Dashboard Performance](docs/screenshots/lead-dashboard-performance.png)
+*Team performance overview with metrics comparison*
+
 **Installation**:
 
 ```typescript
@@ -124,6 +134,10 @@ import { CreateComponentIcon } from '@backstage/core-components';
 - Time range selection
 - Performance trends and insights
 - Embeddable component for any entity type
+
+![Entity Dashboard Sleuth Tab](docs/screenshots/entity-dashboard-sleuth-tab.png)
+*Entity page with Sleuth tab showing project-specific metrics*
+
 
 **Installation**:
 
@@ -164,6 +178,10 @@ spec:
 ## Complete Setup Example
 
 Here's a complete example of setting up all three views:
+
+![Sidebar Navigation](docs/screenshots/sidebar-navigation.png)
+*Sidebar navigation showing DORA menu items*
+
 
 ### 1. App.tsx Configuration
 
