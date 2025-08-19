@@ -58,7 +58,7 @@ import {
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
 
-import { DoraDashboard, DoraPerformanceComponent } from '@internal/plugin-dora-frontend/src/plugin';
+import { DoraPerformanceComponent } from '@nitin15j/plugin-dora-frontend/src/plugin';
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -140,9 +140,9 @@ const overviewContent = (
     <Grid item md={6}>
       <EntityAboutCard variant="gridItem" />
     </Grid>
-    <Grid item md={6}>
+    {/* <Grid item md={6}>
       <DoraDashboard />
-    </Grid>
+    </Grid> */}
     <Grid item md={6} xs={12}>
       <EntityCatalogGraphCard variant="gridItem" height={400} />
     </Grid>

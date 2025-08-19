@@ -75,9 +75,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@apollo/client@npm:^3.13.8":
-  version: 3.13.8
-  resolution: "@apollo/client@npm:3.13.8"
+"@apollo/client@npm:^3.13.9":
+  version: 3.13.9
+  resolution: "@apollo/client@npm:3.13.9"
   dependencies:
     "@graphql-typed-document-node/core": "npm:^3.1.1"
     "@wry/caches": "npm:^1.0.0"
@@ -107,7 +107,7 @@ __metadata:
       optional: true
     subscriptions-transport-ws:
       optional: true
-  checksum: 10c0/0e5032c1ae1dbef72a01f87af06b84bf505d60e71eba7cb9f20f8284778d8ead65fc1b7eacc570eccb8d045577d7194e38401fbfbdf56c197e159ca91ef11755
+  checksum: 10c0/aca33aa1d9971ae0814bd73912c993da83f69d53d9a5e7971e2b8364557821f0447276f507945b80365b1c4a6a541cd3602fa1343dc0d13769bc5a7d81a26461
   languageName: node
   linkType: hard
 
@@ -6852,57 +6852,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@internal/plugin-dora-backend@workspace:^, @internal/plugin-dora-backend@workspace:plugins/dora-backend":
-  version: 0.0.0-use.local
-  resolution: "@internal/plugin-dora-backend@workspace:plugins/dora-backend"
-  dependencies:
-    "@apollo/client": "npm:^3.13.8"
-    "@backstage/backend-defaults": "npm:^0.9.0"
-    "@backstage/backend-plugin-api": "npm:^1.3.0"
-    "@backstage/backend-test-utils": "npm:^1.4.0"
-    "@backstage/catalog-client": "npm:^1.9.1"
-    "@backstage/cli": "npm:^0.32.0"
-    "@backstage/errors": "npm:^1.2.7"
-    "@backstage/plugin-catalog-node": "npm:^1.16.3"
-    "@types/express": "npm:^4.17.6"
-    "@types/node": "npm:^16.11.26"
-    "@types/supertest": "npm:^2.0.12"
-    cross-fetch: "npm:^4.1.0"
-    express: "npm:^4.17.1"
-    express-promise-router: "npm:^4.1.0"
-    graphql: "npm:^16.11.0"
-    graphql-request: "npm:^6.1.0"
-    supertest: "npm:^6.2.4"
-    typescript: "npm:~5.8.0"
-    zod: "npm:^3.22.4"
-  languageName: unknown
-  linkType: soft
-
-"@internal/plugin-dora-frontend@workspace:^, @internal/plugin-dora-frontend@workspace:plugins/dora-frontend":
-  version: 0.0.0-use.local
-  resolution: "@internal/plugin-dora-frontend@workspace:plugins/dora-frontend"
-  dependencies:
-    "@backstage/cli": "npm:^0.32.0"
-    "@backstage/core-app-api": "npm:^1.16.1"
-    "@backstage/core-components": "npm:^0.17.1"
-    "@backstage/core-plugin-api": "npm:^1.10.6"
-    "@backstage/dev-utils": "npm:^1.1.9"
-    "@backstage/test-utils": "npm:^1.7.7"
-    "@backstage/theme": "npm:^0.6.5"
-    "@material-ui/core": "npm:^4.9.13"
-    "@material-ui/icons": "npm:^4.9.1"
-    "@material-ui/lab": "npm:^4.0.0-alpha.61"
-    "@testing-library/jest-dom": "npm:^6.0.0"
-    "@testing-library/react": "npm:^14.0.0"
-    "@testing-library/user-event": "npm:^14.0.0"
-    msw: "npm:^1.0.0"
-    react: "npm:^16.13.1 || ^17.0.0 || ^18.0.0"
-    react-use: "npm:^17.2.4"
-  peerDependencies:
-    react: ^16.13.1 || ^17.0.0 || ^18.0.0
-  languageName: unknown
-  linkType: soft
-
 "@internationalized/date@npm:^3.8.0":
   version: 3.8.0
   resolution: "@internationalized/date@npm:3.8.0"
@@ -8291,6 +8240,59 @@ __metadata:
   checksum: 10c0/c1fbfa49f631a4b95899b0d6c13ab7310e849bbfbcbdb4fabbcc8faa2d9e36fffdd05740746814641220235cfaac7440ee54c313edd32b4c1af37887d0046175
   languageName: node
   linkType: hard
+
+"@nitin15j/plugin-dora-backend@workspace:^, @nitin15j/plugin-dora-backend@workspace:plugins/dora-backend":
+  version: 0.0.0-use.local
+  resolution: "@nitin15j/plugin-dora-backend@workspace:plugins/dora-backend"
+  dependencies:
+    "@apollo/client": "npm:^3.13.9"
+    "@backstage/backend-defaults": "npm:^0.9.0"
+    "@backstage/backend-plugin-api": "npm:^1.3.0"
+    "@backstage/backend-test-utils": "npm:^1.4.0"
+    "@backstage/catalog-client": "npm:^1.9.1"
+    "@backstage/cli": "npm:^0.32.0"
+    "@backstage/errors": "npm:^1.2.7"
+    "@backstage/plugin-catalog-node": "npm:^1.16.3"
+    "@types/express": "npm:^4.17.6"
+    "@types/node": "npm:^16.11.26"
+    "@types/supertest": "npm:^2.0.12"
+    cross-fetch: "npm:^4.1.0"
+    express: "npm:^4.17.1"
+    express-promise-router: "npm:^4.1.0"
+    graphql: "npm:^16.11.0"
+    graphql-request: "npm:^7.2.0"
+    supertest: "npm:^6.2.4"
+    typescript: "npm:~5.8.0"
+    zod: "npm:^3.22.4"
+  languageName: unknown
+  linkType: soft
+
+"@nitin15j/plugin-dora-frontend@workspace:^, @nitin15j/plugin-dora-frontend@workspace:plugins/dora-frontend":
+  version: 0.0.0-use.local
+  resolution: "@nitin15j/plugin-dora-frontend@workspace:plugins/dora-frontend"
+  dependencies:
+    "@backstage/cli": "npm:^0.32.0"
+    "@backstage/core-app-api": "npm:^1.16.1"
+    "@backstage/core-components": "npm:^0.17.1"
+    "@backstage/core-plugin-api": "npm:^1.10.6"
+    "@backstage/dev-utils": "npm:^1.1.9"
+    "@backstage/test-utils": "npm:^1.7.7"
+    "@backstage/theme": "npm:^0.6.5"
+    "@material-ui/core": "npm:^4.9.13"
+    "@material-ui/icons": "npm:^4.9.1"
+    "@material-ui/lab": "npm:^4.0.0-alpha.61"
+    "@testing-library/jest-dom": "npm:^6.0.0"
+    "@testing-library/react": "npm:^14.0.0"
+    "@testing-library/user-event": "npm:^14.0.0"
+    "@types/recharts": "npm:^2.0.1"
+    msw: "npm:^1.0.0"
+    react: "npm:^16.13.1 || ^17.0.0 || ^18.0.0"
+    react-use: "npm:^17.2.4"
+    recharts: "npm:^3.1.2"
+  peerDependencies:
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0
+  languageName: unknown
+  linkType: soft
 
 "@noble/hashes@npm:^1.1.5":
   version: 1.8.0
@@ -9936,6 +9938,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@reduxjs/toolkit@npm:1.x.x || 2.x.x":
+  version: 2.8.2
+  resolution: "@reduxjs/toolkit@npm:2.8.2"
+  dependencies:
+    "@standard-schema/spec": "npm:^1.0.0"
+    "@standard-schema/utils": "npm:^0.3.0"
+    immer: "npm:^10.0.3"
+    redux: "npm:^5.0.1"
+    redux-thunk: "npm:^3.1.0"
+    reselect: "npm:^5.1.0"
+  peerDependencies:
+    react: ^16.9.0 || ^17.0.0 || ^18 || ^19
+    react-redux: ^7.2.1 || ^8.1.3 || ^9.0.0
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-redux:
+      optional: true
+  checksum: 10c0/6a7a33bad5f1100340757151ff86ca0c4c248f030ae56ce0e6f1d98b39fa87c8f193e9faa2ebd6d5a4c0416921e9f9f7a2bbdd81156c39f08f6bf5ce70c2b927
+  languageName: node
+  linkType: hard
+
 "@remix-run/router@npm:1.23.0":
   version: 1.23.0
   resolution: "@remix-run/router@npm:1.23.0"
@@ -11002,6 +11026,20 @@ __metadata:
     "@typescript-eslint/parser": ">=5"
     eslint: ">=8.x"
   checksum: 10c0/b6187252bd0bf2e55e023dcfff6d4cf6f8f3fdacd6baa2c597e94e843c725563552fc15fda7c17a4b1f0d10673792b1f90566763f14499e6b7854b1e3d3d459a
+  languageName: node
+  linkType: hard
+
+"@standard-schema/spec@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@standard-schema/spec@npm:1.0.0"
+  checksum: 10c0/a1ab9a8bdc09b5b47aa8365d0e0ec40cc2df6437be02853696a0e377321653b0d3ac6f079a8c67d5ddbe9821025584b1fb71d9cc041a6666a96f1fadf2ece15f
+  languageName: node
+  linkType: hard
+
+"@standard-schema/utils@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@standard-schema/utils@npm:0.3.0"
+  checksum: 10c0/6eb74cd13e52d5fc74054df51e37d947ef53f3ab9e02c085665dcca3c38c60ece8d735cebbdf18fbb13c775fbcb9becb3f53109b0e092a63f0f7389ce0993fd0
   languageName: node
   linkType: hard
 
@@ -14297,9 +14335,9 @@ __metadata:
     "@backstage/plugin-user-settings": "npm:^0.8.21"
     "@backstage/test-utils": "npm:^1.7.7"
     "@backstage/theme": "npm:^0.6.5"
-    "@internal/plugin-dora-frontend": "workspace:^"
     "@material-ui/core": "npm:^4.12.2"
     "@material-ui/icons": "npm:^4.9.1"
+    "@nitin15j/plugin-dora-frontend": "workspace:^"
     "@playwright/test": "npm:^1.32.3"
     "@testing-library/dom": "npm:^9.0.0"
     "@testing-library/jest-dom": "npm:^6.0.0"
@@ -14964,7 +15002,7 @@ __metadata:
     "@backstage/plugin-search-backend-module-techdocs": "npm:^0.4.1"
     "@backstage/plugin-search-backend-node": "npm:^1.3.10"
     "@backstage/plugin-techdocs-backend": "npm:^2.0.1"
-    "@internal/plugin-dora-backend": "workspace:^"
+    "@nitin15j/plugin-dora-backend": "workspace:^"
     app: "link:../app"
     better-sqlite3: "npm:^9.0.0"
     node-gyp: "npm:^10.0.0"
@@ -17378,7 +17416,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decimal.js-light@npm:^2.4.1":
+"decimal.js-light@npm:^2.4.1, decimal.js-light@npm:^2.5.1":
   version: 2.5.1
   resolution: "decimal.js-light@npm:2.5.1"
   checksum: 10c0/4fd33f535aac9e5bd832796831b65d9ec7914ad129c7437b3ab991b0c2eaaa5a57e654e6174c4a17f1b3895ea366f0c1ab4955cdcdf7cfdcf3ad5a58b456c020
@@ -18356,6 +18394,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-toolkit@npm:^1.39.3":
+  version: 1.39.9
+  resolution: "es-toolkit@npm:1.39.9"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/98921f79dc8f24982ed3265e10267dc64b0e9384925005d645b0a893848eacef3b1646a91e19fd962e8c0527361dbe9aa1dddf01fbc6b816f2345201624d2474
+  languageName: node
+  linkType: hard
+
 "es6-error@npm:^4.1.1":
   version: 4.1.1
   resolution: "es6-error@npm:4.1.1"
@@ -18939,6 +18989,13 @@ __metadata:
   version: 4.0.7
   resolution: "eventemitter3@npm:4.0.7"
   checksum: 10c0/5f6d97cbcbac47be798e6355e3a7639a84ee1f7d9b199a07017f1d2f1e2fe236004d14fa5dfaeba661f94ea57805385e326236a6debbc7145c8877fbc0297c6b
+  languageName: node
+  linkType: hard
+
+"eventemitter3@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "eventemitter3@npm:5.0.1"
+  checksum: 10c0/4ba5c00c506e6c786b4d6262cfbce90ddc14c10d4667e5c83ae993c9de88aa856033994dd2b35b83e8dc1170e224e66a319fa80adc4c32adcd2379bbc75da814
   languageName: node
   linkType: hard
 
@@ -20401,18 +20458,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-request@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "graphql-request@npm:6.1.0"
-  dependencies:
-    "@graphql-typed-document-node/core": "npm:^3.2.0"
-    cross-fetch: "npm:^3.1.5"
-  peerDependencies:
-    graphql: 14 - 16
-  checksum: 10c0/f8167925a110e8e1de93d56c14245e7e64391dc8dce5002dd01bf24a3059f345d4ca1bb6ce2040e2ec78264211b0704e75da3e63984f0f74d2042f697a4e8cc6
-  languageName: node
-  linkType: hard
-
 "graphql-request@npm:^7.1.2":
   version: 7.1.2
   resolution: "graphql-request@npm:7.1.2"
@@ -20421,6 +20466,17 @@ __metadata:
   peerDependencies:
     graphql: 14 - 16
   checksum: 10c0/d87ae2a5603bf5e69a91ff9e2b7a3902ed285d6ea470daf7df37cfa48e71a674a8b026f3fe76881a450484b52e90eff43f950faa6851cd6c79bd5b4ab9d19451
+  languageName: node
+  linkType: hard
+
+"graphql-request@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "graphql-request@npm:7.2.0"
+  dependencies:
+    "@graphql-typed-document-node/core": "npm:^3.2.0"
+  peerDependencies:
+    graphql: 14 - 16
+  checksum: 10c0/f648c2104b4a1b05babdb5eaa943c680530e2c41e0a9f90f34fb9d7a3071e42fefefa0cfa825017b100d6034270d1e3527fcde7245436b762f73f171f9cc745b
   languageName: node
   linkType: hard
 
@@ -21185,6 +21241,13 @@ __metadata:
   version: 3.0.6
   resolution: "immediate@npm:3.0.6"
   checksum: 10c0/f8ba7ede69bee9260241ad078d2d535848745ff5f6995c7c7cb41cfdc9ccc213f66e10fa5afb881f90298b24a3f7344b637b592beb4f54e582770cdce3f1f039
+  languageName: node
+  linkType: hard
+
+"immer@npm:^10.0.3, immer@npm:^10.1.1":
+  version: 10.1.1
+  resolution: "immer@npm:10.1.1"
+  checksum: 10c0/b749e10d137ccae91788f41bd57e9387f32ea6d6ea8fd7eb47b23fd7766681575efc7f86ceef7fe24c3bc9d61e38ff5d2f49c2663b2b0c056e280a4510923653
   languageName: node
   linkType: hard
 
@@ -28271,6 +28334,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-redux@npm:8.x.x || 9.x.x, react-redux@npm:^9.2.0":
+  version: 9.2.0
+  resolution: "react-redux@npm:9.2.0"
+  dependencies:
+    "@types/use-sync-external-store": "npm:^0.0.6"
+    use-sync-external-store: "npm:^1.4.0"
+  peerDependencies:
+    "@types/react": ^18.2.25 || ^19
+    react: ^18.0 || ^19
+    redux: ^5.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    redux:
+      optional: true
+  checksum: 10c0/00d485f9d9219ca1507b4d30dde5f6ff8fb68ba642458f742e0ec83af052f89e65cd668249b99299e1053cc6ad3d2d8ac6cb89e2f70d2ac5585ae0d7fa0ef259
+  languageName: node
+  linkType: hard
+
 "react-redux@npm:^7.2.0":
   version: 7.2.9
   resolution: "react-redux@npm:7.2.9"
@@ -28289,25 +28371,6 @@ __metadata:
     react-native:
       optional: true
   checksum: 10c0/904fac7f493942585ed7ebbd693b4f6b5c09c292366b4550e887ba1a2e83a92c55f0ddc35161d4ba87e3fadb6c681a59003f58df6335e5d2ddd72b06a557851d
-  languageName: node
-  linkType: hard
-
-"react-redux@npm:^9.2.0":
-  version: 9.2.0
-  resolution: "react-redux@npm:9.2.0"
-  dependencies:
-    "@types/use-sync-external-store": "npm:^0.0.6"
-    use-sync-external-store: "npm:^1.4.0"
-  peerDependencies:
-    "@types/react": ^18.2.25 || ^19
-    react: ^18.0 || ^19
-    redux: ^5.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    redux:
-      optional: true
-  checksum: 10c0/00d485f9d9219ca1507b4d30dde5f6ff8fb68ba642458f742e0ec83af052f89e65cd668249b99299e1053cc6ad3d2d8ac6cb89e2f70d2ac5585ae0d7fa0ef259
   languageName: node
   linkType: hard
 
@@ -28660,6 +28723,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"recharts@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "recharts@npm:3.1.2"
+  dependencies:
+    "@reduxjs/toolkit": "npm:1.x.x || 2.x.x"
+    clsx: "npm:^2.1.1"
+    decimal.js-light: "npm:^2.5.1"
+    es-toolkit: "npm:^1.39.3"
+    eventemitter3: "npm:^5.0.1"
+    immer: "npm:^10.1.1"
+    react-redux: "npm:8.x.x || 9.x.x"
+    reselect: "npm:5.1.1"
+    tiny-invariant: "npm:^1.3.3"
+    use-sync-external-store: "npm:^1.2.2"
+    victory-vendor: "npm:^37.0.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-is: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/daf04d57a622086e9950a4e4de75b5a8713e3e37401b88373da30efd1618e83de01027ffb9069e076b516fc274954e920ce2f221228a901ca82c6f70fd6a4046
+  languageName: node
+  linkType: hard
+
 "rechoir@npm:^0.8.0":
   version: 0.8.0
   resolution: "rechoir@npm:0.8.0"
@@ -28710,6 +28796,15 @@ __metadata:
   peerDependencies:
     immutable: ^3.8.1 || ^4.0.0-rc.1
   checksum: 10c0/c706c9f72a1fbce92d54ab9117ab641b6d7ee69f2860ec6de827dbed5bed918d4677a0895e6564bb59011202bb5e639cf69f4e2d2d14086053b32e5c4e35f512
+  languageName: node
+  linkType: hard
+
+"redux-thunk@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "redux-thunk@npm:3.1.0"
+  peerDependencies:
+    redux: ^5.0.0
+  checksum: 10c0/21557f6a30e1b2e3e470933247e51749be7f1d5a9620069a3125778675ce4d178d84bdee3e2a0903427a5c429e3aeec6d4df57897faf93eb83455bc1ef7b66fd
   languageName: node
   linkType: hard
 
@@ -28990,7 +29085,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reselect@npm:^5.1.1":
+"reselect@npm:5.1.1, reselect@npm:^5.1.0, reselect@npm:^5.1.1":
   version: 5.1.1
   resolution: "reselect@npm:5.1.1"
   checksum: 10c0/219c30da122980f61853db3aebd173524a2accd4b3baec770e3d51941426c87648a125ca08d8c57daa6b8b086f2fdd2703cb035dd6231db98cdbe1176a71f489
@@ -31354,7 +31449,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-invariant@npm:^1.0.6, tiny-invariant@npm:^1.3.1":
+"tiny-invariant@npm:^1.0.6, tiny-invariant@npm:^1.3.1, tiny-invariant@npm:^1.3.3":
   version: 1.3.3
   resolution: "tiny-invariant@npm:1.3.3"
   checksum: 10c0/65af4a07324b591a059b35269cd696aba21bef2107f29b9f5894d83cc143159a204b299553435b03874ebb5b94d019afa8b8eff241c8a4cfee95872c2e1c1c4a
@@ -32451,7 +32546,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0":
+"use-sync-external-store@npm:^1.2.2, use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0":
   version: 1.5.0
   resolution: "use-sync-external-store@npm:1.5.0"
   peerDependencies:
@@ -32691,6 +32786,28 @@ __metadata:
     d3-time: "npm:^3.0.0"
     d3-timer: "npm:^3.0.1"
   checksum: 10c0/bad36de3bf4d406834743c2e99a8281d786af324d7e84b7f7a2fc02c27a3779034fb0c3c4707d4c8e68683334d924a67100cfa13985235565e83b9877f8e2ffd
+  languageName: node
+  linkType: hard
+
+"victory-vendor@npm:^37.0.2":
+  version: 37.3.6
+  resolution: "victory-vendor@npm:37.3.6"
+  dependencies:
+    "@types/d3-array": "npm:^3.0.3"
+    "@types/d3-ease": "npm:^3.0.0"
+    "@types/d3-interpolate": "npm:^3.0.1"
+    "@types/d3-scale": "npm:^4.0.2"
+    "@types/d3-shape": "npm:^3.1.0"
+    "@types/d3-time": "npm:^3.0.0"
+    "@types/d3-timer": "npm:^3.0.0"
+    d3-array: "npm:^3.1.6"
+    d3-ease: "npm:^3.0.1"
+    d3-interpolate: "npm:^3.0.1"
+    d3-scale: "npm:^4.0.2"
+    d3-shape: "npm:^3.1.0"
+    d3-time: "npm:^3.0.0"
+    d3-timer: "npm:^3.0.1"
+  checksum: 10c0/0a9628db30b898160409628f26d457ba15adc86472531817d73fbeb847de498d94f91dee5f4caa969195744e91be93e100eeff7a392b591ac5349343a36dec29
   languageName: node
   linkType: hard
 

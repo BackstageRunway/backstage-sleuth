@@ -1,8 +1,7 @@
 {
-  "name": "@internal/plugin-dora-frontend",
-  "version": "0.1.0",
+  "name": "@nitin15j/plugin-dora-frontend",
+  "version": "0.3.0",
   "license": "Apache-2.0",
-  "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
   "publishConfig": {
@@ -11,7 +10,11 @@
     "types": "dist/index.d.ts"
   },
   "backstage": {
-    "role": "frontend-plugin"
+    "role": "frontend-plugin",
+    "pluginId": "dora-frontend",
+    "pluginPackages": [
+      "@nitin15j/plugin-dora-frontend"
+    ]
   },
   "sideEffects": false,
   "scripts": {
@@ -21,7 +24,8 @@
     "test": "backstage-cli package test",
     "clean": "backstage-cli package clean",
     "prepack": "backstage-cli package prepack",
-    "postpack": "backstage-cli package postpack"
+    "postpack": "backstage-cli package postpack",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@backstage/core-components": "^0.17.1",
@@ -30,7 +34,9 @@
     "@material-ui/core": "^4.9.13",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.61",
-    "react-use": "^17.2.4"
+    "@types/recharts": "^2.0.1",
+    "react-use": "^17.2.4",
+    "recharts": "^3.1.2"
   },
   "peerDependencies": {
     "react": "^16.13.1 || ^17.0.0 || ^18.0.0"
@@ -48,5 +54,18 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "keywords": [
+    "backstage",
+    "plugin",
+    "dora",
+    "metrics",
+    "sleuth",
+    "frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mahichr/backstage-sleuth.git",
+    "directory": "plugins/dora-frontend"
+  }
 }
