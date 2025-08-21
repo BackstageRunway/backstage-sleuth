@@ -83,3 +83,17 @@ spec:
     message ExampleMessage {
       string example = 1;
     };
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstagerunway-app
+  annotations: 
+    sleuth.io/project-slug: backstagerunway-app
+spec:
+  type: website
+  lifecycle: experimental
+  owner: guests
+  system: prd
+  providesApis: [example-grpc-api]

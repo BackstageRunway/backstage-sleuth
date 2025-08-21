@@ -52,5 +52,5 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 
-backend.add(import('@nitin15j/plugin-sleuth-dora-backend'));
+backend.add(import('@backstagerunway/plugin-sleuth-dora-backend'));
 backend.start();
