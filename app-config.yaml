@@ -7,11 +7,11 @@ organization:
 
 dora:
   sleuth:
-    organizationId: 'sleuth'
+    organizationId: 'backstagerunway'
     apiUrl: 'https://app.sleuth.io'
-    apiKey: 'your-sleuth-api-key-here'
+    apiKey: 'place-your-api-key-here'
     environment: 'production'
-    deployment: 'application'
+    deployment: ''
     defaultTimeRange: 'last28days'
 
 backend:

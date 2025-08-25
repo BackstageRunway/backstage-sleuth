@@ -32,7 +32,7 @@ export const DEFAULT_ENTITY_VALUES = {
   ORG_ID: 'sleuth',
   PROJECT_SLUG: 'sleuth',
   ENVIRONMENT: 'production',
-  DEPLOYMENT: 'application',
+  DEPLOYMENT: '',
   TEAM: 'default',
   SERVICE: 'default',
 } as const;

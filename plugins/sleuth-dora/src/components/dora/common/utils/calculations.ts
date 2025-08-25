@@ -39,9 +39,29 @@ export const calculateTrendChangeSimple = (current: number, previous: number): n
 export const getMetricPerformance = (metricType: MetricType, value: number): Performance => {
   const thresholds = PERFORMANCE_THRESHOLDS[metricType];
   
-  if (value >= thresholds[Performance.Elite]) return Performance.Elite;
-  if (value >= thresholds[Performance.High]) return Performance.High;
-  if (value >= thresholds[Performance.Medium]) return Performance.Medium;
+  // For Lead Time and MTTR, lower values are better (use <= comparison)
+  if (metricType === MetricType.LeadTime || metricType === MetricType.Mttr) {
+    if (value <= thresholds[Performance.Elite]) return Performance.Elite;
+    if (value <= thresholds[Performance.High]) return Performance.High;
+    if (value <= thresholds[Performance.Medium]) return Performance.Medium;
+    return Performance.Low;
+  }
+  
+  // For Frequency and Failure Rate, higher frequency is better, lower failure rate is better
+  if (metricType === MetricType.Frequency) {
+    if (value >= thresholds[Performance.Elite]) return Performance.Elite;
+    if (value >= thresholds[Performance.High]) return Performance.High;
+    if (value >= thresholds[Performance.Medium]) return Performance.Medium;
+    return Performance.Low;
+  }
+  
+  if (metricType === MetricType.FailureRate) {
+    if (value <= thresholds[Performance.Elite]) return Performance.Elite;
+    if (value <= thresholds[Performance.High]) return Performance.High;
+    if (value <= thresholds[Performance.Medium]) return Performance.Medium;
+    return Performance.Low;
+  }
+  
   return Performance.Low;
 };
 

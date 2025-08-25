@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '@backstage/core-plugin-api';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
+import { identityApiRef } from '@backstage/core-plugin-api';
 import { UserEntity } from '@backstage/catalog-model';
 
 
@@ -11,6 +12,7 @@ export interface TeamInfo {
 
 export function useUserTeams() {
   const catalogApi = useApi(catalogApiRef);
+  const identityApi = useApi(identityApiRef);
 
   const [teams, setTeams] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,9 +23,9 @@ export function useUserTeams() {
       try {
         setLoading(true);
 
-        // const userIdentity = await identityApi.getBackstageIdentity();
+        const userIdentity = await identityApi.getBackstageIdentity();
         // Get the current user entity - try with default namespace
-        const userEntities = await catalogApi.getEntitiesByRefs({entityRefs: ['user:default/user1']});
+        const userEntities = await catalogApi.getEntitiesByRefs({entityRefs: [userIdentity.userEntityRef]});
 
         // Access the first user entity
         const userEntity = userEntities.items[0] as UserEntity;

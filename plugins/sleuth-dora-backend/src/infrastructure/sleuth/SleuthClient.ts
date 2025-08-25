@@ -18,7 +18,6 @@ export class SleuthClient {
         headers: {
           Authorization: `apikey ${apiKey}`,
           'Content-Type': 'application/json',
-          Cookie: '__Host-sessionid=f7xr8j59258nzt0zgy3a9atjhx3aypc2',	
         },
       }),
       cache: new InMemoryCache(),
@@ -32,8 +31,8 @@ export class SleuthClient {
         headers: {
           Authorization: `apikey ${apiKey}`,
           'Content-Type': 'application/json',
-          Cookie: '__Host-sessionid=f7xr8j59258nzt0zgy3a9atjhx3aypc2',	
-        },
+        },                          
+
         batchMax: 5,
         batchInterval: 10,
       }),
@@ -88,11 +87,16 @@ export class SleuthClient {
       }
     `;
 
+    // Only include deploymentSlugs if deploymentSlug is provided and not empty
+    const deploymentSlugs = request.deploymentSlug && request.deploymentSlug.trim() !== '' 
+      ? [request.deploymentSlug] 
+      : [];
+
     const variables = {
       orgSlug: this.organizationId,
       projectSlug: request.projectSlug,
       environmentSlug: request.environment,
-      deploymentSlugs: [],
+      deploymentSlugs,
       currentRangeStartDate: request.currentRangeStart,
       currentRangeEndDate: request.currentRangeEnd,
       previousRangeStartDate: request.previousRangeStart,
@@ -148,11 +152,16 @@ export class SleuthClient {
         }`;
 
 
+    // Only include deploymentSlugs if deploymentSlug is provided and not empty
+    const deploymentSlugs = request.deploymentSlug && request.deploymentSlug.trim() !== '' 
+      ? [request.deploymentSlug] 
+      : [];
+
     const variables = {
       orgSlug: this.organizationId,
       projectSlug: request.projectSlug,
       environmentSlug: request.environment,
-      deploymentSlugs: [],
+      deploymentSlugs,
       startDate: request.currentRangeStart,
       endDate: request.currentRangeEnd,
      };
@@ -322,11 +331,16 @@ export class SleuthClient {
       }
     `;
 
+    // Only include deploymentSlugs if deploymentSlug is provided and not empty
+    const deploymentSlugs = request.deploymentSlug && request.deploymentSlug.trim() !== '' 
+      ? [request.deploymentSlug] 
+      : [];
+
     const variables = {
       orgSlug: this.organizationId,
       teamSlug: request.teamSlug,
       environmentSlug: request.environment,
-      deploymentSlugs: [],
+      deploymentSlugs,
       startDate: request.currentRangeStart,
       endDate: request.currentRangeEnd,
      };

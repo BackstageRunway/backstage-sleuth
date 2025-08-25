@@ -28,7 +28,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
   const MetricsQuerySchema = z.object({
     timeRange: z.string().regex(/^last\d+days$/i, 'Time range must be in format: lastXdays (e.g., last7days)'),
     environment: z.string().min(1, 'Environment is required'),
-    deploymentId: z.string().min(1, 'Deployment ID is required'),
+    deploymentId: z.string(),
   });
 
   const OrgTrendMetricsQuerySchema = MetricsQuerySchema.pick({ timeRange: true });
@@ -304,9 +304,9 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         });
       }
 
-      if (!timeRange || !environment || !deploymentId) {
+      if (!timeRange || !environment) {
         return res.status(400).json({ 
-          error: 'timeRange, environment, and deploymentId are required' 
+          error: 'timeRange, environment are required' 
         });
       }
 
