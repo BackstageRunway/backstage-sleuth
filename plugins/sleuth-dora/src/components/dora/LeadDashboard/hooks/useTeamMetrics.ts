@@ -1,3 +1,14 @@
+/**
+ * Hook for fetching metrics for a single team.
+ * 
+ * This hook could be used to optimize the Team Dashboard when we need single team data
+ * instead of fetching all teams' data and filtering client-side. Currently, the dashboard
+ * uses useAllTeamsMetrics which fetches all teams at once for better performance when
+ * switching between teams, but this hook could be used for:
+ * - Initial load optimization when a specific team is pre-selected
+ * - Lazy loading individual team data
+ * - Reducing initial payload size
+ */
 import { useState, useEffect, useCallback } from 'react';
 import { useApi } from '@backstage/core-plugin-api';
 import { doraBackendApiRef } from '../../../../api/DORABackendClient';

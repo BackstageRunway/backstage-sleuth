@@ -40,9 +40,9 @@ export interface BackstageEntity {
  * Configuration keys for DORA plugin
  */
 export const DORA_CONFIG_KEYS = {
-  ENVIRONMENT: 'dora.environment',
-  DEPLOYMENT: 'dora.deployment',
-  DEFAULT_TIME_RANGE: 'dora.defaultTimeRange',
+  ENVIRONMENT: 'dora.sleuth.environment',
+  DEPLOYMENT: 'dora.sleuth.deployment',
+  DEFAULT_TIME_RANGE: 'dora.sleuth.defaultTimeRange',
 } as const;
 
 /**
