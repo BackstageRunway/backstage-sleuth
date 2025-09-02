@@ -52,8 +52,8 @@ dora:
   sleuth:
     organizationId: 'your-sleuth-organization-id'
     apiKey: 'your-sleuth-api-key-here'
-    environment: 'production'
-    defaultProjectSlug: 'your-default-project'
+    environment: 'production'          # Optional (frontend-visible)
+    # defaultProjectSlug: 'your-default-project'  # Optional; used if entity lacks project-slug annotation
     # apiUrl is optional - defaults to 'https://app.sleuth.io' if not specified
     # apiUrl: 'https://app.sleuth.io'
 ```
@@ -104,7 +104,7 @@ kind: Component
 metadata:
   name: my-component
   annotations:
-    sleuth.io/project-slug: 'your-sleuth-project-slug'  # Required
+    sleuth.io/project-slug: 'your-sleuth-project-slug'  # Required, unless managed globally via dora.sleuth.defaultProjectSlug in app-config
     sleuth.io/code-deployment-slug: 'my-service'        # Optional - defaults to entity name
     sleuth.io/environment: 'production'                 # Optional - defaults to config
 spec:
@@ -327,15 +327,3 @@ yarn test
 - **"No Sleuth project Slug found"**: Add the `sleuth.io/project-slug` annotation to your entity
 - **"Failed to load metrics"**: Check your backend configuration and Sleuth.io API credentials
 - **"No teams found"**: Verify your user has proper team associations in Backstage
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## License
-
-This project is licensed under the Apache 2.0 License.
