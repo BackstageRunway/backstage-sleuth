@@ -9,7 +9,7 @@ export const SLEUTH_ANNOTATION_KEYS = {
   ORG_ID: 'sleuth.io/org-id',
   PROJECT_SLUG: 'sleuth.io/project-slug',
   ENVIRONMENT: 'sleuth.io/environment',
-  DEPLOYMENT: 'sleuth.io/deployment',
+  CODE_DEPLOYMENT_SLUG: 'sleuth.io/code-deployment-slug',
   TEAM: 'sleuth.io/team',
   SERVICE: 'sleuth.io/service',
 } as const;
@@ -32,7 +32,7 @@ export const DEFAULT_ENTITY_VALUES = {
   ORG_ID: 'sleuth',
   PROJECT_SLUG: 'sleuth',
   ENVIRONMENT: 'production',
-  DEPLOYMENT: '',
+  CODE_DEPLOYMENT_SLUG: '',
   TEAM: 'default',
   SERVICE: 'default',
 } as const;

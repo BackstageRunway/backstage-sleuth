@@ -26,7 +26,7 @@ export function useTeamMetrics(teamSlug: string | null) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
 
   // Get configuration from Backstage config API
-  const { environment, deployment } = useDoraConfig();
+  const { environment, codeDeploymentSlug } = useDoraConfig();
 
 
 
@@ -43,7 +43,7 @@ export function useTeamMetrics(teamSlug: string | null) {
       const result = await doraApi.getTeamDORAMetrics(
         teamSlug,
         environment,
-        deployment,
+        codeDeploymentSlug,
         timeRange,
       ) as any;
 
@@ -61,7 +61,7 @@ export function useTeamMetrics(teamSlug: string | null) {
     } finally {
       setLoading(false);
     }
-  }, [doraApi, teamSlug, environment, deployment]);
+  }, [doraApi, teamSlug, environment, codeDeploymentSlug]);
 
   const fetchInsights = useCallback(async (timeRange: TimeRange) => {
     if (!teamSlug) {
@@ -73,7 +73,7 @@ export function useTeamMetrics(teamSlug: string | null) {
       const result = await doraApi.getTeamDORAMetricsInsights(
         teamSlug,
         environment,
-        deployment,
+        codeDeploymentSlug,
         timeRange,
       );
 
@@ -87,7 +87,7 @@ export function useTeamMetrics(teamSlug: string | null) {
       console.error('Failed to fetch team insights:', err);
       setInsights([]);
     }
-  }, [doraApi, teamSlug, environment, deployment]);
+  }, [doraApi, teamSlug, environment, codeDeploymentSlug]);
 
   useEffect(() => {
     fetchMetrics(selectedTimeRange);

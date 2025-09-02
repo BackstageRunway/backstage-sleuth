@@ -11,9 +11,10 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: sleuth-website
+  name: backstage-with-code-deployment-slug
   annotations:
-    sleuth.io/project-slug: sleuth-marketing-site
+    sleuth.io/project-slug: backstagerunway-app
+    sleuth.io/code-deployment-slug: backstage
 spec:
   type: website
   lifecycle: experimental
@@ -25,9 +26,10 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: sleuth-clients
+  name: backstage-heart
   annotations:
-    sleuth.io/project-slug: sleuth-clients
+    sleuth.io/project-slug: backstagerunway-app
+    # sleuth.io/code-deployment-slug: sleuth-clients  # Optional - defaults to entity name
 spec:
   type: website
   lifecycle: experimental
@@ -39,9 +41,7 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: sleuth
-  annotations:
-    sleuth.io/project-slug: sleuth
+  name: community-plugins
 spec:
   type: website
   lifecycle: experimental
@@ -53,9 +53,9 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: dora
+  name: dora-with-code-deployment-slug-mk
   annotations:
-    sleuth.io/project-slug: sleuth
+    sleuth.io/code-deployment-slug: mkdocs-techdocs-core
 spec:
   type: website
   lifecycle: experimental
@@ -88,12 +88,27 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: backstagerunway-app
+  name: dora
   annotations: 
-    sleuth.io/project-slug: backstagerunway-app
+    sleuth.io/code-deployment-slug: dora
+    # sleuth.io/code-deployment-slug: backstagerunway-app  # Optional - defaults to entity name
 spec:
   type: website
   lifecycle: experimental
   owner: guests
   system: prd
   providesApis: [example-grpc-api]
+---
+# Example showing minimal configuration - uses defaults from app-config.yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sleuth
+  # No sleuth.io annotations - will use defaults from app-config.yaml
+  # project-slug: defaults to 'backstagerunway-app' from config
+  # code-deployment-slug: defaults to entity name 'simple-service'
+spec:
+  type: service
+  lifecycle: experimental
+  owner: guests
+  system: prd

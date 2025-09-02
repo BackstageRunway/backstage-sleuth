@@ -165,98 +165,98 @@ export class MetricsService {
     }
   }
 
-  async getTeamMetrics(teamSlug: string, environment:string, timeRange: string): Promise<TeamMetricsResponse> {
-    try {
-      const dateRanges = this.calculateDateRanges(timeRange);
+  // async getTeamMetrics(teamSlug: string, environment:string, timeRange: string): Promise<TeamMetricsResponse> {
+  //   try {
+  //     const dateRanges = this.calculateDateRanges(timeRange);
 
-      this.logger.info('Fetching team metrics', {
-        teamSlug: teamSlug,
-        timeRange: timeRange,
-      });
+  //     this.logger.info('Fetching team metrics', {
+  //       teamSlug: teamSlug,
+  //       timeRange: timeRange,
+  //     });
 
-      const response = await this.client.teamMetrics({
-        teamSlug: teamSlug,
-        environment: environment,
-        currentRangeStart: dateRanges.currentRangeStart,
-        currentRangeEnd: dateRanges.currentRangeEnd,
-        previousRangeStart: dateRanges.previousRangeStart,
-        previousRangeEnd: dateRanges.previousRangeEnd,
-      });
+  //     const response = await this.client.teamMetrics({
+  //       teamSlug: teamSlug,
+  //       environment: environment,
+  //       currentRangeStart: dateRanges.currentRangeStart,
+  //       currentRangeEnd: dateRanges.currentRangeEnd,
+  //       previousRangeStart: dateRanges.previousRangeStart,
+  //       previousRangeEnd: dateRanges.previousRangeEnd,
+  //     });
 
-      if (!response.team?.currentRange || !response.team?.previousRange) {
-        throw new Error('No team metrics data available');
-      }
+  //     if (!response.team?.currentRange || !response.team?.previousRange) {
+  //       throw new Error('No team metrics data available');
+  //     }
 
-      // Log the metrics for monitoring
-      this.logger.info('Retrieved team metrics', {
-        teamSlug,
-        teamName: response.team.name,
-        currentRange: {
-          avgLeadTimeInSec: response.team.currentRange.avgLeadTimeInSec,
-          numOfDeploys: response.team.currentRange.numOfDeploys,
-          numOfDeploysPerDay: response.team.currentRange.numOfDeploysPerDay,
-          failureRatePercent: response.team.currentRange.failureRatePercent,
-          avgMttrDurationInSec: response.team.currentRange.avgMttrDurationInSec,
-        },
-        previousRange: {
-          avgLeadTimeInSec: response.team.previousRange.avgLeadTimeInSec,
-          numOfDeploys: response.team.previousRange.numOfDeploys,
-          numOfDeploysPerDay: response.team.previousRange.numOfDeploysPerDay,
-          failureRatePercent: response.team.previousRange.failureRatePercent,
-          avgMttrDurationInSec: response.team.previousRange.avgMttrDurationInSec,
-        }
-      });
+  //     // Log the metrics for monitoring
+  //     this.logger.info('Retrieved team metrics', {
+  //       teamSlug,
+  //       teamName: response.team.name,
+  //       currentRange: {
+  //         avgLeadTimeInSec: response.team.currentRange.avgLeadTimeInSec,
+  //         numOfDeploys: response.team.currentRange.numOfDeploys,
+  //         numOfDeploysPerDay: response.team.currentRange.numOfDeploysPerDay,
+  //         failureRatePercent: response.team.currentRange.failureRatePercent,
+  //         avgMttrDurationInSec: response.team.currentRange.avgMttrDurationInSec,
+  //       },
+  //       previousRange: {
+  //         avgLeadTimeInSec: response.team.previousRange.avgLeadTimeInSec,
+  //         numOfDeploys: response.team.previousRange.numOfDeploys,
+  //         numOfDeploysPerDay: response.team.previousRange.numOfDeploysPerDay,
+  //         failureRatePercent: response.team.previousRange.failureRatePercent,
+  //         avgMttrDurationInSec: response.team.previousRange.avgMttrDurationInSec,
+  //       }
+  //     });
 
-      return response;
-    } catch (error) {
-      this.logger.error('Failed to fetch team metrics', {
-        error: error instanceof Error ? error.message : String(error),
-        teamSlug,
-        timeRange,
-      });
-      throw error;
-    }
-  }
+  //     return response;
+  //   } catch (error) {
+  //     this.logger.error('Failed to fetch team metrics', {
+  //       error: error instanceof Error ? error.message : String(error),
+  //       teamSlug,
+  //       timeRange,
+  //     });
+  //     throw error;
+  //   }
+  // }
 
-  async getTeamMetricsInsights(teamSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
-    try {
-      const dateRanges = this.calculateDateRanges(timeRange);
+  // async getTeamMetricsInsights(teamSlug: string, environment:string, deploymentId:string, timeRange: string): Promise<ProjectInsightsResponse> {
+  //   try {
+  //     const dateRanges = this.calculateDateRanges(timeRange);
 
-      this.logger.info('Fetching team metrics insights', {
-        teamSlug: teamSlug,
-        timeRange: timeRange,
-      });
+  //     this.logger.info('Fetching team metrics insights', {
+  //       teamSlug: teamSlug,
+  //       timeRange: timeRange,
+  //     });
 
-      const response = await this.client.teamMetricsInsights({
-        teamSlug: teamSlug,
-        environment: environment,
-        deploymentSlug: deploymentId,
-        currentRangeStart: dateRanges.currentRangeStart,
-        currentRangeEnd: dateRanges.currentRangeEnd,
-        previousRangeStart: dateRanges.previousRangeStart,
-        previousRangeEnd: dateRanges.previousRangeEnd,
-      });
+  //     const response = await this.client.teamMetricsInsights({
+  //       teamSlug: teamSlug,
+  //       environment: environment,
+  //       deploymentSlug: deploymentId,
+  //       currentRangeStart: dateRanges.currentRangeStart,
+  //       currentRangeEnd: dateRanges.currentRangeEnd,
+  //       previousRangeStart: dateRanges.previousRangeStart,
+  //       previousRangeEnd: dateRanges.previousRangeEnd,
+  //     });
 
-      if (!response.data?.project?.insights) {
-        throw new Error('No team metrics insights data available');
-      }
+  //     if (!response.data?.project?.insights) {
+  //       throw new Error('No team metrics insights data available');
+  //     }
 
-      // Log the insights for monitoring
-      this.logger.info('Retrieved team metrics insights', {
-        teamSlug,
-        insightsCount: response.data.project.insights.length,
-      });
+  //     // Log the insights for monitoring
+  //     this.logger.info('Retrieved team metrics insights', {
+  //       teamSlug,
+  //       insightsCount: response.data.project.insights.length,
+  //     });
 
-      return response;
-    } catch (error) {
-      this.logger.error('Failed to fetch team metrics insights', {
-        error: error instanceof Error ? error.message : String(error),
-        teamSlug,
-        timeRange,
-      });
-      throw error;
-    }
-  }
+  //     return response;
+  //   } catch (error) {
+  //     this.logger.error('Failed to fetch team metrics insights', {
+  //       error: error instanceof Error ? error.message : String(error),
+  //       teamSlug,
+  //       timeRange,
+  //     });
+  //     throw error;
+  //   }
+  // }
 
   async getBatchTeamMetrics(teamSlugs: string[], environment: string, deploymentId: string, timeRange: string): Promise<{ teams: any[] }> {
     try {

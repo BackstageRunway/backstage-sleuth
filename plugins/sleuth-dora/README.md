@@ -51,80 +51,16 @@ backend.start();
 dora:
   sleuth:
     organizationId: 'your-sleuth-organization-id'
-    apiUrl: 'https://app.sleuth.io'
     apiKey: 'your-sleuth-api-key-here'
+    environment: 'production'
+    defaultProjectSlug: 'your-default-project'
+    # apiUrl is optional - defaults to 'https://app.sleuth.io' if not specified
+    # apiUrl: 'https://app.sleuth.io'
 ```
 
 ## Available Views
 
-### 1. Executive Dashboard (DoraELTPage)
-
-**Purpose**: Provides executive-level overview of organizational DORA metrics and quarterly health trends.
-
-**Features**:
-- Executive summary with key DORA metrics
-- Quarterly health overview
-- Organization-wide trend analysis
-- Time range selection for historical data
-
-![Executive Dashboard Main View](docs/screenshots/executive-dashboard-main.png)
-*Executive Dashboard showing organizational DORA metrics overview*
-
-
-**Installation**:
-
-```typescript
-// packages/app/src/App.tsx
-import { DoraELTPage } from '@backstagerunway/plugin-sleuth-dora';
-
-// Add the route
-<Route path="/dora-elt" element={<DoraELTPage />} />
-```
-
-```typescript
-// packages/app/src/components/Root/Root.tsx
-import { CreateComponentIcon } from '@backstage/core-components';
-
-// Add to sidebar navigation
-<SidebarItem icon={CreateComponentIcon} to="dora-elt" text="Sleuth - ELT" />
-```
-
-### 2. Lead Dashboard (DoraLeadPage)
-
-**Purpose**: Provides team leaders with detailed team performance metrics and the ability to compare teams.
-
-**Features**:
-- Team performance overview
-- Team selector for comparing specific teams
-- All teams view for comprehensive analysis
-- Time range selection
-- User team filtering based on Backstage catalog
-
-![Lead Dashboard Team Selector](docs/screenshots/lead-dashboard-team-selector.png)
-*Team selector dropdown for comparing specific teams*
-
-![Lead Dashboard Performance](docs/screenshots/lead-dashboard-performance.png)
-*Team performance overview with metrics comparison*
-
-**Installation**:
-
-```typescript
-// packages/app/src/App.tsx
-import { DoraLeadPage } from '@backstagerunway/plugin-sleuth-dora';
-
-// Add the route
-<Route path="/dora-lead" element={<DoraLeadPage />} />
-```
-
-```typescript
-// packages/app/src/components/Root/Root.tsx
-import { CreateComponentIcon } from '@backstage/core-components';
-
-// Add to sidebar navigation
-<SidebarItem icon={CreateComponentIcon} to="dora-lead" text="Sleuth - Lead" />
-```
-
-### 3. Entity Dashboard (DoraPerformanceComponent)
+### 1. Entity Dashboard (DoraPerformanceComponent)
 
 **Purpose**: Embeds DORA metrics directly into entity pages for project-specific analysis.
 
@@ -160,7 +96,7 @@ const sleuthContent = (
 </EntityLayout.Route>
 ```
 
-**Entity Configuration**: To use the Entity Dashboard, your entities must have the `sleuth.io/project-slug` annotation:
+**Entity Configuration**: To use the Entity Dashboard, your entities can use the following annotations:
 
 ```yaml
 apiVersion: backstage.io/v1alpha1
@@ -168,11 +104,85 @@ kind: Component
 metadata:
   name: my-component
   annotations:
-    sleuth.io/project-slug: 'your-sleuth-project-slug'
+    sleuth.io/project-slug: 'your-sleuth-project-slug'  # Required
+    sleuth.io/code-deployment-slug: 'my-service'        # Optional - defaults to entity name
+    sleuth.io/environment: 'production'                 # Optional - defaults to config
 spec:
   type: service
   lifecycle: production
   owner: team-a
+```
+
+**Fallback Behavior**:
+- If `sleuth.io/project-slug` is not specified, it uses `defaultProjectSlug` from app-config.yaml
+- If `sleuth.io/code-deployment-slug` is not specified, it uses the entity's `metadata.name`
+- If `sleuth.io/environment` is not specified, it uses the `environment` from app-config.yaml
+
+### 2. Executive Dashboard (DoraELTPage)
+
+**Purpose**: Provides executive-level overview of organizational DORA metrics and quarterly health trends.
+
+**Features**:
+- Executive summary with key DORA metrics
+- Quarterly health overview
+- Organization-wide trend analysis
+- Time range selection for historical data
+
+![Executive Dashboard Main View](docs/screenshots/executive-dashboard-main.png)
+*Executive Dashboard showing organizational DORA metrics overview*
+
+
+**Installation**:
+
+```typescript
+// packages/app/src/App.tsx
+import { DoraELTPage } from '@backstagerunway/plugin-sleuth-dora';
+
+// Add the route
+<Route path="/dora-elt" element={<DoraELTPage />} />
+```
+
+```typescript
+// packages/app/src/components/Root/Root.tsx
+import { CreateComponentIcon } from '@backstage/core-components';
+
+// Add to sidebar navigation
+<SidebarItem icon={CreateComponentIcon} to="dora-elt" text="Sleuth - ELT" />
+```
+
+### 3. Lead Dashboard (DoraLeadPage)
+
+**Purpose**: Provides team leaders with detailed team performance metrics and the ability to compare teams.
+
+**Features**:
+- Team performance overview
+- Team selector for comparing specific teams
+- All teams view for comprehensive analysis
+- Time range selection
+- User team filtering based on Backstage catalog
+
+![Lead Dashboard Team Selector](docs/screenshots/lead-dashboard-team-selector.png)
+*Team selector dropdown for comparing specific teams*
+
+![Lead Dashboard Performance](docs/screenshots/lead-dashboard-performance.png)
+*Team performance overview with metrics comparison*
+
+**Installation**:
+
+```typescript
+// packages/app/src/App.tsx
+import { DoraLeadPage } from '@backstagerunway/plugin-sleuth-dora';
+
+// Add the route
+<Route path="/dora-lead" element={<DoraLeadPage />} />
+```
+
+```typescript
+// packages/app/src/components/Root/Root.tsx
+import { CreateComponentIcon } from '@backstage/core-components';
+
+// Add to sidebar navigation
+<SidebarItem icon={CreateComponentIcon} to="dora-lead" text="Sleuth - Lead" />
 ```
 
 ## Complete Setup Example
@@ -231,6 +241,20 @@ const sleuthContent = (
 
 ## Configuration
 
+### Configuration Precedence (how values are resolved)
+
+For values used by the UI, the plugin resolves configuration in this order:
+
+1. Entity annotations (if an entity is in context)
+2. App config (`app-config.yaml`)
+3. Built-in defaults
+
+Keys and their resolution:
+- `projectSlug`: `sleuth.io/project-slug` → `dora.sleuth.defaultProjectSlug` → `sleuth`
+- `environment`: `sleuth.io/environment` → `dora.sleuth.environment` → `production`
+- `codeDeploymentSlug`: `sleuth.io/code-deployment-slug` → entity `metadata.name` (no app-config fallback)
+- `defaultTimeRange`: `dora.sleuth.defaultTimeRange` → `last28days`
+
 ### Required Configuration
 
 The plugin requires the following configuration in your `app-config.yaml`:
@@ -239,19 +263,40 @@ The plugin requires the following configuration in your `app-config.yaml`:
 dora:
   sleuth:
     organizationId: 'your-sleuth-organization-id'
-    apiUrl: 'https://app.sleuth.io'
     apiKey: 'your-sleuth-api-key-here'
+    environment: 'production'          # Optional (frontend-visible)
+    defaultProjectSlug: 'your-default-project'  # Optional (frontend-visible)
+    # apiUrl is optional - defaults to 'https://app.sleuth.io' if not specified
+    # apiUrl: 'https://app.sleuth.io'
 ```
 
 ### Entity Annotations
 
-For the Entity Dashboard to work, your entities must include:
+For the Entity Dashboard to work, your entities can use these annotations:
 
 ```yaml
 metadata:
   annotations:
-    sleuth.io/project-slug: 'your-sleuth-project-slug'
+    sleuth.io/project-slug: 'your-sleuth-project-slug'  # Required
+    sleuth.io/code-deployment-slug: 'your-service'      # Optional - defaults to entity name
+    sleuth.io/environment: 'production'                 # Optional - defaults to config
 ```
+
+**Fallback Behavior**:
+- `sleuth.io/project-slug`: Falls back to `defaultProjectSlug` from app-config.yaml
+- `sleuth.io/code-deployment-slug`: Falls back to entity's `metadata.name`
+- `sleuth.io/environment`: Falls back to `environment` from app-config.yaml
+
+### Required vs Optional
+
+- Mandatory (backend-only):
+  - `dora.sleuth.organizationId`
+  - `dora.sleuth.apiKey`
+- Optional (frontend-visible):
+  - `dora.sleuth.environment` (default: `production`)
+  - `dora.sleuth.defaultProjectSlug` (default: `sleuth`)
+  - `dora.sleuth.defaultTimeRange` (default: `last28days`)
+  - `dora.sleuth.apiUrl` (default: `https://app.sleuth.io`)
 
 ## Development
 
