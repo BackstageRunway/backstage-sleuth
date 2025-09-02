@@ -18,8 +18,6 @@ dora:
   # Environment for metrics (e.g., 'production', 'staging', 'development')
   environment: 'production'
   
-  # Deployment identifier (e.g., 'application', 'service')
-  deployment: 'application'
   
   # Default time range for metrics (e.g., 'last7days', 'last14days', 'last28days', 'last90days')
   defaultTimeRange: 'last28days'
@@ -42,7 +40,6 @@ dora:
 |-----|-------------|---------------|
 | `dora.orgId` | Organization ID for Sleuth/DORA metrics | `'sleuth'` |
 | `dora.environment` | Environment for metrics | `'production'` |
-| `dora.deployment` | Deployment identifier | `'application'` |
 | `dora.defaultTimeRange` | Default time range for metrics | `'last28days'` |
 | `dora.sleuth.apiKey` | Sleuth API key for authentication | Required |
 
@@ -59,7 +56,7 @@ metadata:
     sleuth.io/org-id: 'my-org'
     sleuth.io/project-slug: 'my-project'
     sleuth.io/environment: 'production'
-    sleuth.io/deployment: 'my-service'
+
 spec:
   type: service
   lifecycle: production
@@ -87,7 +84,6 @@ If you see errors like "Missing required config value at 'dora.orgId'", make sur
 The plugin will use default values if configuration is not provided:
 - `orgId`: 'sleuth'
 - `environment`: 'production'
-- `deployment`: 'application'
 - `defaultTimeRange`: 'last28days'
 
 ### Validation

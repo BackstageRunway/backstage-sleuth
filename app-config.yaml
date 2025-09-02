@@ -8,11 +8,12 @@ organization:
 dora:
   sleuth:
     organizationId: 'backstagerunway'
-    apiUrl: 'https://app.sleuth.io'
-    apiKey: 'place-your-api-key-here'
+    apiKey: 'place-your-apikey-here'
     environment: 'production'
-    deployment: ''
-    defaultTimeRange: 'last28days'
+    # defaultProjectSlug: 'backstagerunway-app'
+    # defaultTimeRange: 'last28days'
+    # apiUrl is optional - defaults to 'https://app.sleuth.io' if not specified
+    # apiUrl: 'https://app.sleuth.io'
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins

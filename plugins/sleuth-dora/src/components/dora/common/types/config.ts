@@ -8,9 +8,10 @@ import { TimeRange } from './metrics';
  * Configuration for DORA metrics API calls
  */
 export interface DoraConfig {
-  environment: string;
-  deployment: string;
-  defaultTimeRange: TimeRange;
+  environment?: string;
+  defaultProjectSlug?: string;
+  codeDeploymentSlug?: string;
+  defaultTimeRange?: TimeRange;
 }
 
 /**
@@ -19,7 +20,7 @@ export interface DoraConfig {
 export interface EntityConfig {
   projectSlug: string;
   environment: string;
-  deployment: string;
+  codeDeploymentSlug: string;
 }
 
 /**
@@ -41,7 +42,7 @@ export interface BackstageEntity {
  */
 export const DORA_CONFIG_KEYS = {
   ENVIRONMENT: 'dora.sleuth.environment',
-  DEPLOYMENT: 'dora.sleuth.deployment',
+  DEFAULT_PROJECT_SLUG: 'dora.sleuth.defaultProjectSlug',
   DEFAULT_TIME_RANGE: 'dora.sleuth.defaultTimeRange',
 } as const;
 
@@ -51,5 +52,5 @@ export const DORA_CONFIG_KEYS = {
 export const ENTITY_ANNOTATION_KEYS = {
   PROJECT_SLUG: 'sleuth.io/project-slug',
   ENVIRONMENT: 'sleuth.io/environment',
-  DEPLOYMENT: 'sleuth.io/deployment',
+  CODE_DEPLOYMENT_SLUG: 'sleuth.io/code-deployment-slug',
 } as const; 

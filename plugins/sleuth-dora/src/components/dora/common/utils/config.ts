@@ -4,7 +4,7 @@
 
 import { useApi } from '@backstage/core-plugin-api';
 import { configApiRef } from '@backstage/core-plugin-api';
-import { DoraConfig, BackstageEntity, EntityConfig, DORA_CONFIG_KEYS, ENTITY_ANNOTATION_KEYS } from '../types/config';
+import { DoraConfig, BackstageEntity, DORA_CONFIG_KEYS, ENTITY_ANNOTATION_KEYS } from '../types/config';
 import { TimeRange } from '../types/metrics';
 import { DEFAULT_ENTITY_VALUES } from '../constants/annotations';
 
@@ -13,7 +13,8 @@ import { DEFAULT_ENTITY_VALUES } from '../constants/annotations';
  */
 export const DORA_DEFAULT_CONFIG: DoraConfig = {
   environment: DEFAULT_ENTITY_VALUES.ENVIRONMENT,
-  deployment: DEFAULT_ENTITY_VALUES.DEPLOYMENT,
+  defaultProjectSlug: DEFAULT_ENTITY_VALUES.PROJECT_SLUG,
+  codeDeploymentSlug: DEFAULT_ENTITY_VALUES.CODE_DEPLOYMENT_SLUG,
   defaultTimeRange: 'last28days' as TimeRange,
 } as const;
 
@@ -21,36 +22,40 @@ export const DORA_DEFAULT_CONFIG: DoraConfig = {
  * Hook to get DORA configuration from Backstage config API
  * Falls back to default values if not configured
  */
-export const useDoraConfig = () => {
-  try {
-    const configApi = useApi(configApiRef);
-    
-    const environment = configApi.getOptionalString(DORA_CONFIG_KEYS.ENVIRONMENT) || DORA_DEFAULT_CONFIG.environment;
-    const deployment = configApi.getOptionalString(DORA_CONFIG_KEYS.DEPLOYMENT) || DORA_DEFAULT_CONFIG.deployment;
-    const defaultTimeRange = configApi.getOptionalString(DORA_CONFIG_KEYS.DEFAULT_TIME_RANGE) || DORA_DEFAULT_CONFIG.defaultTimeRange;
-    
-    return {
-      environment,
-      deployment,
-      defaultTimeRange,
-    };
-  } catch (error) {
-    // Fallback to default values if config API is not available
-    console.warn('DORA Plugin: Config API not available, using default values:', error);
-    return DORA_DEFAULT_CONFIG;
-  }
+export type DoraResolvedConfig = {
+  projectSlug: string;
+  environment: string;
+  codeDeploymentSlug: string;
+  defaultTimeRange: TimeRange;
 };
 
-/**
- * Utility to get entity-specific configuration with fallbacks
- * @param entity - Backstage entity
- * @param config - Base configuration
- * @returns Merged configuration with entity annotations taking precedence
- */
-export const getEntityConfig = (entity: BackstageEntity, config: ReturnType<typeof useDoraConfig>): EntityConfig => {
-  return {
-    projectSlug: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.PROJECT_SLUG] || DEFAULT_ENTITY_VALUES.PROJECT_SLUG,
-    environment: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.ENVIRONMENT] || config.environment,
-    deployment: entity.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.DEPLOYMENT] || config.deployment,
-  };
-}; 
+export const useDoraConfig = (entity?: BackstageEntity): DoraResolvedConfig => {
+  try {
+    const configApi = useApi(configApiRef);
+
+    // first level(read from entity annotations)
+    const annProj = entity?.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.PROJECT_SLUG];
+    const annEnv = entity?.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.ENVIRONMENT];
+    const annCodeDep = entity?.metadata.annotations?.[ENTITY_ANNOTATION_KEYS.CODE_DEPLOYMENT_SLUG] || entity?.metadata.name;
+
+    // second level (read from app-config.yaml) - fallback to config
+    const cfgEnv = configApi.getOptionalString(DORA_CONFIG_KEYS.ENVIRONMENT);
+    const cfgProj = configApi.getOptionalString(DORA_CONFIG_KEYS.DEFAULT_PROJECT_SLUG);
+    const cfgTimeRange = configApi.getOptionalString(DORA_CONFIG_KEYS.DEFAULT_TIME_RANGE) as TimeRange | undefined;
+
+    // third level (read from defaults) - fallback to defaults
+    const projectSlug = annProj ?? cfgProj ?? DORA_DEFAULT_CONFIG.defaultProjectSlug!;
+    const environment = annEnv ?? cfgEnv ?? DORA_DEFAULT_CONFIG.environment!;
+    const codeDeploymentSlug = annCodeDep ?? DORA_DEFAULT_CONFIG.codeDeploymentSlug!;
+    const defaultTimeRange = cfgTimeRange ?? DORA_DEFAULT_CONFIG.defaultTimeRange!;
+
+    return { projectSlug, environment, codeDeploymentSlug, defaultTimeRange };
+  } catch {
+    return {
+      projectSlug: DORA_DEFAULT_CONFIG.defaultProjectSlug!,
+      environment: DORA_DEFAULT_CONFIG.environment!,
+      codeDeploymentSlug: '',
+      defaultTimeRange: DORA_DEFAULT_CONFIG.defaultTimeRange!,
+    };
+  }
+};

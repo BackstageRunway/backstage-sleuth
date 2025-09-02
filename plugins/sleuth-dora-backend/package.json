@@ -49,8 +49,10 @@
     "typescript": "~5.8.0"
   },
   "files": [
-    "dist"
+    "dist",
+    "config.d.ts"
   ],
+  "configSchema": "config.d.ts",
   "keywords": [
     "backstage",
     "plugin",

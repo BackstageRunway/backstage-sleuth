@@ -97,7 +97,7 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
         const result = await doraApi.getBatchTeamDORAMetrics(
           teamSlugs,
           baseConfig.environment,
-          baseConfig.deployment,
+          baseConfig.codeDeploymentSlug,
           timeRange,
         );
 
@@ -133,7 +133,7 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
     };
 
     fetchAllTeamsMetrics();
-  }, [teamSlugs, baseConfig.environment, baseConfig.deployment, timeRange]);
+  }, [teamSlugs, baseConfig.environment, baseConfig.codeDeploymentSlug, timeRange]);
 
   return {
     teams: teamsData,

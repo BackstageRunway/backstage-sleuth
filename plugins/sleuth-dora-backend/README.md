@@ -46,15 +46,30 @@ Add the following configuration to your `app-config.yaml`:
 dora:
   sleuth:
     organizationId: 'your-sleuth-organization-id'
-    apiUrl: 'https://app.sleuth.io'
     apiKey: 'your-sleuth-api-key-here'
+    # Optional frontend-visible defaults
+    environment: 'production'
+    defaultProjectSlug: 'your-default-project'
+    # apiUrl is optional - defaults to 'https://app.sleuth.io' if not specified
+    # apiUrl: 'https://app.sleuth.io'
 ```
 
-### Configuration Options
+### Configuration Options & Precedence
 
+Required (backend-only):
 - `organizationId`: Your Sleuth.io organization identifier
-- `apiUrl`: The Sleuth.io API base URL (default: https://app.sleuth.io)
 - `apiKey`: Your Sleuth.io API key for authentication
+
+Optional (frontend-visible):
+- `environment` (default: `production`)
+- `defaultProjectSlug` (default: `sleuth`)
+- `defaultTimeRange` (default: `last28days`)
+- `apiUrl` (default: `https://app.sleuth.io`)
+
+Frontend resolution order:
+1. Entity annotations (if present)
+2. App config (keys above)
+3. Built-in defaults
 
 ## API Endpoints
 

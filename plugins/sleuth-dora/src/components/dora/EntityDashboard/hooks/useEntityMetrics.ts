@@ -5,7 +5,7 @@ import { ApiInsight, ProjectMetricsResponse } from '../../common/types/api';
 import { MetricData } from '../../common/types/metrics';
 import { TimeRange } from '../../common/types/metrics';
 import { processMetricsResponse, processInsights } from '../../common/utils/processors';
-import { useDoraConfig, getEntityConfig } from '../../common/utils/config';
+import { useDoraConfig } from '../../common/utils/config';
 
 export function useEntityMetrics(entity: any) {
   const doraApi = useApi(doraBackendApiRef);
@@ -15,11 +15,8 @@ export function useEntityMetrics(entity: any) {
   const [error, setError] = useState<string | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
 
-  // Get configuration from Backstage config API and entity annotations
-  const baseConfig = useDoraConfig();
-  const { projectSlug, environment, deployment } = getEntityConfig(entity, baseConfig);
-
-
+  // Resolve configuration using entity (entity annotations → app-config → defaults)
+  const { projectSlug, environment, codeDeploymentSlug } = useDoraConfig(entity);
 
   const fetchMetrics = useCallback(async (timeRange: TimeRange) => {
     setLoading(true);
@@ -27,7 +24,7 @@ export function useEntityMetrics(entity: any) {
       const result = await doraApi.getProjectDORAMetrics(
         projectSlug,
         environment,
-        deployment,
+        codeDeploymentSlug,
         timeRange,
       ) as ProjectMetricsResponse;
 
@@ -45,7 +42,7 @@ export function useEntityMetrics(entity: any) {
     } finally {
       setLoading(false);
     }
-  }, [doraApi, projectSlug, environment, deployment]);
+  }, [doraApi, projectSlug, environment, codeDeploymentSlug]);
 
   const fetchMetricsInsights = useCallback(async (timeRange: TimeRange) => {
     setLoading(true);
@@ -53,7 +50,7 @@ export function useEntityMetrics(entity: any) {
       const result = await doraApi.getProjectDORAMetricsInsights(
         projectSlug,
         environment,
-        deployment,
+        codeDeploymentSlug,
         timeRange,
       );
 
@@ -69,7 +66,7 @@ export function useEntityMetrics(entity: any) {
     } finally {
       setLoading(false);
     }
-  }, [doraApi, projectSlug, environment, deployment]);
+  }, [doraApi, projectSlug, environment, codeDeploymentSlug]);
 
   useEffect(() => {
     fetchMetrics(selectedTimeRange);
