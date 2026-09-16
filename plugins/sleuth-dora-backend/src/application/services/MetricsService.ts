@@ -1,5 +1,5 @@
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { ProjectInsightsResponse, ProjectMetricsResponse, TeamMetricsRequest, TeamMetricsResponse } from '../../domain/models/SleuthBatchTypes';
+import { ProjectInsightsResponse, ProjectMetricsResponse, TeamMetricsRequest } from '../../domain/models/SleuthBatchTypes';
 import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {

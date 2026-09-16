@@ -40,18 +40,18 @@ export function useTeamMetrics(teamSlug: string | null) {
 
     setLoading(true);
     try {
-      const result = await doraApi.getTeamDORAMetrics(
-        teamSlug,
+      const result = await doraApi.getBatchTeamDORAMetrics(
+        [teamSlug],
         environment,
         codeDeploymentSlug,
         timeRange,
       ) as any;
 
-      if (!result || !result.team) {
+      const team = result?.teams?.[0];
+      if (!team) {
         throw new Error('No team metrics data available');
       }
 
-      const team = result.team;
       const metricsData = processMetricsResponse(team, false);
 
       setMetrics(metricsData);
@@ -63,31 +63,11 @@ export function useTeamMetrics(teamSlug: string | null) {
     }
   }, [doraApi, teamSlug, environment, codeDeploymentSlug]);
 
-  const fetchInsights = useCallback(async (timeRange: TimeRange) => {
-    if (!teamSlug) {
-      setInsights([]);
-      return;
-    }
-
-    try {
-      const result = await doraApi.getTeamDORAMetricsInsights(
-        teamSlug,
-        environment,
-        codeDeploymentSlug,
-        timeRange,
-      );
-
-      if (!result || !result.insights) {
-        setInsights([]);
-        return;
-      }
-
-      setInsights(result.insights);
-    } catch (err) {
-      console.error('Failed to fetch team insights:', err);
-      setInsights([]);
-    }
-  }, [doraApi, teamSlug, environment, codeDeploymentSlug]);
+  // No team-level insights endpoint exists on DORABackendClient (only
+  // project-level insights are available), so this stays empty.
+  const fetchInsights = useCallback(async (_timeRange: TimeRange) => {
+    setInsights([]);
+  }, []);
 
   useEffect(() => {
     fetchMetrics(selectedTimeRange);
