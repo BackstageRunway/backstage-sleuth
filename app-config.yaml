@@ -8,14 +8,14 @@ app:
   extensions:
     # Default landing page configuration.
     # The catalog is mounted at /catalog by default but is overridden here to
-    # serve as the root page. To switch to the Home page, comment out the
-    # catalog path override and uncomment the home path override.
+    # serve as the root page. Note: unlike page:catalog, @backstage/plugin-home's
+    # page:home extension hardcodes its own path ("/home") in its factory and
+    # does not honor a config path override, so it isn't usable here - it
+    # stays at its own default /home instead (added to App.tsx's features so
+    # that path actually resolves, which it previously didn't).
     - page:catalog:
         config:
           path: /
-    # - page:home:
-    #     config:
-    #       path: /
 
     # Visit tracking records which pages users navigate to and is disabled by default.
     # Enable it to populate the Most Visited and Recently Visited widgets on the Home page.
