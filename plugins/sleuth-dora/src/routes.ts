@@ -1,9 +1,4 @@
-import { createRouteRef } from '@backstage/core-plugin-api';
+import { createRouteRef } from '@backstage/frontend-plugin-api';
 
-export const rootRouteRef = createRouteRef({
-  id: 'sleuth-dora',
-});
-
-export const innerRouteRef = createRouteRef({
-  id: 'sleuth-dora-inner',
-});
+export const doraEltRouteRef = createRouteRef();
+export const doraTeamRouteRef = createRouteRef();
