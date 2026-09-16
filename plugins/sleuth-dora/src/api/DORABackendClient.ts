@@ -78,7 +78,6 @@ export class DORABackendClientImpl implements DORABackendClient {
 
   async getProjectDORAMetrics(projectSlug: string, environment: string, deploymentSlug: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
-    environment = '';
 
     const url = `${baseUrl}/metrics/${projectSlug}?environment=${environment}&deploymentId=${deploymentSlug}&timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
@@ -86,8 +85,7 @@ export class DORABackendClientImpl implements DORABackendClient {
 
   async getProjectDORAMetricsInsights(projectSlug: string, environment: string, deploymentSlug: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
-    environment = '';
-    
+
     const url = `${baseUrl}/metrics-insights/${projectSlug}?environment=${environment}&deploymentId=${deploymentSlug}&timeRange=${timeRange}`;
     return this.fetchWithAuth(url);
   }

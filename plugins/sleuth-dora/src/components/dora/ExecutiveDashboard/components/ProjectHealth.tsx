@@ -183,7 +183,7 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                         <XAxis dataKey="name" />
                                         <YAxis />
                                         <Tooltip
-                                            formatter={(value: number) => [`${metric.format(value)}${metric.unit}`, '']}
+                                            formatter={value => [`${metric.format(Number(value))}${metric.unit}`, '']}
                                             labelFormatter={(label, payload) => {
                                                 if (payload && payload[0]) {
                                                     return `Quarter: ${label} (${payload[0].payload.date})`;

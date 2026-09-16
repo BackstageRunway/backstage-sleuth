@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, HttpLink, gql, NormalizedCacheObject } fro
 import { BatchHttpLink } from '@apollo/client/link/batch-http';
 import fetch from 'cross-fetch';
 import { DoraMetricsError } from '../../domain/models/DoraMetrics';
-import { ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse, TeamMetricsRequest, TeamMetricsResponse, TeamMetricsInsightsRequest } from '../../domain/models/SleuthBatchTypes';
+import { ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse, TeamMetricsRequest } from '../../domain/models/SleuthBatchTypes';
 
 export class SleuthClient {
   private readonly client: ApolloClient<NormalizedCacheObject>;
