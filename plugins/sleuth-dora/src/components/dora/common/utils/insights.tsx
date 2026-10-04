@@ -2,11 +2,44 @@
  * Insight generation utilities for DORA metrics
  */
 
-import { MetricType } from '../types/metrics';
+import { MetricType, Performance } from '../types/metrics';
+import { getMetricPerformance } from './calculations';
 import { ApiInsight, MetricInsight } from '../types/api';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import WarningIcon from '@material-ui/icons/Warning';
 import ErrorIcon from '@material-ui/icons/Error';
+
+// Wording per metric; the elite text mirrors the thresholds in constants/thresholds.ts
+const LEVEL_TEXT: Record<MetricType, { name: string; elite: string; medium: string; low: string; improving: string }> = {
+    [MetricType.Frequency]: {
+        name: 'deployment frequency',
+        elite: 'at least one deploy per day',
+        medium: 'Consider deploying more often',
+        low: 'Deployment frequency needs immediate attention',
+        improving: 'Deployment frequency is improving',
+    },
+    [MetricType.LeadTime]: {
+        name: 'lead time',
+        elite: 'under one day',
+        medium: 'Consider optimizing CI/CD pipeline',
+        low: 'Lead time needs immediate optimization',
+        improving: 'Lead time is improving',
+    },
+    [MetricType.FailureRate]: {
+        name: 'failure rate',
+        elite: '5% or less',
+        medium: 'Consider improving test coverage',
+        low: 'Failure rate needs immediate attention',
+        improving: 'Failure rate is improving',
+    },
+    [MetricType.Mttr]: {
+        name: 'MTTR',
+        elite: 'under one hour',
+        medium: 'Consider improving incident response',
+        low: 'MTTR needs immediate improvement',
+        improving: 'Recovery time is improving',
+    },
+};
 
 /**
  * Generates metric-specific insights based on values and trends
@@ -37,133 +70,50 @@ export function getMetricInsights(
         });
     }
 
-    // Add metric-specific insights
-    switch (metricType) {
-        case MetricType.Frequency:
-            if (value >= 1) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Meeting elite deployment frequency target',
-                    type: 'PERFORMANCE'
-                });
-            } else if (value >= 0.5) {
-                // insights.push({
-                //     icon: <WarningIcon className={styles.warningInsight} />,
-                //     text: 'Consider increasing deployment frequency',
-                //     type: 'PERFORMANCE'
-                // });
-            } else {
-                insights.push({
-                    icon: <ErrorIcon className={styles.criticalInsight} />,
-                    text: 'Deployment frequency needs immediate attention',
-                    type: 'PERFORMANCE'
-                });
-            }
-            if (percentageChange > 0) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Deployment frequency is improving',
-                    type: 'TREND'
-                });
-            }
-            break;
+    // Rate the current level with the same thresholds as the rating grid, so the card and the grid agree
+    const level = getMetricPerformance(metricType, value);
+    const noIncidents = metricType === MetricType.Mttr && value === 0;
 
-        case MetricType.LeadTime:
-            const leadTimeHours = value / 3600;
-            if (leadTimeHours <= 24) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Meeting elite lead time target',
-                    type: 'PERFORMANCE'
-                });
-            } else if (leadTimeHours <= 24 * 7) {
-                insights.push({
-                    icon: <WarningIcon className={styles.warningInsight} />,
-                    text: 'Consider optimizing CI/CD pipeline',
-                    type: 'PERFORMANCE'
-                });
-            } else {
-                insights.push({
-                    icon: <ErrorIcon className={styles.criticalInsight} />,
-                    text: 'Lead time needs immediate optimization',
-                    type: 'PERFORMANCE'
-                });
-            }
-            if (percentageChange < 0) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Lead time is improving',
-                    type: 'TREND'
-                });
-            }
-            break;
+    if (noIncidents) {
+        insights.push({
+            icon: <CheckCircleIcon className={styles.goodInsight} />,
+            text: 'No incidents in this period',
+            type: 'PERFORMANCE'
+        });
+    } else if (level === Performance.Elite) {
+        insights.push({
+            icon: <CheckCircleIcon className={styles.goodInsight} />,
+            text: `Meeting elite ${LEVEL_TEXT[metricType].name} target`,
+            type: 'PERFORMANCE'
+        });
+    } else if (level === Performance.High) {
+        insights.push({
+            icon: <CheckCircleIcon className={styles.goodInsight} />,
+            text: `High performance; elite is ${LEVEL_TEXT[metricType].elite}`,
+            type: 'PERFORMANCE'
+        });
+    } else if (level === Performance.Medium) {
+        insights.push({
+            icon: <WarningIcon className={styles.warningInsight} />,
+            text: LEVEL_TEXT[metricType].medium,
+            type: 'PERFORMANCE'
+        });
+    } else {
+        insights.push({
+            icon: <ErrorIcon className={styles.criticalInsight} />,
+            text: LEVEL_TEXT[metricType].low,
+            type: 'PERFORMANCE'
+        });
+    }
 
-        case MetricType.FailureRate:
-            if (value <= 15) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Meeting failure rate target',
-                    type: 'PERFORMANCE'
-                });
-            } else if (value <= 30) {
-                insights.push({
-                    icon: <WarningIcon className={styles.warningInsight} />,
-                    text: 'Consider improving test coverage',
-                    type: 'PERFORMANCE'
-                });
-            } else {
-                insights.push({
-                    icon: <ErrorIcon className={styles.criticalInsight} />,
-                    text: 'Failure rate needs immediate attention',
-                    type: 'PERFORMANCE'
-                });
-            }
-            if (percentageChange < 0) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Failure rate is improving',
-                    type: 'TREND'
-                });
-            }
-            break;
-
-        case MetricType.Mttr:
-            const mttrHours = value / 3600;
-            if (value === 0) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'No incidents in this period',
-                    type: 'PERFORMANCE'
-                });
-                break;
-            }
-            if (mttrHours <= 1) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Meeting elite MTTR target',
-                    type: 'PERFORMANCE'
-                });
-            } else if (mttrHours <= 24) {
-                insights.push({
-                    icon: <WarningIcon className={styles.warningInsight} />,
-                    text: 'Consider improving incident response',
-                    type: 'PERFORMANCE'
-                });
-            } else {
-                insights.push({
-                    icon: <ErrorIcon className={styles.criticalInsight} />,
-                    text: 'MTTR needs immediate improvement',
-                    type: 'PERFORMANCE'
-                });
-            }
-            if (percentageChange < 0) {
-                insights.push({
-                    icon: <CheckCircleIcon className={styles.goodInsight} />,
-                    text: 'Recovery time is improving',
-                    type: 'TREND'
-                });
-            }
-            break;
+    // Trend against the previous period; for everything but frequency, lower is better
+    const improving = metricType === MetricType.Frequency ? percentageChange > 0 : percentageChange < 0;
+    if (improving) {
+        insights.push({
+            icon: <CheckCircleIcon className={styles.goodInsight} />,
+            text: LEVEL_TEXT[metricType].improving,
+            type: 'TREND'
+        });
     }
 
     return insights;
