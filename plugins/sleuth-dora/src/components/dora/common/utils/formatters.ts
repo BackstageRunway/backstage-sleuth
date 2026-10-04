@@ -15,13 +15,11 @@ export const formatMetricValue = (value: number, metricType: MetricType): string
     case MetricType.Frequency:
       return `${value.toFixed(2)}/day`;
     case MetricType.LeadTime:
-      const hours = value / 3600;
-      return hours >= 1 ? `${hours.toFixed(1)}h` : `${(value / 60).toFixed(1)}m`;
+      return formatDuration(value);
     case MetricType.FailureRate:
       return `${value.toFixed(1)}%`;
     case MetricType.Mttr:
-      const minutes = value / 60;
-      return minutes >= 1 ? `${minutes.toFixed(1)}m` : `${value}s`;
+      return formatDuration(value);
     default:
       return value.toString();
   }
@@ -38,27 +36,25 @@ export const formatMetricValueLegacy = (metricName: MetricType, value: number): 
 };
 
 /**
- * Formats time duration in seconds to human-readable format
+ * Formats a duration the way Sleuth does: the two largest units, e.g. "45m", "1h 42m", "17d 23h"
  * @param seconds - Duration in seconds
  * @returns Formatted duration string
  */
 export const formatDuration = (seconds: number): string => {
-  if (seconds < 60) {
-    return `${seconds}s`;
+  if (!seconds) return '0m';
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+
+  if (minutes < 24 * 60) {
+    const rest = minutes % 60;
+    return rest ? `${Math.floor(minutes / 60)}h ${rest}m` : `${Math.floor(minutes / 60)}h`;
   }
-  
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) {
-    return `${minutes}m`;
-  }
-  
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    return `${hours}h`;
-  }
-  
-  const days = Math.floor(hours / 24);
-  return `${days}d`;
+
+  const hours = Math.round(seconds / 3600);
+  const rest = hours % 24;
+  return rest ? `${Math.floor(hours / 24)}d ${rest}h` : `${Math.floor(hours / 24)}d`;
 };
 
 /**

@@ -4,6 +4,7 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { formatDuration } from '../../common/utils/formatters';
 
 // Define the type for the metrics data
 interface MetricsData {
@@ -213,7 +214,7 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
         },
         {
             label: 'Average Lead Time',
-            value: `${secondsToHours(metricsData.totalRecap.avgLeadTimeInSec).toFixed(1)}h`,
+            value: formatDuration(metricsData.totalRecap.avgLeadTimeInSec),
             trend: leadTimeTrend.trend,
             change: leadTimeTrend.change,
             isImproving: leadTimeTrend.isImproving,
@@ -233,7 +234,7 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
         },
         {
             label: 'Average MTTR',
-            value: `${Math.round(metricsData.totalRecap.avgMttrDurationInSec / 60)}m`,
+            value: formatDuration(metricsData.totalRecap.avgMttrDurationInSec),
             trend: mttrTrend.trend,
             change: mttrTrend.change,
             isImproving: mttrTrend.isImproving,
