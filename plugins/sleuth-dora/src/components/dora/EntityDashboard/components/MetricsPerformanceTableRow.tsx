@@ -4,8 +4,6 @@ import { MetricType, Performance, getPerformanceDescription } from '../../common
 import { TrendCell } from './TrendCell';
 import { MetricPerformanceStatusMarker } from './MetricPerformanceStatusMarker';
 import { METRIC_LABELS } from '../constants';
-//import TrendingUpIcon from '@material-ui/icons/TrendingUp';
-//import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
 interface MetricsPerformanceTableRowProps {
     metricName: MetricType;

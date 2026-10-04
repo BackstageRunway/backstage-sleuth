@@ -10,7 +10,6 @@ export const doraBackendPlugin = createBackendPlugin({
   register(env) {
     env.registerInit({
       deps: {
-        //database: coreServices.database,
         httpAuth: coreServices.httpAuth,
         httpRouter: coreServices.httpRouter,
         logger: coreServices.logger,

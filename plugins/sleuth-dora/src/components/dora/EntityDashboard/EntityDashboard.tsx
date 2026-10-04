@@ -49,19 +49,6 @@ const useStyles = makeStyles(theme => ({
 export const EntityDashboard = () => {
     const classes = useStyles();
     const { entity } = useEntity();
-    //const projectSlug = entity.metadata.annotations?.['sleuth.io/project-slug'];
-
-    // return if projectId is missing
-    // if (!projectSlug) {
-    //     return (
-    //         <Alert severity="warning" className={classes.error}>
-    //             No Sleuth project Slug found in entity annotations. Add the 'sleuth.io/project-slug' annotation to view DORA metrics.
-    //             <br />
-    //             Available annotations: {JSON.stringify(entity.metadata.annotations, null, 2)}
-    //         </Alert>
-    //     );
-    // }
-
     // Use custom hook for all data fetching and state
     const {
         metrics,

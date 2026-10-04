@@ -37,7 +37,7 @@ export function useOrganizationTrendMetrics()
  
   useEffect(() => {
     fetchOrgTrendMetrics(selectedTimeRange);
-  }, [selectedTimeRange]);
+  }, [fetchOrgTrendMetrics, selectedTimeRange]);
 
   return {
     data,

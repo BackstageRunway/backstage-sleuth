@@ -58,13 +58,6 @@ export const TeamSelector = ({
     );
   }
 
-  // Debug logging
-  console.log('TeamSelector Debug:', {
-    selectedTeam,
-    dropdownValue: selectedTeam === null ? '__ALL_TEAMS__' : selectedTeam,
-    teams
-  });
-
   return (
     <FormControl className={classes.container}>
       <InputLabel id="team-selector-label">Select Team</InputLabel>
@@ -73,7 +66,6 @@ export const TeamSelector = ({
         value={selectedTeam === null ? '__ALL_TEAMS__' : selectedTeam}
         onChange={(event) => {
           const value = event.target.value as string;
-          console.log('TeamSelector onChange:', { value, willSetTo: value === '__ALL_TEAMS__' ? null : value });
           onTeamChange(value === '__ALL_TEAMS__' ? null : value);
         }}
         label="Select Team"

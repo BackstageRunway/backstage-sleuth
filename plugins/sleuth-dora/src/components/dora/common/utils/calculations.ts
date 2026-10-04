@@ -74,21 +74,11 @@ export const getMetricPerformance = (metricType: MetricType, value: number): Per
  */
 export const determineTrend = (current: number, previous: number, metricType: MetricType): 'up' | 'down' | 'stable' => {
   const change = calculateTrendChangeSimple(current, previous);
-  
-  // For lead time and MTTR, lower is better (down trend is positive)
-  if (metricType === MetricType.LeadTime || metricType === MetricType.Mttr) {
-    return change <= -5 ? 'up' : change >= 5 ? 'down' : 'stable';
-  }
-  
-  // For frequency and failure rate, higher frequency is better, lower failure rate is better
-  if (metricType === MetricType.Frequency) {
-    return change >= 5 ? 'up' : change <= -5 ? 'down' : 'stable';
-  }
-  
-  if (metricType === MetricType.FailureRate) {
-    return change <= -5 ? 'up' : change >= 5 ? 'down' : 'stable';
-  }
-  
+
+  // Only for frequency is a rise good; for lead time, failure rate and MTTR lower is better
+  const improvement = metricType === MetricType.Frequency ? change : -change;
+  if (improvement >= 5) return 'up';
+  if (improvement <= -5) return 'down';
   return 'stable';
 };
 

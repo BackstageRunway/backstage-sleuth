@@ -110,10 +110,9 @@ const calculateTrend = (quarters: any[], metricKey: string): { trend: string, ch
     if (firstHalfAvg === 0) {
         if (secondHalfAvg === 0) {
             return { trend: 'flat', change: '0%', isImproving: false };
-        } else {
-            // nothing to compare against; higher is only an improvement for deployments
-            return { trend: 'up', change: 'new', isImproving: metricKey === 'numOfDeploysPerDay' };
         }
+        // nothing to compare against; higher is only an improvement for deployments
+        return { trend: 'up', change: 'new', isImproving: metricKey === 'numOfDeploysPerDay' };
     }
     
     const percentageChange = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100);
@@ -156,6 +155,9 @@ const calculateTrend = (quarters: any[], metricKey: string): { trend: string, ch
             } else if (secondHalfAvg > firstHalfAvg) {
                 return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
             }
+            break;
+
+        default:
             break;
     }
     
@@ -295,7 +297,7 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
                                                 dataKey="value" 
                                                 stroke={lineColor} 
                                                 strokeWidth={2} 
-                                                dot={true} 
+                                                dot 
                                             />
                                             <XAxis dataKey="name" hide />
                                             <YAxis hide />

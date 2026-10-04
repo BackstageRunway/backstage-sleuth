@@ -42,7 +42,6 @@ export class SleuthClient {
         },
       }),
       cache: new InMemoryCache(),
-      //defaultOptions: { query: { fetchPolicy: 'no-cache' } },
     });
     
     this.batchClient = new ApolloClient({
@@ -58,7 +57,6 @@ export class SleuthClient {
         batchInterval: 10,
       }),
       cache: new InMemoryCache(),
-      //defaultOptions: { query: { fetchPolicy: 'no-cache' } },
     });
   }
 
