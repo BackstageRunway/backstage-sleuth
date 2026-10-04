@@ -12,4 +12,11 @@ export const METRIC_TARGETS: Record<MetricType, string> = {
     [MetricType.LeadTime]: 'Less than one day',
     [MetricType.FailureRate]: 'Less than 15%',
     [MetricType.Mttr]: 'Less than one hour',
-}; 
+};
+
+export const METRIC_LABELS: Record<MetricType, string> = {
+    [MetricType.Frequency]: 'Frequency',
+    [MetricType.LeadTime]: 'Lead Time',
+    [MetricType.FailureRate]: 'Failure Rate',
+    [MetricType.Mttr]: 'MTTR',
+};

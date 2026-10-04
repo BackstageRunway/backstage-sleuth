@@ -2,7 +2,7 @@ import { MetricData, MetricType } from '../../common/types/metrics';
 import { ApiInsight } from '../../common/types/api';
 import { formatMetricValue, getMetricInsights } from '../../common';
 import { TrendCell } from './TrendCell';
-import { METRIC_DESCRIPTIONS, METRIC_TARGETS } from '../constants';
+import { METRIC_DESCRIPTIONS, METRIC_LABELS, METRIC_TARGETS } from '../constants';
 import { useStyles } from '../styles';
 import { Card, CardContent, Typography, Tooltip, Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 
@@ -28,7 +28,7 @@ export function MetricSummaryCard({ metric, insight }: Props) {
                 <div className={classes.metricHeader}>
                     <Tooltip title={METRIC_DESCRIPTIONS[metric.metricName as MetricType]}>
                         <Typography className={classes.metricName}>
-                            {metric.metricName}
+                            {METRIC_LABELS[metric.metricName as MetricType]}
                         </Typography>
                     </Tooltip>
                 </div>
