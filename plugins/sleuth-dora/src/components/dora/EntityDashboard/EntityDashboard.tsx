@@ -5,6 +5,7 @@ import { CircularProgress, Grid, Paper } from '@material-ui/core';
 import { TimeRangeSelector } from '../shared/components/TimeRangeSelector';
 import { useEntityMetrics } from './hooks/useEntityMetrics';
 import { MetricSummary, MetricsPerformance } from './components';
+import { ENTITY_ANNOTATION_KEYS } from '../common/types/config';
 
 const useStyles = makeStyles(theme => ({
     error: {
@@ -66,6 +67,7 @@ export const EntityDashboard = () => {
         metrics,
         insights,
         hasDeployments,
+        projectSlug,
         codeDeploymentSlug,
         loading,
         error,
@@ -78,12 +80,27 @@ export const EntityDashboard = () => {
         ? `No deployments recorded in Sleuth for "${codeDeploymentSlug}" in this period.`
         : null;
 
+    // Without annotations the lookup falls back to the default project and the component's own name;
+    // say so, since the numbers may belong to something else or to nothing
+    const annotations = entity.metadata.annotations ?? {};
+    const isMapped = Boolean(
+        annotations[ENTITY_ANNOTATION_KEYS.PROJECT_SLUG] || annotations[ENTITY_ANNOTATION_KEYS.CODE_DEPLOYMENT_SLUG],
+    );
+
     return (
         <div className={classes.container}>
             <TimeRangeSelector 
                 selectedRange={selectedTimeRange}
                 onRangeChange={setSelectedTimeRange}
             />
+            {!isMapped && (
+                <Alert severity="info" className={classes.error}>
+                    This component has no Sleuth annotations, so it is looked up as code deployment
+                    "{codeDeploymentSlug}" in the default project "{projectSlug}". Add{' '}
+                    <code>{ENTITY_ANNOTATION_KEYS.PROJECT_SLUG}</code> and{' '}
+                    <code>{ENTITY_ANNOTATION_KEYS.CODE_DEPLOYMENT_SLUG}</code> to map it explicitly.
+                </Alert>
+            )}
             {error && (
                 <Alert severity="error" className={classes.error}>
                     {error}

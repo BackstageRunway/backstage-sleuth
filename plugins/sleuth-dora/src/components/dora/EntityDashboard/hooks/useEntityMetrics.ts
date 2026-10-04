@@ -80,6 +80,7 @@ export function useEntityMetrics(entity: any) {
     metrics,
     insights,
     hasDeployments,
+    projectSlug,
     codeDeploymentSlug,
     loading,
     error,

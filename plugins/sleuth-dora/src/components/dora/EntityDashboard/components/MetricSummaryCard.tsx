@@ -36,10 +36,16 @@ export function MetricSummaryCard({ metric, insight }: Props) {
                     {formatMetricValue(metric.rawValue, metric.metricName)}
                 </Typography>
                 <div className={classes.metricInfo}>
-                    <TrendCell
-                        metricType={metric.metricName}
-                        percentageChange={metric.percentageChange}
-                    />
+                    {/* the arrow compares periods; the tick below it rates the current level against the target */}
+                    <div className={classes.trendRow}>
+                        <TrendCell
+                            metricType={metric.metricName}
+                            percentageChange={metric.percentageChange}
+                        />
+                        {isFinite(metric.percentageChange) && (
+                            <Typography className={classes.trendCaption}>vs previous period</Typography>
+                        )}
+                    </div>
                     <Typography className={classes.targetValue}>
                         Target: {METRIC_TARGETS[metric.metricName as MetricType]}
                     </Typography>
