@@ -62,8 +62,13 @@ export function TrendCell({ metricType, percentageChange }: Props) {
 
     const formatPercentage = (value: number) => {
         if (isNaN(value)) return '0%';
-        // A previous value of zero has no percentage change; like Sleuth, show the arrow alone
-        if (!isFinite(value)) return '';
+        // A previous value of zero has no percentage change. Sleuth shows a bare arrow there, which reads
+        // as a missing value beside the other trends, so say what the metric rose from instead.
+        if (!isFinite(value)) {
+            if (metricType === MetricType.FailureRate) return 'from 0%';
+            if (metricType === MetricType.Mttr) return 'from 0m';
+            return 'new';
+        }
         const absValue = Math.abs(value);
         return absValue > 999 ? '>999%' : `${Math.round(absValue)}%`;
     };
@@ -71,11 +76,9 @@ export function TrendCell({ metricType, percentageChange }: Props) {
     return (
         <div className={classes.container}>
             {getTrendIcon()}
-            {formatPercentage(percentageChange) && (
-                <span className={classes.value}>
-                    {formatPercentage(percentageChange)}
-                </span>
-            )}
+            <span className={classes.value}>
+                {formatPercentage(percentageChange)}
+            </span>
         </div>
     );
 } 

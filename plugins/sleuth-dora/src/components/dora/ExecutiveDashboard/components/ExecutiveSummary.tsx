@@ -111,8 +111,8 @@ const calculateTrend = (quarters: any[], metricKey: string): { trend: string, ch
         if (secondHalfAvg === 0) {
             return { trend: 'flat', change: '0%', isImproving: false };
         } else {
-            // nothing to compare against, so like Sleuth show the arrow alone; higher is only an improvement for deployments
-            return { trend: 'up', change: '', isImproving: metricKey === 'numOfDeploysPerDay' };
+            // nothing to compare against; higher is only an improvement for deployments
+            return { trend: 'up', change: 'new', isImproving: metricKey === 'numOfDeploysPerDay' };
         }
     }
     
