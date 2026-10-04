@@ -31,6 +31,10 @@ export const useStyles = makeStyles(theme => ({
         height: '100%',
     },
     metricHeader: {
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: '6px',
         marginBottom: '0.25rem',
     },
     metricName: {
