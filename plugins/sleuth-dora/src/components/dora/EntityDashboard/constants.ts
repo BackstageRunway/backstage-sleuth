@@ -9,7 +9,7 @@ export const METRIC_DESCRIPTIONS: Record<MetricType, string> = {
 
 export const METRIC_TARGETS: Record<MetricType, string> = {
     [MetricType.Frequency]: 'Multiple deploys per day',
-    [MetricType.LeadTime]: 'Less than one hour',
+    [MetricType.LeadTime]: 'Less than one day',
     [MetricType.FailureRate]: 'Less than 15%',
     [MetricType.Mttr]: 'Less than one hour',
 }; 

@@ -70,13 +70,13 @@ export function getMetricInsights(
 
         case MetricType.LeadTime:
             const leadTimeHours = value / 3600;
-            if (leadTimeHours <= 1) {
+            if (leadTimeHours <= 24) {
                 insights.push({
                     icon: <CheckCircleIcon className={styles.goodInsight} />,
                     text: 'Meeting elite lead time target',
                     type: 'PERFORMANCE'
                 });
-            } else if (leadTimeHours <= 24) {
+            } else if (leadTimeHours <= 24 * 7) {
                 insights.push({
                     icon: <WarningIcon className={styles.warningInsight} />,
                     text: 'Consider optimizing CI/CD pipeline',
@@ -129,6 +129,14 @@ export function getMetricInsights(
 
         case MetricType.Mttr:
             const mttrHours = value / 3600;
+            if (value === 0) {
+                insights.push({
+                    icon: <CheckCircleIcon className={styles.goodInsight} />,
+                    text: 'No incidents in this period',
+                    type: 'PERFORMANCE'
+                });
+                break;
+            }
             if (mttrHours <= 1) {
                 insights.push({
                     icon: <CheckCircleIcon className={styles.goodInsight} />,

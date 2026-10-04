@@ -101,6 +101,10 @@ const useStyles = makeStyles({
 
 
 
+// The selected range is split into four equal slices; label each by the day it starts
+const periodLabel = (startIncl: string) =>
+    new Date(startIncl).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+
 export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
     const classes = useStyles();
 
@@ -156,7 +160,7 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
     if (!quartersData || quartersData.length === 0) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-                <Typography color="textSecondary">No quarterly data available</Typography>
+                <Typography color="textSecondary">No trend data available</Typography>
             </Box>
         );
     }
@@ -173,23 +177,18 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                             <Box className={classes.chartContainer}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
-                                        data={quartersData.map((quarter: any, index: number) => ({
-                                            name: `Q${index + 1}`,
-                                            value: quarter[metric.key as keyof typeof quarter] as number,
-                                            date: new Date(quarter.startIncl).toLocaleDateString(),
+                                        data={quartersData.map((quarter: any) => ({
+                                            name: periodLabel(quarter.startIncl),
+                                            // plotted in the displayed unit so the axis matches the values below
+                                            value: Number(metric.format(quarter[metric.key as keyof typeof quarter] as number)),
                                         }))}
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                        margin={{ top: 20, right: 8, left: -8, bottom: 5 }}
                                     >
-                                        <XAxis dataKey="name" />
+                                        <XAxis dataKey="name" interval={0} tick={{ fontSize: 10 }} />
                                         <YAxis />
                                         <Tooltip
-                                            formatter={value => [`${metric.format(Number(value))}${metric.unit}`, '']}
-                                            labelFormatter={(label, payload) => {
-                                                if (payload && payload[0]) {
-                                                    return `Quarter: ${label} (${payload[0].payload.date})`;
-                                                }
-                                                return label;
-                                            }}
+                                            formatter={value => [`${value}${metric.unit}`, '']}
+                                            labelFormatter={label => `From ${label}`}
                                             contentStyle={{
                                                 background: 'rgba(255, 255, 255, 0.9)',
                                                 border: 'none',
@@ -223,7 +222,7 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                                          whiteSpace: 'pre-line',
                                                      }}
                                                  >
-                                                     Q{index + 1}
+                                                     {periodLabel(quarter.startIncl)}
                                                  </Typography>
                                                                                                    <Typography 
                                                       className={classes.metricValue}

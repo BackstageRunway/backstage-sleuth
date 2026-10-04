@@ -40,16 +40,6 @@ export const ExecutiveDashboard = () => {
     // Extract the metrics data from the response
     const metricsData = data?.organization?.metricsRecapWithQuarters;
 
-    if (error) {
-        return (
-            <div className={classes.container}>
-                <Alert severity="error" className={classes.error}>
-                    {error}
-                </Alert>
-            </div>
-        );
-    }
-
     return (
         <div className={classes.container}>
             <TimeRangeSelector 
@@ -57,7 +47,11 @@ export const ExecutiveDashboard = () => {
                 onRangeChange={setSelectedTimeRange}
             />
             {loading && <div>Loading organization trend metrics...</div>}
-            {error && <div style={{color: 'red'}}>Error: {error}</div>}
+            {error && (
+                <Alert severity="error" className={classes.error}>
+                    {error}
+                </Alert>
+            )}
          
             <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -69,7 +63,7 @@ export const ExecutiveDashboard = () => {
                 
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <Typography className={classes.title}>Quaterly Health</Typography>
+                        <Typography className={classes.title}>Trend Over Selected Range</Typography>
                         <ProjectHealth 
                             data={data}
                             loading={loading}

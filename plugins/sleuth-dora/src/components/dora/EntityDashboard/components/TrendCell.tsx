@@ -56,8 +56,9 @@ export function TrendCell({ metricType, percentageChange }: Props) {
 
     const formatPercentage = (value: number) => {
         if (isNaN(value)) return '0%';
+        if (!isFinite(value)) return 'new';
         const absValue = Math.abs(value);
-        return `${Math.round(absValue)}%`;
+        return absValue > 999 ? '>999%' : `${Math.round(absValue)}%`;
     };
 
     return (

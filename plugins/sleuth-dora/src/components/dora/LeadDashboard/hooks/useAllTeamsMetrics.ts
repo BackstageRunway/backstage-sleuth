@@ -51,8 +51,10 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
       MetricType.FailureRate
     );
     
-    // Determine overall trend using utility function
-    const overallTrend = determineOverallTrend(frequencyTrend, leadTimeTrend, failureRateTrend);
+    // With no deployments in the previous period there is nothing to compare against
+    const overallTrend = previousRange.numOfDeploys > 0
+      ? determineOverallTrend(frequencyTrend, leadTimeTrend, failureRateTrend)
+      : 'stable';
 
     return {
       name,
@@ -110,23 +112,10 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
         setTeamsData(transformedTeams);
         
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch team metrics';
         setOverallError('We are facing challenges at the moment. Please come back later.');
         
-        // Set error state for all teams
-        const errorTeamsData: TeamMetricsData[] = teamSlugs.map(slug => ({
-          name: slug,
-          metrics: {
-            deploymentFrequency: '0/day',
-            leadTime: '0h',
-            failureRate: '0%',
-            mttr: '0m',
-          },
-          trend: 'stable',
-          loading: false,
-          error: errorMessage,
-        }));
-        setTeamsData(errorTeamsData);
+        // No cards on failure: zeros with a "Stable" badge would read as real data
+        setTeamsData([]);
       } finally {
         setOverallLoading(false);
       }
