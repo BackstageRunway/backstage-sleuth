@@ -1,85 +1,41 @@
-import {
-  mockCredentials,
-  startTestBackend,
-} from '@backstage/backend-test-utils';
+import { mockServices, startTestBackend } from '@backstage/backend-test-utils';
 import { doraBackendPlugin } from './plugin';
 import request from 'supertest';
-import { catalogServiceMock } from '@backstage/plugin-catalog-node/testUtils';
 
-// TEMPLATE NOTE:
-// Plugin tests are integration tests for your plugin, ensuring that all pieces
-// work together end-to-end. You can still mock injected backend services
-// however, just like anyone who installs your plugin might replace the
-// services with their own implementations.
 describe('plugin', () => {
-  it('should create and read TODO items', async () => {
-    const { server } = await startTestBackend({
-      features: [doraBackendPlugin],
-    });
-
-    await request(server).get('/api/sleuth-dora-backend/todos').expect(200, {
-      items: [],
-    });
-
-    const createRes = await request(server)
-      .post('/api/sleuth-dora-backend/todos')
-      .send({ title: 'My Todo' });
-
-    expect(createRes.status).toBe(201);
-    expect(createRes.body).toEqual({
-      id: expect.any(String),
-      title: 'My Todo',
-      createdBy: mockCredentials.user().principal.userEntityRef,
-      createdAt: expect.any(String),
-    });
-
-    const createdTodoItem = createRes.body;
-
-    await request(server)
-      .get('/api/sleuth-dora-backend/todos')
-      .expect(200, {
-        items: [createdTodoItem],
-      });
-
-    await request(server)
-      .get(`/api/sleuth-dora-backend/todos/${createdTodoItem.id}`)
-      .expect(200, createdTodoItem);
-  });
-
-  it('should create TODO item with catalog information', async () => {
+  it('starts without an API key and reports that it is not configured', async () => {
     const { server } = await startTestBackend({
       features: [
         doraBackendPlugin,
-        catalogServiceMock.factory({
-          entities: [
-            {
-              apiVersion: 'backstage.io/v1alpha1',
-              kind: 'Component',
-              metadata: {
-                name: 'my-component',
-                namespace: 'default',
-                title: 'My Component',
-              },
-              spec: {
-                type: 'service',
-                owner: 'me',
-              },
-            },
-          ],
+        mockServices.rootConfig.factory({
+          data: { dora: { sleuth: { organizationId: 'my-org' } } },
         }),
       ],
     });
 
-    const createRes = await request(server)
-      .post('/api/sleuth-dora-backend/todos')
-      .send({ title: 'My Todo', entityRef: 'component:default/my-component' });
+    const res = await request(server).get(
+      '/api/sleuth-dora-backend/org-trend-metrics?timeRange=last7days',
+    );
 
-    expect(createRes.status).toBe(201);
-    expect(createRes.body).toEqual({
-      id: expect.any(String),
-      title: '[My Component] My Todo',
-      createdBy: mockCredentials.user().principal.userEntityRef,
-      createdAt: expect.any(String),
+    expect(res.status).toBe(503);
+    expect(res.body.error).toContain('dora.sleuth.apiKey is not set');
+  });
+
+  it('rejects an invalid time range before calling Sleuth', async () => {
+    const { server } = await startTestBackend({
+      features: [
+        doraBackendPlugin,
+        mockServices.rootConfig.factory({
+          data: { dora: { sleuth: { organizationId: 'my-org', apiKey: 'test-key' } } },
+        }),
+      ],
     });
+
+    const res = await request(server).get(
+      '/api/sleuth-dora-backend/org-trend-metrics?timeRange=yesterday',
+    );
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid request parameters');
   });
 });

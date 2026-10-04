@@ -20,6 +20,12 @@ export interface Config {
       apiKey?: string;
 
       /**
+       * How long Sleuth results are cached in the backend, in seconds. Defaults to 300.
+       * @visibility backend
+       */
+      cacheTtlSeconds?: number;
+
+      /**
        * Default environment for metrics (e.g. production, staging)
        * @visibility frontend
        */
