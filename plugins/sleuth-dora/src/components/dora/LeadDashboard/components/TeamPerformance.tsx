@@ -145,6 +145,19 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         const parsed = parseFloat(value);
         return isNaN(parsed) ? defaultValue : parsed;
     };
+
+    // Formatted durations carry their own unit ("3.3h", "91.0m", "45s"); split it off instead of assuming hours
+    const splitUnit = (value: string) => {
+        const match = value.match(/^(-?[\d.]+)\s*(.*)$/);
+        return match ? { number: match[1], unit: match[2] } : { number: value, unit: '' };
+    };
+    const toMinutes = (value: string) => {
+        const { number, unit } = splitUnit(value);
+        const perUnit: Record<string, number> = { h: 60, m: 1, s: 1 / 60 };
+        return safeParseFloat(number) * (perUnit[unit] ?? 1);
+    };
+    const formatMinutes = (minutes: number) =>
+        minutes >= 60 ? `${(minutes / 60).toFixed(1)}h` : `${minutes.toFixed(1)}m`;
     
     const deploymentDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
@@ -154,13 +167,13 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
     
     const leadTimeDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
-        value: safeParseFloat(team.metrics.leadTime),
+        value: toMinutes(team.metrics.leadTime) / 60,
         color: colorPalette[idx % colorPalette.length],
     }));
     
     const mttrDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
-        value: safeParseFloat(team.metrics.mttr),
+        value: toMinutes(team.metrics.mttr),
         color: colorPalette[idx % colorPalette.length],
     }));
     
@@ -170,7 +183,8 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         color: colorPalette[idx % colorPalette.length],
     }));
     
-    const totalDeployments = deploymentDonutData.reduce((sum, t) => sum + t.value, 0);
+    // Averaged, not summed: teams can share members, so their deployments overlap
+    const avgDeployments = deploymentDonutData.length > 0 ? deploymentDonutData.reduce((sum, t) => sum + t.value, 0) / deploymentDonutData.length : 0;
     const avgLeadTime = leadTimeDonutData.length > 0 ? leadTimeDonutData.reduce((sum, t) => sum + t.value, 0) / leadTimeDonutData.length : 0;
     const avgMTTR = mttrDonutData.length > 0 ? mttrDonutData.reduce((sum, t) => sum + t.value, 0) / mttrDonutData.length : 0;
     const avgFailureRate = failureRateDonutData.length > 0 ? failureRateDonutData.reduce((sum, t) => sum + t.value, 0) / failureRateDonutData.length : 0;
@@ -179,8 +193,8 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         {
             title: 'Deployments',
             data: deploymentDonutData,
-            center: `${totalDeployments.toFixed(2)}/day`,
-            centerLabel: 'Total Deployments',
+            center: `${avgDeployments.toFixed(2)}/day`,
+            centerLabel: 'Avg Deployments',
             tooltipUnit: '/day',
         },
         {
@@ -193,9 +207,9 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         {
             title: 'MTTR',
             data: mttrDonutData,
-            center: `${avgMTTR.toFixed(1)}h`,
+            center: formatMinutes(avgMTTR),
             centerLabel: 'Avg MTTR',
-            tooltipUnit: 'h',
+            tooltipUnit: 'm',
         },
         {
             title: 'Failure Rate',
@@ -337,10 +351,10 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                       Lead Time
                                                   </Typography>
                                                   <AnimatedNumber 
-                                                      value={team.metrics.leadTime.replace('h','')} 
+                                                      value={splitUnit(team.metrics.leadTime).number} 
                                                       color="#3498db" 
                                                       fontSize="2rem" 
-                                                      unit="h"
+                                                      unit={splitUnit(team.metrics.leadTime).unit}
                                                   />
                                               </Box>
                                           </Grid>
@@ -366,10 +380,10 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                       MTTR
                                                   </Typography>
                                                   <AnimatedNumber 
-                                                      value={team.metrics.mttr.replace('h','')} 
+                                                      value={splitUnit(team.metrics.mttr).number} 
                                                       color="#f1c40f" 
                                                       fontSize="2rem" 
-                                                      unit="h"
+                                                      unit={splitUnit(team.metrics.mttr).unit}
                                                   />
                                               </Box>
                                           </Grid>

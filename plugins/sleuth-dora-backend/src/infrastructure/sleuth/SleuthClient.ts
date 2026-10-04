@@ -366,6 +366,7 @@ export class SleuthClient {
       query GetTeamMetrics(
         $orgSlug: ID!
         $teamSlug: ID!
+        $environment: String
         $previousRangeStart: DateTime!
         $previousRangeEnd: DateTime!
         $currentRangeStart: DateTime!
@@ -376,6 +377,7 @@ export class SleuthClient {
           currentRange: metricRecap(
             start: $currentRangeStart
             end: $currentRangeEnd
+            filters: {environmentName: $environment}
           ) {
             avgLeadTimeInSec
             numOfDeploys
@@ -386,6 +388,7 @@ export class SleuthClient {
           previousRange: metricRecap(
             start: $previousRangeStart
             end: $previousRangeEnd
+            filters: {environmentName: $environment}
           ) {
             avgLeadTimeInSec
             numOfDeploys
@@ -403,6 +406,8 @@ export class SleuthClient {
         variables: {
           orgSlug: this.organizationId,
           teamSlug: request.teamSlug,
+          // without an environment Sleuth returns zero failure rate and MTTR for a team
+          environment: request.environment,
           currentRangeStart: request.currentRangeStart,
           currentRangeEnd: request.currentRangeEnd,
           previousRangeStart: request.previousRangeStart,
