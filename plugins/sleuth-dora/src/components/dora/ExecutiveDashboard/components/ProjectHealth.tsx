@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Grid, Typography, Box, Card, CardContent, CircularProgress } from '@material-ui/core';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -8,10 +8,13 @@ interface ProjectHealthProps {
     error: string | null;
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     card: {
         height: '100%',
-        background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
+        // the light gradient would leave theme-coloured text unreadable in dark mode
+        background: theme.palette.type === 'dark'
+            ? theme.palette.background.default
+            : 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         borderRadius: '12px',
         transition: 'transform 0.2s',
@@ -23,22 +26,22 @@ const useStyles = makeStyles({
         fontSize: '1.2rem',
         fontWeight: 600,
         marginBottom: '1.5rem',
-        color: '#2c3e50',
+        color: theme.palette.text.primary,
         textAlign: 'center',
     },
     projectName: {
         fontSize: '0.9rem',
         fontWeight: 600,
-        color: '#2c3e50',
+        color: theme.palette.text.primary,
     },
     metricValue: {
         fontSize: '1.1rem',
         fontWeight: 700,
-        color: '#2c3e50',
+        color: theme.palette.text.primary,
     },
     metricLabel: {
         fontSize: '0.875rem',
-        color: '#7f8c8d',
+        color: theme.palette.text.secondary,
         marginBottom: '0.5rem',
     },
     chartContainer: {
@@ -90,14 +93,14 @@ const useStyles = makeStyles({
     comparisonContainer: {
         marginTop: '1rem',
         padding: '1rem',
-        background: 'rgba(236, 240, 241, 0.5)',
+        background: theme.palette.action.hover,
         borderRadius: '8px',
     },
     barLabel: {
         fontSize: '0.75rem',
-        fill: '#7f8c8d',
+        fill: theme.palette.text.secondary,
     },
-});
+}));
 
 
 
@@ -107,6 +110,7 @@ const periodLabel = (startIncl: string) =>
 
 export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
     const classes = useStyles();
+    const theme = useTheme();
 
     const metrics = [
         {
@@ -184,13 +188,14 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                         }))}
                                         margin={{ top: 20, right: 8, left: -8, bottom: 5 }}
                                     >
-                                        <XAxis dataKey="name" interval={0} tick={{ fontSize: 10 }} />
-                                        <YAxis />
+                                        <XAxis dataKey="name" interval={0} tick={{ fontSize: 10, fill: theme.palette.text.secondary }} />
+                                        <YAxis tick={{ fill: theme.palette.text.secondary }} />
                                         <Tooltip
                                             formatter={value => [`${value}${metric.unit}`, '']}
                                             labelFormatter={label => `From ${label}`}
                                             contentStyle={{
-                                                background: 'rgba(255, 255, 255, 0.9)',
+                                                background: theme.palette.background.paper,
+                                                color: theme.palette.text.primary,
                                                 border: 'none',
                                                 borderRadius: '8px',
                                                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -240,7 +245,7 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                  <Typography 
                                      style={{ 
                                          fontSize: '0.8rem', 
-                                         color: '#7f8c8d',
+                                         color: theme.palette.text.secondary,
                                          fontWeight: 500
                                      }}
                                  >

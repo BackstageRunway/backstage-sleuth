@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Grid, Typography, Box, Card, CardContent, Fade, Chip, CircularProgress } from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
@@ -7,18 +7,23 @@ import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { TeamMetricsData } from '../hooks/useAllTeamsMetrics';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     teamCard: {
         padding: '1rem',
         borderRadius: '12px',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        // the light gradient would leave theme-coloured text unreadable in dark mode
+        background: theme.palette.type === 'dark'
+            ? theme.palette.background.default
+            : 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
         marginBottom: '1rem',
         boxShadow: '0 4px 12px rgba(44, 62, 80, 0.08)',
         transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
         '&:hover': {
             transform: 'translateY(-6px) scale(1.03)',
             boxShadow: '0 8px 24px rgba(44, 62, 80, 0.18)',
-            background: 'linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)',
+            background: theme.palette.type === 'dark'
+                ? theme.palette.action.hover
+                : 'linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)',
         },
     },
     teamHeader: {
@@ -34,7 +39,7 @@ const useStyles = makeStyles({
         marginTop: '0.5rem',
     },
     metricLabel: {
-        color: 'rgba(0, 0, 0, 0.6)',
+        color: theme.palette.text.secondary,
         fontSize: '0.875rem',
         marginBottom: '0.25rem',
     },
@@ -60,7 +65,7 @@ const useStyles = makeStyles({
         alignItems: 'center',
         gap: '8px',
     },
-});
+}));
 
 interface TeamPerformanceProps {
     selectedTeam?: string | null;
@@ -70,6 +75,7 @@ interface TeamPerformanceProps {
 
 export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false }: TeamPerformanceProps) => {
     const classes = useStyles();
+    const theme = useTheme();
     const [fadeIn, setFadeIn] = useState(false);
     useEffect(() => { setFadeIn(true); }, []);
 
@@ -281,8 +287,8 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                 </PieChart>
                             </ResponsiveContainer>
                             <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                                <span style={{ fontWeight: 700, fontSize: '1.7rem', color: '#222', lineHeight: 1, whiteSpace: 'nowrap' }}>{chart.center}</span>
-                                <Typography variant="caption" style={{ color: '#888', textAlign: 'center' }}>{chart.centerLabel}</Typography>
+                                <span style={{ fontWeight: 700, fontSize: '1.7rem', color: theme.palette.text.primary, lineHeight: 1, whiteSpace: 'nowrap' }}>{chart.center}</span>
+                                <Typography variant="caption" style={{ color: theme.palette.text.secondary, textAlign: 'center' }}>{chart.centerLabel}</Typography>
                             </Box>
                         </Box>
                     </Grid>
@@ -293,7 +299,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                 {sortedTeams.map((team, idx) => (
                     <Box key={team.name} display="flex" alignItems="center" mr={3} mb={1}>
                         <Box style={{ width: 18, height: 18, background: colorPalette[idx % colorPalette.length], borderRadius: 9, marginRight: 8 }} />
-                        <Typography variant="body2" style={{ color: '#444', fontSize: '1.05rem' }}>{team.name}</Typography>
+                        <Typography variant="body2" style={{ color: theme.palette.text.primary, fontSize: '1.05rem' }}>{team.name}</Typography>
                     </Box>
                 ))}
             </Box>
@@ -305,7 +311,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                 className={classes.teamCard}
                                 elevation={isDeclining(team.trend) ? 8 : 0}
                                 style={isDeclining(team.trend)
-                                    ? { border: '2px solid #e53935', boxShadow: '0 0 16px 2px #ffebee' }
+                                    ? { border: '2px solid #e53935', boxShadow: '0 0 16px 2px rgba(229, 57, 53, 0.25)' }
                                     : {}}
                             >
                                 <CardContent>
@@ -339,7 +345,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   </Typography>
                                                   <AnimatedNumber 
                                                       value={team.metrics.deploymentFrequency.replace('/day','')} 
-                                                      color="#2c3e50" 
+                                                      color={theme.palette.text.primary} 
                                                       fontSize="2rem" 
                                                       unit="/day"
                                                   />

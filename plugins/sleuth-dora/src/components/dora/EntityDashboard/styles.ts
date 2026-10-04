@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 
-export const useStyles = makeStyles({
+export const useStyles = makeStyles(theme => ({
     container: {
         padding: '1rem',
     },
@@ -35,12 +35,12 @@ export const useStyles = makeStyles({
     },
     metricName: {
         fontSize: '1.1rem',
-        color: 'rgba(0, 0, 0, 0.6)',
+        color: theme.palette.text.secondary,
     },
     metricValue: {
         fontSize: '1.8rem',
         fontWeight: 600,
-        color: 'rgba(0, 0, 0, 0.87)',
+        color: theme.palette.text.primary,
         marginBottom: '0.25rem',
     },
     metricInfo: {
@@ -52,7 +52,7 @@ export const useStyles = makeStyles({
     },
     targetValue: {
         fontSize: '0.875rem',
-        color: 'rgba(0, 0, 0, 0.6)',
+        color: theme.palette.text.secondary,
     },
     divider: {
         width: '100%',
@@ -93,4 +93,4 @@ export const useStyles = makeStyles({
     trendDown: {
         color: '#f44336',
     },
-}); 
+}));

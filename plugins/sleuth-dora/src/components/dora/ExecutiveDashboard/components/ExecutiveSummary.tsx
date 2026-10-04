@@ -28,10 +28,13 @@ interface ExecutiveSummaryProps {
     metricsData?: MetricsData;
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     card: {
         height: '100%',
-        background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
+        // the light gradient would leave theme-coloured text unreadable in dark mode
+        background: theme.palette.type === 'dark'
+            ? theme.palette.background.default
+            : 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         borderRadius: '12px',
         transition: 'all 0.3s ease',
@@ -43,14 +46,14 @@ const useStyles = makeStyles({
     metricValue: {
         fontSize: '2rem',
         fontWeight: 700,
-        background: 'linear-gradient(45deg, #2c3e50 30%, #3498db 90%)',
+        background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, #3498db 90%)`,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         marginBottom: '0.5rem',
     },
     metricLabel: {
         fontSize: '1rem',
-        color: '#7f8c8d',
+        color: theme.palette.text.secondary,
         marginBottom: '1rem',
     },
     trendContainer: {
@@ -81,9 +84,9 @@ const useStyles = makeStyles({
         justifyContent: 'center',
         alignItems: 'center',
         height: '200px',
-        color: '#7f8c8d',
+        color: theme.palette.text.secondary,
     },
-});
+}));
 
 // Helper function to convert seconds to hours
 const secondsToHours = (seconds: number): number => {
