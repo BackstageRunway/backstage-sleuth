@@ -4,13 +4,34 @@ import fetch from 'cross-fetch';
 import { DoraMetricsError } from '../../domain/models/DoraMetrics';
 import { ProjectMetricsRequest, ProjectMetricsResponse, ProjectInsightsResponse, TeamMetricsRequest } from '../../domain/models/SleuthBatchTypes';
 
+const DEFAULT_CACHE_TTL_SECONDS = 300;
+
+// Sleuth's own message (e.g. PERMISSION_DENIED) sits in the Apollo error; pull it out so it can be logged and shown
+const reasonOf = (error: any): string => {
+  const graphQLMessages = (error?.graphQLErrors ?? []).map((e: any) => e.message).filter(Boolean);
+  if (graphQLMessages.length > 0) return graphQLMessages.join('; ');
+  const network = error?.networkError;
+  if (network) {
+    const bodyErrors = (network.result?.errors ?? []).map((e: any) => e.message).filter(Boolean);
+    if (bodyErrors.length > 0) return bodyErrors.join('; ');
+    return network.statusCode ? `HTTP ${network.statusCode} ${network.message}` : network.message;
+  }
+  return error instanceof Error ? error.message : String(error);
+};
+
+const sleuthError = (message: string, error: unknown) =>
+  new DoraMetricsError(`${message}: ${reasonOf(error)}`, 'PROVIDER_ERROR', error);
+
 export class SleuthClient {
   private readonly client: ApolloClient<NormalizedCacheObject>;
   private readonly batchClient: ApolloClient<NormalizedCacheObject>;
   private readonly organizationId: string;
+  private readonly cacheTtlMs: number;
+  private cacheClearedAt = Date.now();
    
-  constructor(apiKey: string, apiUrl: string, organizationId: string) {
+  constructor(apiKey: string, apiUrl: string, organizationId: string, cacheTtlSeconds: number = DEFAULT_CACHE_TTL_SECONDS) {
     this.organizationId = organizationId;
+    this.cacheTtlMs = cacheTtlSeconds * 1000;
     this.client = new ApolloClient({
       link: new HttpLink({
         uri: `${apiUrl}/graphql`,
@@ -41,6 +62,13 @@ export class SleuthClient {
     });
   }
 
+
+  // Results are shared between users but must not outlive the TTL, or new deployments never show up
+  private async expireCache(): Promise<void> {
+    if (Date.now() - this.cacheClearedAt < this.cacheTtlMs) return;
+    this.cacheClearedAt = Date.now();
+    await Promise.all([this.client.clearStore(), this.batchClient.clearStore()]);
+  }
 
   async projectMetrics(request: ProjectMetricsRequest): Promise<ProjectMetricsResponse> {
     const query = `
@@ -104,17 +132,14 @@ export class SleuthClient {
      };
 
     try {
+      await this.expireCache();
       const result = await this.client.query({
         query: gql`${query}`,
         variables,
       });
       return result.data as ProjectMetricsResponse;
     } catch (error) {
-      throw new DoraMetricsError(
-        'Failed to query Sleuth API',
-        'PROVIDER_ERROR',
-        error,
-      );
+      throw sleuthError('Failed to query Sleuth API', error);
     }
   }
 
@@ -167,17 +192,14 @@ export class SleuthClient {
      };
 
         try {
+          await this.expireCache();
             const result = await this.client.query({
               query: gql`${query}`,
               variables,
             });
             return result.data as ProjectInsightsResponse;
         } catch (error) {
-            throw new DoraMetricsError(
-                'Failed to query Sleuth API for insights',
-                'PROVIDER_ERROR',
-                error,
-            );
+            throw sleuthError('Failed to query Sleuth API for insights', error);
         }
     }
 
@@ -221,17 +243,14 @@ export class SleuthClient {
 
 
       try {
+        await this.expireCache();
            const result = await this.batchClient.query({
             query: gql`${trendQuery}`,
             variables,
           });
           return result.data;
       } catch (error) {
-          throw new DoraMetricsError(
-              'Failed to query Sleuth API for trend metrics',
-              'PROVIDER_ERROR',
-              error,
-          );
+          throw sleuthError('Failed to query Sleuth API for trend metrics', error);
       }
   }
 
@@ -416,6 +435,8 @@ export class SleuthClient {
       }));
 
     try {
+      await this.expireCache();
+      const failures: unknown[] = [];
       // Send each team query individually - BatchHttpLink will automatically batch them
       const teamPromises = batchQueries.map(async (batchQuery) => {
         try {
@@ -425,7 +446,7 @@ export class SleuthClient {
           });
           return result.data.team;
         } catch (error) {
-          console.error(`Failed to fetch metrics for team: ${batchQuery.variables.teamSlug}`, error);
+          failures.push(error);
           return null;
         }
       });
@@ -433,16 +454,17 @@ export class SleuthClient {
       // Wait for all queries to complete
       const teamResults = await Promise.all(teamPromises);
       
-      // Filter out any failed requests
+      // One team failing should not hide the others, but if every request failed the cause must surface
+      if (failures.length === batchQueries.length && failures.length > 0) {
+        throw failures[0];
+      }
+
+      // Filter out failed requests and teams Sleuth does not know
       const teams = teamResults.filter((team: any) => team !== null && team !== undefined);
 
       return { teams };
     } catch (error) {
-      throw new DoraMetricsError(
-        'Failed to query Sleuth API for batch team metrics',
-        'PROVIDER_ERROR',
-        error,
-      );
+      throw sleuthError('Failed to query Sleuth API for batch team metrics', error);
     }
   }
 }

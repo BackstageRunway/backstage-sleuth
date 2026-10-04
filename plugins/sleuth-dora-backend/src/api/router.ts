@@ -5,6 +5,7 @@ import { Router } from 'express';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { z } from 'zod';
 import { MetricsService } from '../application/services/MetricsService';
+import { DoraMetricsError } from '../domain/models/DoraMetrics';
 
 interface RouterOptions {
   metricsService: MetricsService;
@@ -17,6 +18,14 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
   // JSON parsing middleware
   router.use(express.json());
+
+  // Sleuth failures answer 502 with Sleuth's own reason; anything else stays a generic 500
+  const sendFailure = (res: express.Response, error: unknown, fallback: string) => {
+    if (error instanceof DoraMetricsError && error.code === 'PROVIDER_ERROR') {
+      return res.status(502).json({ error: error.message });
+    }
+    return res.status(500).json({ error: fallback });
+  };
 
    /**
    * Helper method to extract the userEntityRef from the request.
@@ -85,7 +94,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         return res.status(404).json({ error: 'No metrics data available' });
       }
       
-      return res.status(500).json({ error: 'Failed to fetch metrics' });
+      return sendFailure(res, error, 'Failed to fetch metrics');
     }
   });
 
@@ -138,7 +147,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         return res.status(404).json({ error: 'No metrics insights data available' });
       }
       
-      return res.status(500).json({ error: 'Failed to fetch metrics insights' });
+      return sendFailure(res, error, 'Failed to fetch metrics insights');
     }
   });
 
@@ -182,7 +191,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       logger.error('Failed to fetch organization trend metrics', {
         error: error instanceof Error ? error.message : String(error),
       });
-      return res.status(500).json({ error: 'Failed to fetch organization trend metrics' });
+      return sendFailure(res, error, 'Failed to fetch organization trend metrics');
     }
   });
 
@@ -338,7 +347,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         return res.status(404).json({ error: 'No batch team metrics data available' });
       }
       
-      return res.status(500).json({ error: 'Failed to fetch batch team metrics' });
+      return sendFailure(res, error, 'Failed to fetch batch team metrics');
     }
   });
 
