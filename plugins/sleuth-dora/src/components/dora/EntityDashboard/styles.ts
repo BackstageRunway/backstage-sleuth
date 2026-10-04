@@ -50,6 +50,16 @@ export const useStyles = makeStyles(theme => ({
         gap: '1.25rem',
         marginBottom: '0.125rem',
     },
+    trendRow: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+    },
+    trendCaption: {
+        fontSize: '0.75rem',
+        color: theme.palette.text.secondary,
+        whiteSpace: 'nowrap',
+    },
     targetValue: {
         fontSize: '0.875rem',
         color: theme.palette.text.secondary,
