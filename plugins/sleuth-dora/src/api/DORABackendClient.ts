@@ -1,4 +1,3 @@
-//import { parseEntityRef } from '@backstage/catalog-model';
 import {
   ConfigApi,
   createApiRef,
@@ -24,8 +23,6 @@ export interface DORABackendClient {
   getOrganizationTrendMetrics( timeRange: string): Promise<any>;
   
   // Team metrics methods
-  //getTeamDORAMetrics( teamSlug: string, environment: string, deployment: string, timeRange: string): Promise<ProjectMetricsResponse | null>;
-  //getTeamDORAMetricsInsights( teamSlug: string, environment: string, deployment: string, timeRange: string): Promise<any>;
   getBatchTeamDORAMetrics( teamSlugs: string[], environment: string, deployment: string, timeRange: string): Promise<any>;
 }
 

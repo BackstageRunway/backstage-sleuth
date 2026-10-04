@@ -132,7 +132,7 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
     };
 
     fetchAllTeamsMetrics();
-  }, [teamSlugs, baseConfig.environment, baseConfig.codeDeploymentSlug, timeRange]);
+  }, [doraApi, teamSlugs, baseConfig.environment, baseConfig.codeDeploymentSlug, timeRange]);
 
   return {
     teams: teamsData,

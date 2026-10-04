@@ -114,11 +114,11 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
     const AnimatedNumber = ({ value, color, fontSize = '1.5rem', fontWeight = 700, unit = '' }: { value: string, color: string, fontSize?: string, fontWeight?: number, unit?: string }) => {
         const [displayValue, setDisplayValue] = useState('0');
         useEffect(() => {
-            let start = 0;
+            const start = 0;
             const end = parseFloat(value);
             if (isNaN(end)) {
                 setDisplayValue(value);
-                return;
+                return undefined;
             }
             const duration = 800;
             const stepTime = 20;
@@ -261,7 +261,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                         outerRadius={110}
                                         startAngle={90}
                                         endAngle={-270}
-                                        isAnimationActive={true}
+                                        isAnimationActive
                                         label={false}
                                     >
                                         {chart.data.map((entry) => (

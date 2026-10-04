@@ -56,13 +56,13 @@ export function MetricSummaryCard({ metric, insight }: Props) {
                 </div>
                 <Divider className={classes.divider} />
                 <List className={classes.insightsList}>
-                    {insights.map((insight, index) => (
+                    {insights.map((item, index) => (
                         <ListItem key={index} className={classes.insightItem}>
                             <ListItemIcon className={classes.insightIcon}>
-                                {insight.icon}
+                                {item.icon}
                             </ListItemIcon>
                             <ListItemText 
-                                primary={insight.text} 
+                                primary={item.text} 
                                 primaryTypographyProps={{ color: 'textSecondary', style: { fontSize: '0.86rem' } }}
                             />
                         </ListItem>

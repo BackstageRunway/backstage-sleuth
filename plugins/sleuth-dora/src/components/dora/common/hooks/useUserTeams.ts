@@ -51,7 +51,7 @@ export function useUserTeams() {
     };
 
     fetchUserTeams();
-  }, [catalogApi]);
+  }, [catalogApi, identityApi]);
 
   return {
     teams,
