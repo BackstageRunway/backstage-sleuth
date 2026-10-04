@@ -4,7 +4,6 @@ import { SleuthClient } from '../../infrastructure/sleuth/SleuthClient';
 
 export class MetricsService {
   constructor(
-    //private readonly database: DatabaseService,
     private readonly client: SleuthClient,
     private readonly logger: LoggerService,
   ) {}

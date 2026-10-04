@@ -79,7 +79,7 @@ dora:
 
 ```typescript
 // packages/app/src/components/catalog/EntityPage.tsx
-import { DoraPerformanceComponent } from '@backstagerunway/plugin-sleuth-dora/src/plugin';
+import { DoraPerformanceComponent, isSleuthDoraAvailable } from '@backstagerunway/plugin-sleuth-dora';
 
 // Add the component content
 const sleuthContent = (
@@ -91,7 +91,7 @@ const sleuthContent = (
 );
 
 // Add the route to your entity layout
-<EntityLayout.Route path="/sleuth" title="Sleuth">
+<EntityLayout.Route path="/sleuth" title="Sleuth" if={isSleuthDoraAvailable}>
   {sleuthContent}
 </EntityLayout.Route>
 ```
@@ -185,7 +185,25 @@ import { CreateComponentIcon } from '@backstage/core-components';
 <SidebarItem icon={CreateComponentIcon} to="dora-lead" text="Sleuth - Lead" />
 ```
 
-## Complete Setup Example
+## Choosing a Setup
+
+The package supports both Backstage frontend systems.
+
+**New Frontend System:** add the plugin as a feature. The two pages, their sidebar entries and the Sleuth tab on service and website components are registered for you.
+
+```typescript
+// packages/app/src/App.tsx
+import { createApp } from '@backstage/frontend-defaults';
+import { doraFrontendPlugin } from '@backstagerunway/plugin-sleuth-dora';
+
+export default createApp({
+  features: [doraFrontendPlugin],
+});
+```
+
+**Legacy frontend system:** mount the pages and the entity tab by hand, as shown in the example below.
+
+## Complete Setup Example (legacy frontend system)
 
 Here's a complete example of setting up all three views:
 
@@ -222,7 +240,7 @@ import { CreateComponentIcon } from '@backstage/core-components';
 
 ```typescript
 // packages/app/src/components/catalog/EntityPage.tsx
-import { DoraPerformanceComponent } from '@backstagerunway/plugin-sleuth-dora/src/plugin';
+import { DoraPerformanceComponent, isSleuthDoraAvailable } from '@backstagerunway/plugin-sleuth-dora';
 
 // Add the component content
 const sleuthContent = (
@@ -234,7 +252,7 @@ const sleuthContent = (
 );
 
 // Add the route to your entity layout
-<EntityLayout.Route path="/sleuth" title="Sleuth">
+<EntityLayout.Route path="/sleuth" title="Sleuth" if={isSleuthDoraAvailable}>
   {sleuthContent}
 </EntityLayout.Route>
 ```
