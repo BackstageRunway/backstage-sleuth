@@ -62,7 +62,13 @@ export function TrendCell({ metricType, percentageChange }: Props) {
 
     const formatPercentage = (value: number) => {
         if (isNaN(value)) return '0%';
-        if (!isFinite(value)) return 'new';
+        // A previous value of zero has no percentage change. For failure rate and MTTR zero is a real
+        // reading (no failures), so say where it rose from; otherwise there was simply nothing before.
+        if (!isFinite(value)) {
+            if (metricType === MetricType.FailureRate) return 'from 0%';
+            if (metricType === MetricType.Mttr) return 'from 0m';
+            return 'new';
+        }
         const absValue = Math.abs(value);
         return absValue > 999 ? '>999%' : `${Math.round(absValue)}%`;
     };
