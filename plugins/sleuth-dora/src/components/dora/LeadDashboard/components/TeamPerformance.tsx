@@ -6,6 +6,7 @@ import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { TeamMetricsData } from '../hooks/useAllTeamsMetrics';
+import { formatDuration } from '../../common/utils/formatters';
 
 const useStyles = makeStyles(theme => ({
     teamCard: {
@@ -152,19 +153,6 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         return isNaN(parsed) ? defaultValue : parsed;
     };
 
-    // Formatted durations carry their own unit ("3.3h", "91.0m", "45s"); split it off instead of assuming hours
-    const splitUnit = (value: string) => {
-        const match = value.match(/^(-?[\d.]+)\s*(.*)$/);
-        return match ? { number: match[1], unit: match[2] } : { number: value, unit: '' };
-    };
-    const toMinutes = (value: string) => {
-        const { number, unit } = splitUnit(value);
-        const perUnit: Record<string, number> = { h: 60, m: 1, s: 1 / 60 };
-        return safeParseFloat(number) * (perUnit[unit] ?? 1);
-    };
-    const formatMinutes = (minutes: number) =>
-        minutes >= 60 ? `${(minutes / 60).toFixed(1)}h` : `${minutes.toFixed(1)}m`;
-    
     const deploymentDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
         value: safeParseFloat(team.metrics.deploymentFrequency),
@@ -173,13 +161,13 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
     
     const leadTimeDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
-        value: toMinutes(team.metrics.leadTime) / 60,
+        value: team.raw.leadTimeSec,
         color: colorPalette[idx % colorPalette.length],
     }));
     
     const mttrDonutData = sortedTeams.map((team, idx) => ({
         name: team.name || 'Unknown Team',
-        value: toMinutes(team.metrics.mttr),
+        value: team.raw.mttrSec,
         color: colorPalette[idx % colorPalette.length],
     }));
     
@@ -201,28 +189,28 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
             data: deploymentDonutData,
             center: `${avgDeployments.toFixed(2)}/day`,
             centerLabel: 'Avg Deployments',
-            tooltipUnit: '/day',
+            format: (value: number) => `${value.toFixed(2)}/day`,
         },
         {
             title: 'Lead Time',
             data: leadTimeDonutData,
-            center: `${avgLeadTime.toFixed(1)}h`,
+            center: formatDuration(avgLeadTime),
             centerLabel: 'Avg Lead Time',
-            tooltipUnit: 'h',
+            format: formatDuration,
         },
         {
             title: 'MTTR',
             data: mttrDonutData,
-            center: formatMinutes(avgMTTR),
+            center: formatDuration(avgMTTR),
             centerLabel: 'Avg MTTR',
-            tooltipUnit: 'm',
+            format: formatDuration,
         },
         {
             title: 'Failure Rate',
             data: failureRateDonutData,
             center: `${avgFailureRate.toFixed(1)}%`,
             centerLabel: 'Avg Failure Rate',
-            tooltipUnit: '%',
+            format: (value: number) => `${value.toFixed(1)}%`,
         },
     ];
 
@@ -282,7 +270,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                     </Pie>
                                     <RechartsTooltip formatter={(value, name, props) => {
                                         const teamName = name || props?.payload?.name || 'Unknown Team';
-                                        return [`${Number(value).toFixed(2)}${chart.tooltipUnit}`, teamName];
+                                        return [chart.format(Number(value)), teamName];
                                     }} />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -356,12 +344,9 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   <Typography variant="caption" className={classes.metricLabel} style={{ display: 'block', marginBottom: '0.5rem' }}>
                                                       Lead Time
                                                   </Typography>
-                                                  <AnimatedNumber 
-                                                      value={splitUnit(team.metrics.leadTime).number} 
-                                                      color="#3498db" 
-                                                      fontSize="2rem" 
-                                                      unit={splitUnit(team.metrics.leadTime).unit}
-                                                  />
+                                                  <span style={{ fontWeight: 700, fontSize: '2rem', color: '#3498db', display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                                      {team.metrics.leadTime}
+                                                  </span>
                                               </Box>
                                           </Grid>
                                       </Grid>
@@ -385,12 +370,9 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   <Typography variant="caption" className={classes.metricLabel} style={{ display: 'block', marginBottom: '0.5rem' }}>
                                                       MTTR
                                                   </Typography>
-                                                  <AnimatedNumber 
-                                                      value={splitUnit(team.metrics.mttr).number} 
-                                                      color="#f1c40f" 
-                                                      fontSize="2rem" 
-                                                      unit={splitUnit(team.metrics.mttr).unit}
-                                                  />
+                                                  <span style={{ fontWeight: 700, fontSize: '2rem', color: '#f1c40f', display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                                      {team.metrics.mttr}
+                                                  </span>
                                               </Box>
                                           </Grid>
                                       </Grid>

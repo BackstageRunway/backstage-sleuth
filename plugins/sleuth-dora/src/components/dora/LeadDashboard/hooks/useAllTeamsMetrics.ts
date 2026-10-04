@@ -14,6 +14,11 @@ export interface TeamMetricsData {
     failureRate: string;
     mttr: string;
   };
+  // seconds, for charts and averages; the strings above are for display only
+  raw: {
+    leadTimeSec: number;
+    mttrSec: number;
+  };
   trend: 'up' | 'down' | 'stable';
   loading: boolean;
   error?: string;
@@ -64,6 +69,10 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
         failureRate: formatMetricValue(currentRange.failureRatePercent, MetricType.FailureRate),
         mttr: formatMetricValue(currentRange.avgMttrDurationInSec, MetricType.Mttr),
       },
+      raw: {
+        leadTimeSec: currentRange.avgLeadTimeInSec,
+        mttrSec: currentRange.avgMttrDurationInSec,
+      },
       trend: overallTrend,
       loading: false,
     };
@@ -89,6 +98,7 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
           failureRate: '0%',
           mttr: '0m',
         },
+        raw: { leadTimeSec: 0, mttrSec: 0 },
         trend: 'stable',
         loading: true,
       }));

@@ -1,6 +1,7 @@
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Grid, Typography, Box, Card, CardContent, CircularProgress } from '@material-ui/core';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { formatDuration } from '../../common/utils/formatters';
 
 interface ProjectHealthProps {
     data: any;
@@ -108,6 +109,13 @@ const useStyles = makeStyles(theme => ({
 const periodLabel = (startIncl: string) =>
     new Date(startIncl).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 
+// Durations are plotted in the largest unit their biggest value fills, so the axis stays readable
+const durationScale = (maxSeconds: number) => {
+    if (maxSeconds >= 2 * 86400) return { unit: 'd', seconds: 86400 };
+    if (maxSeconds >= 3600) return { unit: 'h', seconds: 3600 };
+    return { unit: 'm', seconds: 60 };
+};
+
 export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
     const classes = useStyles();
     const theme = useTheme();
@@ -123,8 +131,9 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
         {
             title: 'Lead Time',
             key: 'avgLeadTimeInSec',
-            unit: 'h',
-            format: (value: number) => (value / 3600).toFixed(1), // Convert seconds to hours
+            unit: '',
+            duration: true,
+            format: formatDuration,
             color: '#3498db',
         },
         {
@@ -137,8 +146,9 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
         {
             title: 'MTTR',
             key: 'avgMttrDurationInSec',
-            unit: 'h',
-            format: (value: number) => (value / 3600).toFixed(1), // Convert seconds to hours
+            unit: '',
+            duration: true,
+            format: formatDuration,
             color: '#f1c40f',
         },
     ];
@@ -171,7 +181,11 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
 
     return (
         <Grid container spacing={3}>
-            {metrics.map((metric) => (
+            {metrics.map((metric) => {
+                const rawValues: number[] = quartersData.map((quarter: any) => quarter[metric.key] as number);
+                const scale = metric.duration ? durationScale(Math.max(...rawValues)) : null;
+                const unit = scale ? scale.unit : metric.unit;
+                return (
                 <Grid item xs={12} sm={6} md={3} key={metric.title}>
                     <Card className={classes.card}>
                         <CardContent>
@@ -183,15 +197,21 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                     <BarChart
                                         data={quartersData.map((quarter: any) => ({
                                             name: periodLabel(quarter.startIncl),
-                                            // plotted in the displayed unit so the axis matches the values below
-                                            value: Number(metric.format(quarter[metric.key as keyof typeof quarter] as number)),
+                                            raw: quarter[metric.key as keyof typeof quarter] as number,
+                                            // plotted in the displayed unit so the axis matches the unit below
+                                            value: scale
+                                                ? Number(((quarter[metric.key as keyof typeof quarter] as number) / scale.seconds).toFixed(1))
+                                                : Number(metric.format(quarter[metric.key as keyof typeof quarter] as number)),
                                         }))}
                                         margin={{ top: 20, right: 8, left: -8, bottom: 5 }}
                                     >
                                         <XAxis dataKey="name" interval={0} tick={{ fontSize: 10, fill: theme.palette.text.secondary }} />
                                         <YAxis tick={{ fill: theme.palette.text.secondary }} />
                                         <Tooltip
-                                            formatter={value => [`${value}${metric.unit}`, '']}
+                                            formatter={(value, _name, item) => [
+                                                scale ? formatDuration(item?.payload?.raw ?? 0) : `${value}${unit}`,
+                                                '',
+                                            ]}
                                             labelFormatter={label => `From ${label}`}
                                             contentStyle={{
                                                 background: theme.palette.background.paper,
@@ -231,7 +251,7 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                                  </Typography>
                                                                                                    <Typography 
                                                       className={classes.metricValue}
-                                                      style={{ fontSize: '0.9rem' }}
+                                                      style={{ fontSize: scale ? '0.78rem' : '0.9rem', whiteSpace: 'nowrap' }}
                                                   >
                                                       {metric.format(value)}
                                                   </Typography>
@@ -249,13 +269,14 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                          fontWeight: 500
                                      }}
                                  >
-                                     Unit: {metric.unit}
+                                     Unit: {unit}
                                  </Typography>
                              </Box>
                          </CardContent>
                      </Card>
                 </Grid>
-            ))}
+                );
+            })}
         </Grid>
     );
 }; 
