@@ -3,6 +3,7 @@ import { TableRow, TableCell } from '@material-ui/core';
 import { MetricType, Performance, getPerformanceDescription } from '../../common/types/metrics';
 import { TrendCell } from './TrendCell';
 import { MetricPerformanceStatusMarker } from './MetricPerformanceStatusMarker';
+import { METRIC_LABELS } from '../constants';
 //import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 //import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 
@@ -18,8 +19,13 @@ const useStyles = makeStyles({
     cell: {
         textAlign: 'center',
     },
+    nameCell: {
+        whiteSpace: 'nowrap',
+        wordBreak: 'normal',
+    },
     statusCell: {
-        width: '100px',
+        minWidth: '110px',
+        whiteSpace: 'nowrap',
     },
     trendUp: {
         color: 'green',
@@ -43,7 +49,7 @@ const MetricsPerformanceTableRow = ({
 
     return (
         <TableRow>
-            <TableCell>{metricName}</TableCell>
+            <TableCell className={classes.nameCell}>{METRIC_LABELS[metricName]}</TableCell>
             <TableCell className={classes.statusCell}>
                                         <TrendCell
                     metricType={metricName}

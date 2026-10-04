@@ -11,9 +11,15 @@ type Props = {
 
 const useStyles = makeStyles(theme => ({
     container: {
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         gap: '4px',
+        // Backstage table cells break long words, which split "200%" into "200" and "%"
+        whiteSpace: 'nowrap',
+        wordBreak: 'normal',
+        '& svg': {
+            flexShrink: 0,
+        },
     },
     value: {
         fontSize: '0.875rem',
