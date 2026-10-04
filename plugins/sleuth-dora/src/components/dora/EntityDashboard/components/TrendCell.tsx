@@ -62,8 +62,8 @@ export function TrendCell({ metricType, percentageChange }: Props) {
 
     const formatPercentage = (value: number) => {
         if (isNaN(value)) return '0%';
-        // A previous value of zero has no percentage change. For failure rate and MTTR zero is a real
-        // reading (no failures), so say where it rose from; otherwise there was simply nothing before.
+        // A previous value of zero has no percentage change. Sleuth shows a bare arrow there, which reads
+        // as a missing value beside the other trends, so say what the metric rose from instead.
         if (!isFinite(value)) {
             if (metricType === MetricType.FailureRate) return 'from 0%';
             if (metricType === MetricType.Mttr) return 'from 0m';

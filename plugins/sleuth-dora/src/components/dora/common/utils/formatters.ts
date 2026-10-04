@@ -36,15 +36,15 @@ export const formatMetricValueLegacy = (metricName: MetricType, value: number): 
 };
 
 /**
- * Formats a duration the way Sleuth does: the two largest units, e.g. "45m", "1h 42m", "17d 23h"
+ * Formats a duration the way Sleuth does: the two largest units, rounded down, e.g. "45m", "1h 42m", "17d 23h"
  * @param seconds - Duration in seconds
  * @returns Formatted duration string
  */
 export const formatDuration = (seconds: number): string => {
   if (!seconds) return '0m';
-  if (seconds < 60) return `${Math.round(seconds)}s`;
+  if (seconds < 60) return `${Math.floor(seconds)}s`;
 
-  const minutes = Math.round(seconds / 60);
+  const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m`;
 
   if (minutes < 24 * 60) {
@@ -52,7 +52,7 @@ export const formatDuration = (seconds: number): string => {
     return rest ? `${Math.floor(minutes / 60)}h ${rest}m` : `${Math.floor(minutes / 60)}h`;
   }
 
-  const hours = Math.round(seconds / 3600);
+  const hours = Math.floor(seconds / 3600);
   const rest = hours % 24;
   return rest ? `${Math.floor(hours / 24)}d ${rest}h` : `${Math.floor(hours / 24)}d`;
 };
