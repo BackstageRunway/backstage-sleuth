@@ -9,7 +9,7 @@ type Props = {
     percentageChange: number;
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     container: {
         display: 'flex',
         alignItems: 'center',
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
     },
     value: {
         fontSize: '0.875rem',
-        color: 'rgba(0, 0, 0, 0.87)',
+        color: theme.palette.text.primary,
     },
     improving: {
         color: '#4caf50',
@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     neutral: {
         color: '#9e9e9e',
     },
-});
+}));
 
 export function TrendCell({ metricType, percentageChange }: Props) {
     const classes = useStyles();

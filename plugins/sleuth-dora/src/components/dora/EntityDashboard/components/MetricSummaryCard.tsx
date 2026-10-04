@@ -53,7 +53,7 @@ export function MetricSummaryCard({ metric, insight }: Props) {
                             </ListItemIcon>
                             <ListItemText 
                                 primary={insight.text} 
-                                primaryTypographyProps={{ style: { fontSize: '0.86rem', color: 'rgba(0, 0, 0, 0.6)' } }}
+                                primaryTypographyProps={{ color: 'textSecondary', style: { fontSize: '0.86rem' } }}
                             />
                         </ListItem>
                     ))}

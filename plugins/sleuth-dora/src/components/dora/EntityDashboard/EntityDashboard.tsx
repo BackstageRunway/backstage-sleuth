@@ -1,12 +1,12 @@
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Alert } from '@material-ui/lab';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, alpha } from '@material-ui/core/styles';
 import { CircularProgress, Grid, Paper } from '@material-ui/core';
 import { TimeRangeSelector } from '../shared/components/TimeRangeSelector';
 import { useEntityMetrics } from './hooks/useEntityMetrics';
 import { MetricSummary, MetricsPerformance } from './components';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
     error: {
         marginBottom: '1rem',
     },
@@ -37,13 +37,13 @@ const useStyles = makeStyles({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        backgroundColor: alpha(theme.palette.background.paper, 0.7),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1,
     }
-});
+}));
 
 export const EntityDashboard = () => {
     const classes = useStyles();
