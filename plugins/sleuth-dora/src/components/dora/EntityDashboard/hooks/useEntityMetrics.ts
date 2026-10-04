@@ -11,6 +11,7 @@ export function useEntityMetrics(entity: any) {
   const doraApi = useApi(doraBackendApiRef);
   const [metrics, setMetrics] = useState<MetricData[]>([]);
   const [insights, setInsights] = useState<ApiInsight[]>([]);
+  const [hasDeployments, setHasDeployments] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last28days');
@@ -36,6 +37,7 @@ export function useEntityMetrics(entity: any) {
       const metricsData = processMetricsResponse(project, true);
 
       setMetrics(metricsData);
+      setHasDeployments(project.currentRange.numOfDeploysPerDay > 0);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch metrics');
@@ -77,6 +79,8 @@ export function useEntityMetrics(entity: any) {
   return {
     metrics,
     insights,
+    hasDeployments,
+    codeDeploymentSlug,
     loading,
     error,
     selectedTimeRange,

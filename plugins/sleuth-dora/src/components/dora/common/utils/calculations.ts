@@ -9,10 +9,10 @@ import { PERFORMANCE_THRESHOLDS } from '../constants/thresholds';
  * Calculates the percentage change between current and previous values
  * @param current - Current value
  * @param previous - Previous value
- * @returns Percentage change rounded to 1 decimal place
+ * @returns Percentage change rounded to 1 decimal place; Infinity when there was nothing before
  */
 export const calculateTrendChange = (current: number, previous: number): number => {
-  if (previous === 0) return 0;
+  if (previous === 0) return current > 0 ? Infinity : 0;
   const result = ((current - previous) / previous) * 100;
   // Round to 1 decimal place to match Sleuth's formatting
   return Math.round(result * 10) / 10;
@@ -23,10 +23,10 @@ export const calculateTrendChange = (current: number, previous: number): number 
  * Used in some contexts where rounding is not required
  * @param current - Current value
  * @param previous - Previous value
- * @returns Percentage change
+ * @returns Percentage change; Infinity when there was nothing before
  */
 export const calculateTrendChangeSimple = (current: number, previous: number): number => {
-  if (previous === 0) return 0;
+  if (previous === 0) return current > 0 ? Infinity : 0;
   return ((current - previous) / previous) * 100;
 };
 

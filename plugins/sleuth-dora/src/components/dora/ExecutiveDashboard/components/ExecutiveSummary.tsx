@@ -107,7 +107,8 @@ const calculateTrend = (quarters: any[], metricKey: string): { trend: string, ch
         if (secondHalfAvg === 0) {
             return { trend: 'flat', change: '0%', isImproving: false };
         } else {
-            return { trend: 'up', change: '+∞%', isImproving: true };
+            // nothing to compare against; higher is only an improvement for deployments
+            return { trend: 'up', change: 'new', isImproving: metricKey === 'numOfDeploysPerDay' };
         }
     }
     

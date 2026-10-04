@@ -9,6 +9,7 @@ import { TeamSelector } from './components/TeamSelector';
 import { TimeRangeSelector } from '../shared/components/TimeRangeSelector';
 import { useAllTeamsMetrics } from './hooks/useAllTeamsMetrics';
 import { useUserTeams } from '../common/hooks/useUserTeams';
+import { useDoraConfig } from '../common/utils/config';
 
 
 const useStyles = makeStyles({
@@ -35,7 +36,8 @@ const useStyles = makeStyles({
 export const LeadDashboard = () => {
     const classes = useStyles();
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null); // null means "All Teams"
-    const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('last7days');
+    const { defaultTimeRange } = useDoraConfig();
+    const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>(defaultTimeRange);
 
     // Get user's teams from Backstage catalog
     const { teams: userTeams, loading: userTeamsLoading, error: userTeamsError } = useUserTeams();

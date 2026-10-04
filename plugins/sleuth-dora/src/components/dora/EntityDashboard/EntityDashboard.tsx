@@ -65,21 +65,18 @@ export const EntityDashboard = () => {
     const {
         metrics,
         insights,
+        hasDeployments,
+        codeDeploymentSlug,
         loading,
         error,
         selectedTimeRange,
         setSelectedTimeRange,
     } = useEntityMetrics(entity);
 
-    if (error) {
-        return (
-            <div className={classes.container}>
-                <Alert severity="error" className={classes.error}>
-                    {error}
-                </Alert>
-            </div>
-        );
-    }
+    // Zeros would otherwise be rated as elite lead time and failure rate
+    const emptyMessage = !loading && !error && !hasDeployments
+        ? `No deployments recorded in Sleuth for "${codeDeploymentSlug}" in this period.`
+        : null;
 
     return (
         <div className={classes.container}>
@@ -87,6 +84,17 @@ export const EntityDashboard = () => {
                 selectedRange={selectedTimeRange}
                 onRangeChange={setSelectedTimeRange}
             />
+            {error && (
+                <Alert severity="error" className={classes.error}>
+                    {error}
+                </Alert>
+            )}
+            {emptyMessage && (
+                <Alert severity="info" className={classes.error}>
+                    {emptyMessage}
+                </Alert>
+            )}
+            {!error && !emptyMessage && (
             <div className={classes.content}>
                 {loading && (
                     <div className={classes.loadingOverlay}>
@@ -111,6 +119,7 @@ export const EntityDashboard = () => {
                     </Grid>
                 </Grid>
             </div>
+            )}
         </div>
     );
 };
