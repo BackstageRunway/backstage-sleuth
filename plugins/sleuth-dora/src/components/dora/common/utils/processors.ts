@@ -43,8 +43,9 @@ export const processMetricsResponse = (
   useRoundedCalculation: boolean = true
 ): MetricData[] => {
   const { currentRange, previousRange } = response;
-  
-  return [
+  const calculateChange = useRoundedCalculation ? calculateTrendChange : calculateTrendChangeSimple;
+
+  const metrics = [
     createMetricData(
       MetricType.Frequency,
       currentRange.numOfDeploysPerDay,
@@ -70,6 +71,27 @@ export const processMetricsResponse = (
       useRoundedCalculation
     ),
   ];
+
+  // Sleuth rounds deploys per day to two decimals, which skews the change for rarely deployed code;
+  // the periods are equally long, so the deploy counts give the exact figure
+  if (currentRange.numOfDeploys !== undefined && previousRange.numOfDeploys !== undefined) {
+    const frequency = metrics[0];
+    frequency.percentageChange = calculateChange(currentRange.numOfDeploys, previousRange.numOfDeploys);
+    frequency.trend = determineTrend(currentRange.numOfDeploys, previousRange.numOfDeploys, MetricType.Frequency);
+  }
+
+  // With no deployments before, a zero lead time or failure rate is missing data, not an elite result
+  if (previousRange.numOfDeploys === 0) {
+    metrics
+      .filter(metric => metric.metricName === MetricType.LeadTime || metric.metricName === MetricType.FailureRate)
+      .forEach(metric => {
+        metric.previousValue = null;
+        metric.percentageChange = NaN;
+        metric.trend = 'stable';
+      });
+  }
+
+  return metrics;
 };
 
 /**
@@ -79,9 +101,11 @@ export const processMetricsResponse = (
  */
 export const mapMetricType = (insightMetricType: string): string => {
   switch (insightMetricType) {
-    case 'DEPLOYING':
+    // DEPLOYING is Sleuth's deploying time, a part of lead time, not how often deploys happen
     case 'FREQUENCY':
       return 'Frequency';
+    case 'LEAD_TIME':
+      return 'LeadTime';
     case 'MTTR':
       return 'Mttr';
     case 'FAILURE_RATE':

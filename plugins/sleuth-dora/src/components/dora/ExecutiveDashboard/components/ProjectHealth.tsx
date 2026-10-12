@@ -253,7 +253,10 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                                       className={classes.metricValue}
                                                       style={{ fontSize: scale ? '0.78rem' : '0.9rem', whiteSpace: 'nowrap' }}
                                                   >
-                                                      {metric.format(value)}
+                                                      {/* a slice with no deployments has no lead time, failure rate or MTTR to show */}
+                                                      {metric.key !== 'numOfDeploysPerDay' && quarter.numOfDeploysPerDay === 0
+                                                          ? '–'
+                                                          : metric.format(value)}
                                                   </Typography>
                                                 
                                             </Box>

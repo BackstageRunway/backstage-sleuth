@@ -99,7 +99,11 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
 
 
 
-    const getTrendChip = (trend: string) => {
+    const getTrendChip = (trend: string, hasDeployments: boolean) => {
+        // "Stable" would suggest the team is doing fine when it has shipped nothing
+        if (!hasDeployments) {
+            return <Chip label="No deployments" style={{ backgroundColor: '#9e9e9e', color: '#fff', fontWeight: 600, marginLeft: 8 }} size="small" />;
+        }
         switch (trend) {
             case 'up':
                 return <Chip label="Improving" icon={<TrendingUpIcon style={{ color: '#fff' }} />} style={{ backgroundColor: '#43a047', color: '#fff', fontWeight: 600, marginLeft: 8 }} size="small" />;
@@ -116,6 +120,8 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         useEffect(() => {
             const start = 0;
             const end = parseFloat(value);
+            // keep the precision of the formatted value, so the card agrees with the chart and the other views
+            const decimals = (value.split('.')[1] ?? '').length;
             if (isNaN(end)) {
                 setDisplayValue(value);
                 return undefined;
@@ -127,10 +133,10 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
             const timer = setInterval(() => {
                 current += increment;
                 if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                    setDisplayValue(end.toFixed(value.includes('.') ? 1 : 0));
+                    setDisplayValue(end.toFixed(decimals));
                     clearInterval(timer);
                 } else {
-                    setDisplayValue(current.toFixed(value.includes('.') ? 1 : 0));
+                    setDisplayValue(current.toFixed(decimals));
                 }
             }, stepTime);
             return () => clearInterval(timer);
@@ -177,11 +183,17 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
         color: colorPalette[idx % colorPalette.length],
     }));
     
-    // Averaged, not summed: teams can share members, so their deployments overlap
-    const avgDeployments = deploymentDonutData.length > 0 ? deploymentDonutData.reduce((sum, t) => sum + t.value, 0) / deploymentDonutData.length : 0;
-    const avgLeadTime = leadTimeDonutData.length > 0 ? leadTimeDonutData.reduce((sum, t) => sum + t.value, 0) / leadTimeDonutData.length : 0;
-    const avgMTTR = mttrDonutData.length > 0 ? mttrDonutData.reduce((sum, t) => sum + t.value, 0) / mttrDonutData.length : 0;
-    const avgFailureRate = failureRateDonutData.length > 0 ? failureRateDonutData.reduce((sum, t) => sum + t.value, 0) / failureRateDonutData.length : 0;
+    // Averaged, not summed: teams can share members, so their deployments overlap.
+    // A team without deployments has no lead time, failure rate or MTTR, so it only counts towards deployments.
+    const activeTeamNames = new Set(sortedTeams.filter(team => team.hasDeployments).map(team => team.name));
+    const average = (data: { name: string; value: number }[], activeOnly: boolean) => {
+        const counted = activeOnly ? data.filter(t => activeTeamNames.has(t.name)) : data;
+        return counted.length > 0 ? counted.reduce((sum, t) => sum + t.value, 0) / counted.length : 0;
+    };
+    const avgDeployments = average(deploymentDonutData, false);
+    const avgLeadTime = average(leadTimeDonutData, true);
+    const avgMTTR = average(mttrDonutData, true);
+    const avgFailureRate = average(failureRateDonutData, true);
 
     const donutCharts = [
         {
@@ -245,6 +257,14 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
 
     return (
         <>
+            {activeTeamNames.size === 0 && (
+                <Box textAlign="center" py={2}>
+                    <Typography variant="h6" color="textSecondary">
+                        No deployments recorded in Sleuth for {sortedTeams.length === 1 ? 'this team' : 'these teams'} in this period.
+                    </Typography>
+                </Box>
+            )}
+            {activeTeamNames.size > 0 && (
             <Grid container spacing={3} style={{ marginBottom: 24 }}>
                 {donutCharts.map((chart) => (
                     <Grid item xs={12} sm={6} md={3} key={chart.title}>
@@ -282,6 +302,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                     </Grid>
                 ))}
             </Grid>
+            )}
             {/* Combined legend for all charts */}
             <Box mt={-2} mb={3} display="flex" flexWrap="wrap" justifyContent="center" alignItems="center">
                 {sortedTeams.map((team, idx) => (
@@ -322,7 +343,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                          <Typography className={classes.teamName} style={{ fontSize: '1.25rem' }}>
                                              {team.name}
                                          </Typography>
-                                         {getTrendChip(team.trend)}
+                                         {getTrendChip(team.trend, team.hasDeployments)}
                                      </Box>
                                                                            {/* Summary Row */}
                                       <Grid container spacing={2} style={{ marginBottom: 8 }}>
@@ -345,7 +366,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                       Lead Time
                                                   </Typography>
                                                   <span style={{ fontWeight: 700, fontSize: '2rem', color: '#3498db', display: 'inline-block', whiteSpace: 'nowrap' }}>
-                                                      {team.metrics.leadTime}
+                                                      {team.hasDeployments ? team.metrics.leadTime : '–'}
                                                   </span>
                                               </Box>
                                           </Grid>
@@ -357,12 +378,16 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   <Typography variant="caption" className={classes.metricLabel} style={{ display: 'block', marginBottom: '0.5rem' }}>
                                                       Failure Rate
                                                   </Typography>
-                                                  <AnimatedNumber 
-                                                      value={team.metrics.failureRate.replace('%','')} 
-                                                      color="#e74c3c" 
-                                                      fontSize="2rem" 
-                                                      unit="%"
-                                                  />
+                                                  {team.hasDeployments ? (
+                                                      <AnimatedNumber
+                                                          value={team.metrics.failureRate.replace('%','')}
+                                                          color="#e74c3c"
+                                                          fontSize="2rem"
+                                                          unit="%"
+                                                      />
+                                                  ) : (
+                                                      <span style={{ fontWeight: 700, fontSize: '2rem', color: '#e74c3c', display: 'inline-block' }}>–</span>
+                                                  )}
                                               </Box>
                                           </Grid>
                                           <Grid item xs={6}>
@@ -371,7 +396,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                       MTTR
                                                   </Typography>
                                                   <span style={{ fontWeight: 700, fontSize: '2rem', color: '#f1c40f', display: 'inline-block', whiteSpace: 'nowrap' }}>
-                                                      {team.metrics.mttr}
+                                                      {team.hasDeployments ? team.metrics.mttr : '–'}
                                                   </span>
                                               </Box>
                                           </Grid>

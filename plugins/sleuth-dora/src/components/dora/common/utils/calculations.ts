@@ -82,6 +82,46 @@ export const determineTrend = (current: number, previous: number, metricType: Me
   return 'stable';
 };
 
+export interface PeriodTrend {
+  trend: 'up' | 'down' | 'flat';
+  change: string;
+  isImproving: boolean;
+}
+
+/**
+ * Describes how a metric moved against the previous period, the comparison Sleuth itself reports
+ * @param metricType - Type of metric
+ * @param current - Current value
+ * @param previous - Previous value
+ * @param comparable - false when one of the periods has no deployments to measure
+ * @returns Direction, display text and whether the move is an improvement
+ */
+export const describePeriodTrend = (
+  metricType: MetricType,
+  current: number,
+  previous: number,
+  comparable: boolean = true,
+): PeriodTrend => {
+  if (!comparable) return { trend: 'flat', change: 'n/a', isImproving: false };
+
+  const change = calculateTrendChange(current, previous);
+  if (change === 0) return { trend: 'flat', change: '0%', isImproving: false };
+
+  const isImproving = metricType === MetricType.Frequency ? change > 0 : change < 0;
+  if (!isFinite(change)) {
+    if (metricType === MetricType.FailureRate) return { trend: 'up', change: 'from 0%', isImproving };
+    if (metricType === MetricType.Mttr) return { trend: 'up', change: 'from 0m', isImproving };
+    return { trend: 'up', change: 'new', isImproving };
+  }
+
+  const absolute = Math.abs(change);
+  return {
+    trend: change > 0 ? 'up' : 'down',
+    change: absolute > 999 ? '>999%' : `${Math.round(absolute)}%`,
+    isImproving,
+  };
+};
+
 /**
  * Determines overall trend based on key metrics
  * Prioritizes negative trends (declining performance)

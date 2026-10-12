@@ -153,6 +153,8 @@ export class MetricsService {
       const organization = await this.client.getTrendMetrics(
         dateRanges.currentRangeStart,
         dateRanges.currentRangeEnd,
+        dateRanges.previousRangeStart,
+        dateRanges.previousRangeEnd,
       );
       this.logger.info('Retrieved organization trend metrics', { organization });
       return organization;

@@ -41,7 +41,9 @@ export interface MetricData {
   metricName: MetricType;
   value: Performance;
   rawValue: number;
-  previousValue: Performance;
+  // null when the previous period had no deployments, so there is nothing to rate
+  previousValue: Performance | null;
+  // NaN when there is nothing to compare against
   percentageChange: number;
   trend: Trend;
 }
@@ -50,6 +52,7 @@ export interface MetricData {
  * API metric range interface
  */
 export interface MetricRange {
+  numOfDeploys?: number;
   numOfDeploysPerDay: number;
   avgLeadTimeInSec: number;
   failureRatePercent: number;

@@ -57,7 +57,7 @@ export const ExecutiveDashboard = () => {
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
                         <Typography className={classes.title}>Executive Dashboard</Typography>
-                         <ExecutiveSummary metricsData={metricsData} />
+                         <ExecutiveSummary metricsData={metricsData} previousRecap={data?.organization?.previousRecap} />
                     </Paper>
                 </Grid>
                 

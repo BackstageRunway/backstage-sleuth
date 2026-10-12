@@ -1,6 +1,7 @@
 import { MetricType, Performance } from '../types/metrics';
 import {
   calculateTrendChange,
+  describePeriodTrend,
   determineOverallTrend,
   determineTrend,
   getMetricPerformance,
@@ -62,10 +63,52 @@ describe('getMetricPerformance', () => {
     expect(getMetricPerformance(MetricType.Mttr, 6136)).toBe(Performance.High);
   });
 
+  it('rates frequency by the daily, weekly and monthly bands', () => {
+    expect(getMetricPerformance(MetricType.Frequency, 1)).toBe(Performance.Elite);
+    // 43 deploys in 90 days: more than weekly, less than daily
+    expect(getMetricPerformance(MetricType.Frequency, 0.48)).toBe(Performance.High);
+    // 2 deploys in 28 days: more than monthly, less than weekly
+    expect(getMetricPerformance(MetricType.Frequency, 0.07)).toBe(Performance.Medium);
+    expect(getMetricPerformance(MetricType.Frequency, 0.02)).toBe(Performance.Low);
+  });
+
   it('rates failure rate at the 5, 10 and 15 percent boundaries', () => {
     expect(getMetricPerformance(MetricType.FailureRate, 5)).toBe(Performance.Elite);
     expect(getMetricPerformance(MetricType.FailureRate, 10)).toBe(Performance.High);
     expect(getMetricPerformance(MetricType.FailureRate, 12.2)).toBe(Performance.Medium);
     expect(getMetricPerformance(MetricType.FailureRate, 15.1)).toBe(Performance.Low);
+  });
+});
+
+describe('describePeriodTrend', () => {
+  // Organisation figures from Sleuth for 15 Sep to 12 Oct 2026 against the 28 days before
+  it('reports the change against the previous period', () => {
+    expect(describePeriodTrend(MetricType.Frequency, 65, 80)).toEqual({ trend: 'down', change: '19%', isImproving: false });
+    expect(describePeriodTrend(MetricType.LeadTime, 1885879, 540435)).toEqual({ trend: 'up', change: '249%', isImproving: false });
+    expect(describePeriodTrend(MetricType.FailureRate, 10.77, 10)).toEqual({ trend: 'up', change: '8%', isImproving: false });
+    expect(describePeriodTrend(MetricType.Mttr, 5854, 6694)).toEqual({ trend: 'down', change: '13%', isImproving: true });
+  });
+
+  it('counts a rise as an improvement only for frequency', () => {
+    expect(describePeriodTrend(MetricType.Frequency, 3, 2).isImproving).toBe(true);
+    expect(describePeriodTrend(MetricType.LeadTime, 3, 2).isImproving).toBe(false);
+  });
+
+  it('is flat and neither good nor bad when nothing changed', () => {
+    expect(describePeriodTrend(MetricType.FailureRate, 10, 10)).toEqual({ trend: 'flat', change: '0%', isImproving: false });
+  });
+
+  it('caps very large changes', () => {
+    expect(describePeriodTrend(MetricType.Frequency, 236, 20).change).toBe('>999%');
+  });
+
+  it('says what a metric rose from when the previous value was zero', () => {
+    expect(describePeriodTrend(MetricType.Frequency, 5, 0)).toEqual({ trend: 'up', change: 'new', isImproving: true });
+    expect(describePeriodTrend(MetricType.FailureRate, 13.95, 0).change).toBe('from 0%');
+    expect(describePeriodTrend(MetricType.Mttr, 4780, 0).change).toBe('from 0m');
+  });
+
+  it('makes no comparison when a period has no deployments to measure', () => {
+    expect(describePeriodTrend(MetricType.LeadTime, 1885879, 0, false)).toEqual({ trend: 'flat', change: 'n/a', isImproving: false });
   });
 });

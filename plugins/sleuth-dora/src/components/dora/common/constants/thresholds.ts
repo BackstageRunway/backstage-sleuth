@@ -20,8 +20,8 @@ import { MetricType, Performance } from '../types/metrics';
 export const PERFORMANCE_THRESHOLDS = {
   [MetricType.Frequency]: {
     [Performance.Elite]: 1.0,     // Multiple deploys per day
-    [Performance.High]: 0.5,      // Once per day to once per week
-    [Performance.Medium]: 0.1,    // Once per week to once per month
+    [Performance.High]: 1 / 7,    // Once per day to once per week
+    [Performance.Medium]: 1 / 30, // Once per week to once per month
     [Performance.Low]: 0,         // Less than once per month
   },
   [MetricType.LeadTime]: {

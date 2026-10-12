@@ -8,7 +8,7 @@ import { METRIC_LABELS } from '../constants';
 interface MetricsPerformanceTableRowProps {
     metricName: MetricType;
     value: Performance;
-    previousValue: Performance;
+    previousValue: Performance | null;
     percentageChange: number;
     trend: 'up' | 'down' | 'stable';
 }
