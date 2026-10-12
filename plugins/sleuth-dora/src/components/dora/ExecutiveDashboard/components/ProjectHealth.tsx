@@ -251,7 +251,8 @@ export const ProjectHealth = ({ data, loading, error }: ProjectHealthProps) => {
                                                  </Typography>
                                                                                                    <Typography 
                                                       className={classes.metricValue}
-                                                      style={{ fontSize: scale ? '0.78rem' : '0.9rem', whiteSpace: 'nowrap' }}
+                                                      // four slices share the card, too narrow for "17d 7h" on one line, so durations may wrap
+                                                      style={{ fontSize: scale ? '0.78rem' : '0.9rem', whiteSpace: scale ? 'normal' : 'nowrap', textAlign: 'center', lineHeight: 1.2 }}
                                                   >
                                                       {/* a slice with no deployments has no lead time, failure rate or MTTR to show */}
                                                       {metric.key !== 'numOfDeploysPerDay' && quarter.numOfDeploysPerDay === 0
