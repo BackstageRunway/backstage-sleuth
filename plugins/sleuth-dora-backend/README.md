@@ -1,107 +1,67 @@
-# @backstagerunway/plugin-sleuth-dora-backend
+# Sleuth DORA metrics for Backstage: backend
 
-A Backstage backend plugin that provides DORA (DevOps Research and Assessment) metrics integration with Sleuth.io. This plugin fetches and serves DORA metrics data to the frontend components.
+This is the half of the Sleuth DORA plugin that talks to [Sleuth](https://sleuth.io). The screens in
+`@backstagerunway/plugin-sleuth-dora` ask this backend for their numbers; it asks Sleuth, using an API
+key that never leaves the server.
 
-## Features
+You need both packages. Start with the
+[main plugin documentation](https://www.npmjs.com/package/@backstagerunway/plugin-sleuth-dora), which
+covers the whole setup. This page is the reference for the backend alone.
 
-- **Sleuth.io Integration**: Connects to Sleuth.io API to fetch DORA metrics
-- **RESTful API**: Provides endpoints for retrieving metrics data
-- **Configurable**: Supports custom Sleuth.io organization and API configuration
-- **Authentication**: Integrates with Backstage's authentication system
-
-## Prerequisites
-
-- A Backstage application
-- A Sleuth.io account with API access
-- Your Sleuth.io API key and organization ID
-
-## Installation
-
-1. Install the plugin in your backend package:
+## Install
 
 ```bash
-cd packages/backend
-yarn add @backstagerunway/plugin-sleuth-dora-backend
+yarn --cwd packages/backend add @backstagerunway/plugin-sleuth-dora-backend
 ```
-
-2. Add the plugin to your backend:
 
 ```typescript
 // packages/backend/src/index.ts
-import { createBackend } from '@backstage/backend-defaults';
-
-const backend = createBackend();
-
-// Add the DORA backend plugin
 backend.add(import('@backstagerunway/plugin-sleuth-dora-backend'));
-
-backend.start();
 ```
 
-## Configuration
-
-Add the following configuration to your `app-config.yaml`:
+## Configure
 
 ```yaml
+# app-config.yaml
 dora:
   sleuth:
-    organizationId: 'your-sleuth-organization-id'
-    apiKey: 'your-sleuth-api-key-here'
-    # Optional frontend-visible defaults
-    environment: 'production'
-    defaultProjectSlug: 'your-default-project'
-    # apiUrl is optional - defaults to 'https://app.sleuth.io' if not specified
-    # apiUrl: 'https://app.sleuth.io'
+    organizationId: my-org # required: your Sleuth organisation slug
+    apiKey: ${SLEUTH_API_KEY} # required: your Sleuth API key
+    cacheTtlSeconds: 300 # optional: how long answers from Sleuth are reused
+    # apiUrl: https://app.sleuth.io
 ```
 
-### Configuration Options & Precedence
+If the key or the organisation is missing, Backstage still starts. This plugin logs a warning and
+answers every request with "Sleuth DORA plugin is not configured", naming what is missing.
 
-Required (backend-only):
-- `organizationId`: Your Sleuth.io organization identifier
-- `apiKey`: Your Sleuth.io API key for authentication
+## What it does with a request
 
-Optional (frontend-visible):
-- `environment` (default: `production`)
-- `defaultProjectSlug` (default: `sleuth`)
-- `defaultTimeRange` (default: `last28days`)
-- `apiUrl` (default: `https://app.sleuth.io`)
+- **Works out the dates.** A request names a period such as `last28days`. The backend turns that into
+  the period ending at the close of today (UTC) and the equally long period before it, so the screens
+  can show a change.
+- **Asks Sleuth** for the figures of both periods.
+- **Remembers the answer** for five minutes, or for `cacheTtlSeconds`, so that many people opening the
+  same screen do not each cause a call to Sleuth.
+- **Passes Sleuth's figures on unchanged.** Nothing is recalculated here.
 
-Frontend resolution order:
-1. Entity annotations (if present)
-2. App config (keys above)
-3. Built-in defaults
+## Requests it answers
 
-## API Endpoints
+All addresses start with `/api/sleuth-dora-backend` and need a signed-in Backstage user. `timeRange` is
+`last` + a number of days + `days`, for example `last7days`.
 
-The plugin provides the following REST endpoints:
+| Request                                                                    | Returns                                                                                                                                                         |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /metrics/:projectSlug?environment=&deploymentId=&timeRange=`          | The four metrics for a project, for the current and the previous period. `deploymentId` narrows it to one code deployment; leave it empty for the whole project |
+| `GET /metrics-insights/:projectSlug?environment=&deploymentId=&timeRange=` | Sleuth's own observations for the same scope                                                                                                                    |
+| `GET /org-trend-metrics?timeRange=`                                        | The four metrics for the whole organisation: the total, the total of the previous period, and the period cut into four parts                                    |
+| `POST /batch-team-metrics` with `{ teamSlugs, environment, timeRange }`    | The four metrics for each team, for the current and the previous period. A team Sleuth does not know is left out                                                |
 
-- `GET /api/dora/metrics` - Retrieve DORA metrics for the organization
-- `GET /api/dora/metrics/teams` - Retrieve DORA metrics for specific teams
-- `GET /api/dora/metrics/entity` - Retrieve DORA metrics for a specific entity/project
+## When a request fails
 
-## Development
-
-### Running the Plugin Locally
-
-1. Clone the repository
-2. Install dependencies: `yarn install`
-3. Configure your Sleuth.io credentials in `app-config.yaml`
-4. Start the backend: `yarn start`
-
-### Testing
-
-```bash
-yarn test
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **API Key Issues**: Ensure your Sleuth.io API key is valid and has the necessary permissions
-2. **Organization ID**: Verify your organization ID is correct in the configuration
-3. **Network Issues**: Check that your backend can reach the Sleuth.io API
-
-### Logs
-
-The plugin logs important events and errors. Check your backend logs for debugging information.
+| Status | Meaning                                                                                                                                                                |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 400    | The request is missing something or the time range is not in the expected form                                                                                         |
+| 404    | Sleuth has no data for what was asked, or has no code deployment by that name. The message says which                                                                  |
+| 502    | Sleuth refused the request or could not be reached. The message includes Sleuth's own reason, such as a project or environment it does not know, or a rejected API key |
+| 503    | The plugin is not configured                                                                                                                                           |
+| 500    | Something unexpected went wrong in the backend. The details are in the backend log, not in the answer                                                                  |

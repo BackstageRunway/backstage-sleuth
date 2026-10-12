@@ -1,63 +1,21 @@
-# Screenshots Documentation
+# Screenshots
 
-This directory contains screenshots demonstrating the various features and views of the DORA plugin.
+The pictures used in the plugin documentation.
 
-## Screenshot Guidelines
+| File                           | Shows                                                      |
+| ------------------------------ | ---------------------------------------------------------- |
+| `executive.png`                | The executive screen over the last 28 days                 |
+| `executive-no-deployments.png` | The executive screen for a period with no deployments      |
+| `team.png`                     | The team screen with two teams                             |
+| `team-no-deployments.png`      | The team screen when the teams deployed nothing            |
+| `component.png`                | The Sleuth tab on a component                              |
+| `component-not-mapped.png`     | The Sleuth tab on a component that is not linked to Sleuth |
 
-When taking screenshots for this documentation:
+They are taken by the browser tests, which show fixed figures recorded from Sleuth, so every picture
+uses the same numbers. To retake them after a change to the screens:
 
-1. **Use a consistent resolution**: 1920x1080 or 1440x900
-2. **Include realistic data**: Use sample data that looks professional
-3. **Show key features**: Highlight the main functionality of each view
-4. **Use consistent styling**: Ensure all screenshots follow the same visual style
-5. **Include context**: Show the full page/component when possible
+```bash
+SLEUTH_E2E_SCREENSHOTS=/some/folder yarn test:e2e
+```
 
-## Required Screenshots
-
-### Executive Dashboard (DoraELTPage)
-- [ ] Main executive dashboard view
-- [ ] Time range selector in action
-- [ ] Quarterly health overview section
-- [ ] Executive summary metrics
-- [ ] Organization trend charts
-
-### Lead Dashboard (DoraLeadPage)
-- [ ] Team selector dropdown
-- [ ] Team performance overview
-- [ ] All teams comparison view
-- [ ] Time range selection
-- [ ] Team metrics table
-
-### Entity Dashboard (DoraPerformanceComponent)
-- [ ] Entity page with Sleuth tab
-- [ ] Project-specific metrics
-- [ ] Performance trends
-- [ ] Entity-based filtering
-- [ ] Embedded component view
-
-### Navigation and Setup
-- [ ] Sidebar navigation showing DORA menu items
-- [ ] Route configuration in App.tsx
-- [ ] Entity annotation configuration
-- [ ] Backend plugin setup
-
-## Screenshot Naming Convention
-
-Use the following naming convention:
-- `executive-dashboard-main.png`
-- `executive-dashboard-time-selector.png`
-- `lead-dashboard-team-selector.png`
-- `lead-dashboard-performance.png`
-- `entity-dashboard-sleuth-tab.png`
-- `entity-dashboard-metrics.png`
-- `sidebar-navigation.png`
-- `app-configuration.png`
-
-## Adding Screenshots to Documentation
-
-When adding screenshots to the main README.md:
-
-1. Place screenshots in this directory
-2. Reference them in the main documentation using relative paths
-3. Add alt text for accessibility
-4. Include captions explaining what each screenshot shows
+Then copy the pictures from that folder over the ones here.
