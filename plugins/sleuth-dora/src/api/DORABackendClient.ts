@@ -6,23 +6,10 @@ import {
 } from '@backstage/core-plugin-api';
 import { ProjectMetricsResponse } from '../components/dora/common/types/api';
 
-const API_PATHS = {
-  PERMISSION: '/permission/',
-  TEAM_METRICS: '/teammetrics',
-  PROJECT_METRICS: '/projectmetrics',
-  PROJECT_INSIGHTS: '/projectmetricsinsights',
-  DORA_METRICS: '/metrics',
-  DEPLOYMENTS: '/deployments',
-} as const;
-
 export interface DORABackendClient {
-  // Existing Sleuth API methods
-  // getUserAuthorization(): Promise<{ status: string; [key: string]: any }>;
   getProjectDORAMetrics( projectId: string, environment: string, deployment: string, timeRange: string): Promise<ProjectMetricsResponse | null>;
   getProjectDORAMetricsInsights( projectId: string, environment: string, deployment: string, timeRange: string): Promise<any>;
   getOrganizationTrendMetrics( timeRange: string): Promise<any>;
-  
-  // Team metrics methods
   getBatchTeamDORAMetrics( teamSlugs: string[], environment: string, deployment: string, timeRange: string): Promise<any>;
 }
 
@@ -38,16 +25,12 @@ export const doraBackendApiRef = createApiRef<DORABackendClient>({
 });
 
 export class DORABackendClientImpl implements DORABackendClient {
-  private readonly configApi: ConfigApi;
   private readonly identityApi: IdentityApi;
   private readonly discoveryApi: DiscoveryApi;
-  private readonly baseUrl: string;
 
   constructor(options: Options) {
-    this.configApi = options.configApi;
     this.identityApi = options.identityApi;
     this.discoveryApi = options.discoveryApi;
-    this.baseUrl = this.configApi.getString('backend.baseUrl');
   }
 
   private async fetchWithAuth(url: string, options: RequestInit = {}) {
@@ -71,11 +54,6 @@ export class DORABackendClientImpl implements DORABackendClient {
     return response.json();
   }
 
-  async getUserAuthorization() {
-    return this.fetchWithAuth(`${this.baseUrl}${API_PATHS.PERMISSION}`);
-  }
-
-
   async getProjectDORAMetrics(projectSlug: string, environment: string, deploymentSlug: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
 
@@ -97,18 +75,6 @@ export class DORABackendClientImpl implements DORABackendClient {
     const url = `${baseUrl}/org-trend-metrics?${new URLSearchParams({ timeRange })}`;
     return this.fetchWithAuth(url);
   }
-
-  // async getTeamDORAMetrics(teamSlug: string, environment: string, deployment: string, timeRange: string) {
-  //   const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
-  //   const url = `${baseUrl}/team-metrics/${teamSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-  //   return this.fetchWithAuth(url);
-  // }
-
-  // async getTeamDORAMetricsInsights(teamSlug: string, environment: string, deployment: string, timeRange: string) {
-  //   const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
-  //   const url = `${baseUrl}/team-metrics-insights/${teamSlug}?environment=${environment}&deploymentId=${deployment}&timeRange=${timeRange}`;
-  //   return this.fetchWithAuth(url);
-  // }
 
   async getBatchTeamDORAMetrics(teamSlugs: string[], environment: string, deploymentSlug: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
