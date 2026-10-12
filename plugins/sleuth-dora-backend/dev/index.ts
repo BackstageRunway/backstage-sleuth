@@ -6,22 +6,12 @@ import { catalogServiceMock } from '@backstage/plugin-catalog-node/testUtils';
 // This is the development setup for your plugin that wires up a
 // minimal backend that can use both real and mocked plugins and services.
 //
-// Start up the backend by running `yarn start` in the package directory.
+// Start up the backend by running `yarn start` in the package directory, with
+// dora.sleuth.apiKey and dora.sleuth.organizationId set in the app config.
 // Once it's up and running, try out the following requests:
 //
-// Create a new todo item, standalone or for the sample component:
-//
-//   curl http://localhost:7007/api/sleuth-dora-backend/todos -H 'Content-Type: application/json' -d '{"title": "My Todo"}'
-//   curl http://localhost:7007/api/sleuth-dora-backend/todos -H 'Content-Type: application/json' -d '{"title": "My Todo", "entityRef": "component:default/sample"}'
-//
-// List TODOs:
-//
-//   curl http://localhost:7007/api/sleuth-dora-backend/todos
-//
-// Explicitly make an unauthenticated request, or with service auth:
-//
-//   curl http://localhost:7007/api/sleuth-dora-backend/todos -H 'Authorization: Bearer mock-none-token'
-//   curl http://localhost:7007/api/sleuth-dora-backend/todos -H 'Authorization: Bearer mock-service-token'
+//   curl 'http://localhost:7007/api/sleuth-dora-backend/org-trend-metrics?timeRange=last28days'
+//   curl 'http://localhost:7007/api/sleuth-dora-backend/metrics/<project-slug>?environment=production&deploymentId=&timeRange=last28days'
 
 const backend = createBackend();
 

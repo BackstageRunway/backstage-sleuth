@@ -43,14 +43,6 @@ export interface ProjectMetricsResponse {
   };
 }
 
-export interface TeamMetricsResponse {
-  team: {
-    name: string;
-    previousRange: MetricRecap;
-    currentRange: MetricRecap;
-  };
-}
-
 export type InsightType = 'GreatTeamInsightType' | 'MetricOffsetFromAverageInsightType' | 'WorstDeployInsightType';
 
 export interface BaseInsight {
