@@ -104,7 +104,8 @@ export const describePeriodTrend = (
 ): PeriodTrend => {
   if (!comparable) return { trend: 'flat', change: 'n/a', isImproving: false };
 
-  const change = calculateTrendChange(current, previous);
+  // unrounded, so the whole percent below is rounded once: 3.496% is 3%, not 3.5% and then 4%
+  const change = calculateTrendChangeSimple(current, previous);
   if (change === 0) return { trend: 'flat', change: '0%', isImproving: false };
 
   const isImproving = metricType === MetricType.Frequency ? change > 0 : change < 0;

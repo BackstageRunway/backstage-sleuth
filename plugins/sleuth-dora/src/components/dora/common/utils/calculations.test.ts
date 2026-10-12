@@ -98,6 +98,11 @@ describe('describePeriodTrend', () => {
     expect(describePeriodTrend(MetricType.FailureRate, 10, 10)).toEqual({ trend: 'flat', change: '0%', isImproving: false });
   });
 
+  it('rounds to a whole percent once', () => {
+    // 3.496%, which rounding to one decimal first would turn into 4%
+    expect(describePeriodTrend(MetricType.LeadTime, 10184, 9840).change).toBe('3%');
+  });
+
   it('caps very large changes', () => {
     expect(describePeriodTrend(MetricType.Frequency, 236, 20).change).toBe('>999%');
   });

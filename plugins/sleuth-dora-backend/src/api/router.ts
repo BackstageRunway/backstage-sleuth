@@ -339,6 +339,13 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
         });
       }
 
+      // the GET endpoints check this through their schema; without it a bad range surfaces as a 500
+      if (!MetricsQuerySchema.shape.timeRange.safeParse(timeRange).success) {
+        return res.status(400).json({
+          error: 'Time range must be in format: lastXdays (e.g., last7days)'
+        });
+      }
+
       logger.info('Received batch team metrics request', {
         teamSlugs,
         timeRange,

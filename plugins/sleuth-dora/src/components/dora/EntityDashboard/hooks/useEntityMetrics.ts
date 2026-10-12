@@ -34,7 +34,8 @@ export function useEntityMetrics(entity: any) {
       }
 
       const project = result.project;
-      const metricsData = processMetricsResponse(project, true);
+      // unrounded: the trend cell rounds to a whole percent, and rounding twice turns 3.496% into 4%
+      const metricsData = processMetricsResponse(project, false);
 
       setMetrics(metricsData);
       setHasDeployments(project.currentRange.numOfDeploysPerDay > 0);
@@ -46,8 +47,9 @@ export function useEntityMetrics(entity: any) {
     }
   }, [doraApi, projectSlug, environment, codeDeploymentSlug]);
 
+  // Insights are an extra on top of the metrics: a failure here must neither hide good metrics
+  // nor clear an error the metrics request raised, so it leaves the error and loading state alone
   const fetchMetricsInsights = useCallback(async (timeRange: TimeRange) => {
-    setLoading(true);
     try {
       const result = await doraApi.getProjectDORAMetricsInsights(
         projectSlug,
@@ -56,17 +58,9 @@ export function useEntityMetrics(entity: any) {
         timeRange,
       );
 
-             if (!result?.project?.insights) {
-         throw new Error('No insights data available');
-       }
-
-       const processedInsights = processInsights(result.project.insights);
-       setInsights(processedInsights);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch insights');
-    } finally {
-      setLoading(false);
+      setInsights(processInsights(result?.project?.insights ?? []));
+    } catch {
+      setInsights([]);
     }
   }, [doraApi, projectSlug, environment, codeDeploymentSlug]);
 
