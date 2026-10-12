@@ -61,8 +61,11 @@ export class DORABackendClientImpl implements DORABackendClient {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Request failed');
+      // The plugin backend answers { error: '...' }, Backstage itself { error: { message } },
+      // and a proxy in between may answer with something that is not JSON at all
+      const body = await response.json().catch(() => undefined);
+      const reason = typeof body?.error === 'string' ? body.error : body?.error?.message;
+      throw new Error(reason || `Request failed with status ${response.status}`);
     }
 
     return response.json();
@@ -76,20 +79,22 @@ export class DORABackendClientImpl implements DORABackendClient {
   async getProjectDORAMetrics(projectSlug: string, environment: string, deploymentSlug: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
 
-    const url = `${baseUrl}/metrics/${projectSlug}?environment=${environment}&deploymentId=${deploymentSlug}&timeRange=${timeRange}`;
+    const query = new URLSearchParams({ environment, deploymentId: deploymentSlug, timeRange });
+    const url = `${baseUrl}/metrics/${encodeURIComponent(projectSlug)}?${query}`;
     return this.fetchWithAuth(url);
   }
 
   async getProjectDORAMetricsInsights(projectSlug: string, environment: string, deploymentSlug: string, timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
 
-    const url = `${baseUrl}/metrics-insights/${projectSlug}?environment=${environment}&deploymentId=${deploymentSlug}&timeRange=${timeRange}`;
+    const query = new URLSearchParams({ environment, deploymentId: deploymentSlug, timeRange });
+    const url = `${baseUrl}/metrics-insights/${encodeURIComponent(projectSlug)}?${query}`;
     return this.fetchWithAuth(url);
   }
 
   async getOrganizationTrendMetrics(timeRange: string) {
     const baseUrl = await this.discoveryApi.getBaseUrl('sleuth-dora-backend');
-    const url = `${baseUrl}/org-trend-metrics?timeRange=${timeRange}`;
+    const url = `${baseUrl}/org-trend-metrics?${new URLSearchParams({ timeRange })}`;
     return this.fetchWithAuth(url);
   }
 
