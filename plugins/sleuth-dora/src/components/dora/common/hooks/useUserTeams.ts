@@ -5,11 +5,6 @@ import { identityApiRef } from '@backstage/core-plugin-api';
 import { UserEntity } from '@backstage/catalog-model';
 
 
-export interface TeamInfo {
-  name: string;
-  entityRef: string;
-}
-
 export function useUserTeams() {
   const catalogApi = useApi(catalogApiRef);
   const identityApi = useApi(identityApiRef);

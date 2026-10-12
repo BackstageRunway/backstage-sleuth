@@ -148,14 +148,3 @@ export const determineOverallTrend = (
   
   return 'stable';
 };
-
-/**
- * Gets the trend direction for a metric (legacy function for compatibility)
- * @param metricType - Type of metric
- * @param current - Current value
- * @param previous - Previous value
- * @returns Trend direction
- */
-export const getTrend = (metricType: MetricType, current: number, previous: number): 'up' | 'down' | 'stable' => {
-  return determineTrend(current, previous, metricType);
-}; 

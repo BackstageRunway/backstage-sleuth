@@ -15,15 +15,6 @@ export interface DoraConfig {
 }
 
 /**
- * Entity-specific configuration
- */
-export interface EntityConfig {
-  projectSlug: string;
-  environment: string;
-  codeDeploymentSlug: string;
-}
-
-/**
  * Backstage entity interface for configuration
  */
 export interface BackstageEntity {
