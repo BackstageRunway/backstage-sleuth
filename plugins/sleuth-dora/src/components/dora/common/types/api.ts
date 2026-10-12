@@ -61,49 +61,6 @@ export interface ProjectInsightsResponse {
 }
 
 /**
- * Team metrics response from API
- */
-export interface TeamMetricsResponse {
-  team: {
-    currentRange: {
-      numOfDeploysPerDay: number;
-      avgLeadTimeInSec: number;
-      failureRatePercent: number;
-      avgMttrDurationInSec: number;
-    };
-    previousRange: {
-      numOfDeploysPerDay: number;
-      avgLeadTimeInSec: number;
-      failureRatePercent: number;
-      avgMttrDurationInSec: number;
-    };
-  };
-}
-
-/**
- * Organization metrics response from API
- */
-export interface OrganizationMetricsResponse {
-  organization: {
-    teams: Array<{
-      name: string;
-      currentRange: {
-        numOfDeploysPerDay: number;
-        avgLeadTimeInSec: number;
-        failureRatePercent: number;
-        avgMttrDurationInSec: number;
-      };
-      previousRange: {
-        numOfDeploysPerDay: number;
-        avgLeadTimeInSec: number;
-        failureRatePercent: number;
-        avgMttrDurationInSec: number;
-      };
-    }>;
-  };
-}
-
-/**
  * Metric insight interface for UI display
  */
 export interface MetricInsight {

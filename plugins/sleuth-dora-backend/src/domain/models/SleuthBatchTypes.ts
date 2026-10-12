@@ -23,16 +23,6 @@ export interface TeamMetricsRequest {
   previousRangeStart: string;
 }
 
-export interface TeamMetricsInsightsRequest {
-  teamSlug: string;
-  environment: string;
-  deploymentSlug: string;
-  currentRangeEnd: string;
-  currentRangeStart: string;
-  previousRangeEnd: string;
-  previousRangeStart: string;
-}
-
 export interface ContributingTeam {
   slug: string;
 }
@@ -50,81 +40,6 @@ export interface ProjectMetricsResponse {
   project: {
     previousRange: MetricRecap;
     currentRange: MetricRecap;
-  };
-}
-
-export interface TeamMetricsResponse {
-  team: {
-    name: string;
-    previousRange: MetricRecap;
-    currentRange: MetricRecap;
-  };
-}
-
-export interface DeploymentRequest {
-  teamSlugs?: string[];
-  projectSlugs: string[];
-  environmentSlugs: string[];
-  deploymentSlugs: string[];
-  start: string;
-  end: string;
-  page: number;
-  deploymentType: string[];
-  size: string[];
-  healthTimes: string[];
-  onlyFailedDeploys?: boolean;
-  orderBy?: string | null;
-}
-
-export interface DeploymentResponse {
-  orgDeploys: {
-    page: number;
-    pages: number;
-    count: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-    objects: Array<{
-      __typename: string;
-      on: string;
-      slug: string;
-      deploymentSlug: string;
-      deploymentName: string;
-      projectName: string;
-      summary: string;
-      healthManuallySet: boolean;
-      magnitude: string;
-      trackingType: string;
-      deploymentTrackingType: string;
-      deploymentCollectImpact: boolean;
-      environment: {
-        name: string;
-        slug: string;
-      };
-      commits: Array<{
-        revision: string;
-      }>;
-      numOfAllPullRequests: number;
-      numOfIgnoredPullRequests: number;
-      authors: Array<{
-        name: string;
-      }>;
-      tags: string[];
-      deploymentType: string;
-      compareUrl: string;
-      approvalStatuses: any[];
-      changeLeadTime: number;
-      healthTimeBreakdown: {
-        healthy: number;
-        ailing: number;
-        unhealthy: number;
-        rolledBack: number;
-        incident: number;
-      };
-      nextDeploy: {
-        on: string;
-      };
-      workingHoursUsedForCltCalculation: number;
-    }>;
   };
 }
 

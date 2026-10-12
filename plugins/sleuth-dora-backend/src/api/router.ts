@@ -35,12 +35,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     `Sleuth has no code deployment "${deploymentId}" in project "${projectSlug}". ` +
     'Check the sleuth.io/code-deployment-slug annotation on this component.';
 
-   /**
-   * Helper method to extract the userEntityRef from the request.
-   */
-
-
-
   // Input validation schemas
   const MetricsQuerySchema = z.object({
     timeRange: z.string().regex(/^last[1-9]\d*days$/i, 'Time range must be in format: lastXdays (e.g., last7days)'),
@@ -214,112 +208,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       return sendFailure(res, error, 'Failed to fetch organization trend metrics');
     }
   });
-
-
-  // Team metrics endpoint - GET
-  // router.get('/team-metrics/:teamSlug', async (req, res) => {
-  //   try {
-  //     const { teamSlug } = req.params;
-  //     const queryResult = MetricsQuerySchema.safeParse(req.query);
-
-  //     if (!queryResult.success) {
-  //       logger.warn('Invalid team metrics request parameters', { 
-  //         errors: queryResult.error.errors.map(e => ({
-  //           path: e.path.join('.'),
-  //           message: e.message,
-  //         }))
-  //       });
-  //       return res.status(400).json({ 
-  //         error: 'Invalid request parameters',
-  //         details: queryResult.error.errors 
-  //       });
-  //     }
-
-  //     const { timeRange, environment, deploymentId } = queryResult.data;
-
-  //     logger.info('Received team metrics request', {
-  //       teamSlug,
-  //       timeRange,
-  //       environment,
-  //       deploymentId,
-  //       path: req.path,
-  //       url: req.url,
-  //       method: req.method,
-  //     });
-
-  //     const metrics = await metricsService.getTeamMetrics(
-  //       teamSlug,
-  //       environment,
-  //       timeRange
-  //     );
-
-  //     return res.json(metrics);
-  //   } catch (error) {
-  //     logger.error('Failed to fetch team metrics', {
-  //       error: error instanceof Error ? error.message : String(error),
-  //       teamSlug: req.params.teamSlug,
-  //     });
-      
-  //     if (error instanceof Error && error.message === 'No team metrics data available') {
-  //       return res.status(404).json({ error: 'No team metrics data available' });
-  //     }
-      
-  //     return res.status(500).json({ error: 'Failed to fetch team metrics' });
-  //   }
-  // });
-
-  // // Team metrics insights endpoint - GET
-  // router.get('/team-metrics-insights/:teamSlug', async (req, res) => {
-  //   try {
-  //     const { teamSlug } = req.params;
-  //     const queryResult = MetricsQuerySchema.safeParse(req.query);
-
-  //     if (!queryResult.success) {
-  //       logger.warn('Invalid team metrics insights request parameters', { 
-  //         errors: queryResult.error.errors.map(e => ({
-  //           path: e.path.join('.'),
-  //           message: e.message,
-  //         }))
-  //       });
-  //       return res.status(400).json({ 
-  //         error: 'Invalid request parameters',
-  //         details: queryResult.error.errors 
-  //       });
-  //     }
-
-  //     const { timeRange, environment, deploymentId } = queryResult.data;
-
-  //     logger.info('Received team metrics insights request', {
-  //       teamSlug,
-  //       timeRange,
-  //       environment,
-  //       deploymentId,
-  //       path: req.path,
-  //       url: req.url,
-  //       method: req.method,
-  //     });
-
-  //     const metrics = await metricsService.getTeamMetricsInsights(
-  //       teamSlug,
-  //       environment,
-  //       deploymentId,
-  //       timeRange
-  //     );
-
-  //     return res.json(metrics);
-  //   } catch (error) {
-  //     logger.error('Failed to fetch team metrics insights', {
-  //       error: error instanceof Error ? error.message : String(error),
-  //       teamSlug: req.params.teamSlug,
-  //     });
-      
-  //     if (error instanceof Error && error.message === 'No team metrics insights data available') {
-  //       return res.status(404).json({ error: 'No team metrics insights data available' });
-  //     }
-      
-  //     return res.status(500).json({ error: 'Failed to fetch team metrics insights' });
-  //   }
-  // });
 
   // Batch team metrics endpoint - POST
   router.post('/batch-team-metrics', async (req, res) => {

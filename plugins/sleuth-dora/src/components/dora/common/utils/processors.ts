@@ -3,8 +3,8 @@
  */
 
 import { MetricType, MetricData, MetricsResponse } from '../types/metrics';
-import { ApiInsight, ProjectMetricsResponse, TeamMetricsResponse, OrganizationMetricsResponse } from '../types/api';
-import { calculateTrendChange, calculateTrendChangeSimple, getMetricPerformance, determineTrend, determineOverallTrend } from './calculations';
+import { ApiInsight } from '../types/api';
+import { calculateTrendChange, calculateTrendChangeSimple, getMetricPerformance, determineTrend } from './calculations';
 
 /**
  * Creates a MetricData object for a specific metric type
@@ -132,73 +132,3 @@ export const processInsights = (insights: any[]): ApiInsight[] => {
       summary: insight.message,
     }));
 };
-
-/**
- * Transforms team data for display in dashboards
- * @param teamData - Raw team data from API
- * @returns Transformed team data for UI
- */
-export const transformTeamData = (teamData: any) => {
-  const { name, currentRange, previousRange } = teamData;
-  
-  const frequencyTrend = determineTrend(
-    currentRange.numOfDeploysPerDay,
-    previousRange.numOfDeploysPerDay,
-    MetricType.Frequency
-  );
-  
-  const leadTimeTrend = determineTrend(
-    currentRange.avgLeadTimeInSec,
-    previousRange.avgLeadTimeInSec,
-    MetricType.LeadTime
-  );
-  
-  const failureRateTrend = determineTrend(
-    currentRange.failureRatePercent,
-    previousRange.failureRatePercent,
-    MetricType.FailureRate
-  );
-  
-  return {
-    name,
-    metrics: {
-      deploymentFrequency: currentRange.numOfDeploysPerDay,
-      leadTime: currentRange.avgLeadTimeInSec,
-      failureRate: currentRange.failureRatePercent,
-      mttr: currentRange.avgMttrDurationInSec,
-    },
-    trends: {
-      frequency: frequencyTrend,
-      leadTime: leadTimeTrend,
-      failureRate: failureRateTrend,
-    },
-    overallTrend: determineOverallTrend(frequencyTrend, leadTimeTrend, failureRateTrend),
-  };
-};
-
-/**
- * Processes project metrics response
- * @param response - Project metrics response from API
- * @returns Processed metrics data
- */
-export const processProjectMetrics = (response: ProjectMetricsResponse): MetricData[] => {
-  return processMetricsResponse(response.project);
-};
-
-/**
- * Processes team metrics response
- * @param response - Team metrics response from API
- * @returns Processed metrics data
- */
-export const processTeamMetrics = (response: TeamMetricsResponse): MetricData[] => {
-  return processMetricsResponse(response.team);
-};
-
-/**
- * Processes organization metrics response
- * @param response - Organization metrics response from API
- * @returns Array of processed team data
- */
-export const processOrganizationMetrics = (response: OrganizationMetricsResponse): any[] => {
-  return response.organization.teams.map(transformTeamData);
-}; 
