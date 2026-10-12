@@ -20,6 +20,8 @@ export interface TeamMetricsData {
     mttrSec: number;
   };
   trend: 'up' | 'down' | 'stable';
+  // false when the team deployed nothing in the period; its zeros are then missing data, not results
+  hasDeployments: boolean;
   loading: boolean;
   error?: string;
 }
@@ -38,9 +40,10 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
     const { name, currentRange, previousRange } = teamResponse;
     
     // Calculate individual metric trends
+    // deploy counts, not the per-day rate Sleuth rounds to two decimals; the periods are equally long
     const frequencyTrend = determineTrend(
-      currentRange.numOfDeploysPerDay,
-      previousRange.numOfDeploysPerDay,
+      currentRange.numOfDeploys,
+      previousRange.numOfDeploys,
       MetricType.Frequency
     );
     
@@ -56,8 +59,9 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
       MetricType.FailureRate
     );
     
-    // With no deployments in the previous period there is nothing to compare against
-    const overallTrend = previousRange.numOfDeploys > 0
+    // With no deployments in either period there is nothing to compare
+    const hasDeployments = currentRange.numOfDeploys > 0;
+    const overallTrend = hasDeployments && previousRange.numOfDeploys > 0
       ? determineOverallTrend(frequencyTrend, leadTimeTrend, failureRateTrend)
       : 'stable';
 
@@ -74,6 +78,7 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
         mttrSec: currentRange.avgMttrDurationInSec,
       },
       trend: overallTrend,
+      hasDeployments,
       loading: false,
     };
   };
@@ -100,6 +105,7 @@ export function useAllTeamsMetrics(teamSlugs: string[], timeRange: TimeRange) {
         },
         raw: { leadTimeSec: 0, mttrSec: 0 },
         trend: 'stable',
+        hasDeployments: false,
         loading: true,
       }));
       setTeamsData(initialTeamsData);

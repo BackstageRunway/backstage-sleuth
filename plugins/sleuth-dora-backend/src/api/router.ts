@@ -27,6 +27,14 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     return res.status(500).json({ error: fallback });
   };
 
+  // An unknown code deployment is a mapping mistake in the catalog, not a Sleuth outage; say how to fix it
+  const isUnknownDeployment = (error: unknown) =>
+    error instanceof DoraMetricsError && /No deployments found for/.test(error.message);
+
+  const unknownDeploymentMessage = (projectSlug: string, deploymentId: string) =>
+    `Sleuth has no code deployment "${deploymentId}" in project "${projectSlug}". ` +
+    'Check the sleuth.io/code-deployment-slug annotation on this component.';
+
    /**
    * Helper method to extract the userEntityRef from the request.
    */
@@ -35,7 +43,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
   // Input validation schemas
   const MetricsQuerySchema = z.object({
-    timeRange: z.string().regex(/^last\d+days$/i, 'Time range must be in format: lastXdays (e.g., last7days)'),
+    timeRange: z.string().regex(/^last[1-9]\d*days$/i, 'Time range must be in format: lastXdays (e.g., last7days)'),
     environment: z.string().min(1, 'Environment is required'),
     deploymentId: z.string(),
   });
@@ -93,6 +101,12 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       if (error instanceof Error && error.message === 'No metrics data available') {
         return res.status(404).json({ error: 'No metrics data available' });
       }
+
+      if (isUnknownDeployment(error)) {
+        return res.status(404).json({
+          error: unknownDeploymentMessage(req.params.projectSlug, String(req.query.deploymentId ?? '')),
+        });
+      }
       
       return sendFailure(res, error, 'Failed to fetch metrics');
     }
@@ -145,6 +159,12 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
       
       if (error instanceof Error && error.message === 'No metrics insights data available') {
         return res.status(404).json({ error: 'No metrics insights data available' });
+      }
+
+      if (isUnknownDeployment(error)) {
+        return res.status(404).json({
+          error: unknownDeploymentMessage(req.params.projectId, String(req.query.deploymentId ?? '')),
+        });
       }
       
       return sendFailure(res, error, 'Failed to fetch metrics insights');

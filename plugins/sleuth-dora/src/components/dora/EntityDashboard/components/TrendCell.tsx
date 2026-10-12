@@ -61,7 +61,7 @@ export function TrendCell({ metricType, percentageChange }: Props) {
     };
 
     const formatPercentage = (value: number) => {
-        if (isNaN(value)) return '0%';
+        if (isNaN(value)) return 'n/a';
         // A previous value of zero has no percentage change. Sleuth shows a bare arrow there, which reads
         // as a missing value beside the other trends, so say what the metric rose from instead.
         if (!isFinite(value)) {

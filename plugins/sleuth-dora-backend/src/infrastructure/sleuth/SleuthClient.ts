@@ -204,10 +204,23 @@ export class SleuthClient {
     async getTrendMetrics(
       start: string,
       end: string,
+      previousStart: string,
+      previousEnd: string,
   ): Promise<any> {
       const trendQuery = `
-          query GetTrendMetrics($orgSlug: ID!, $projectSlugs: [ID!], $labelSlugs: [ID!], $teamSlugs: [ID!], $environmentName: String, $start: DateTime!, $end: DateTime!) {
+          query GetTrendMetrics($orgSlug: ID!, $projectSlugs: [ID!], $labelSlugs: [ID!], $teamSlugs: [ID!], $environmentName: String, $start: DateTime!, $end: DateTime!, $previousStart: DateTime!, $previousEnd: DateTime!) {
             organization(orgSlug: $orgSlug) {
+              previousRecap: metricsRecap(
+                start: $previousStart
+                end: $previousEnd
+                filters: {projectSlugs: $projectSlugs, labelSlugs: $labelSlugs, environmentName: $environmentName, teamSlugs: $teamSlugs}
+              ) {
+                numOfDeploys
+                numOfDeploysPerDay
+                avgLeadTimeInSec
+                failureRatePercent
+                avgMttrDurationInSec
+              }
               metricsRecapWithQuarters(
                 start: $start
                 end: $end
@@ -237,6 +250,8 @@ export class SleuthClient {
            orgSlug : this.organizationId,
            start,
            end,
+           previousStart,
+           previousEnd,
        };
 
 

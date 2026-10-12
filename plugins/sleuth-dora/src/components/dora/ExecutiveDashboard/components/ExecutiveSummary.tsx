@@ -5,6 +5,8 @@ import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatDuration } from '../../common/utils/formatters';
+import { describePeriodTrend } from '../../common/utils/calculations';
+import { MetricType } from '../../common/types/metrics';
 
 // Define the type for the metrics data
 interface MetricsData {
@@ -27,6 +29,8 @@ interface MetricsData {
 
 interface ExecutiveSummaryProps {
     metricsData?: MetricsData;
+    // the period of the same length just before the selected one; absent with an older backend
+    previousRecap?: MetricsData['totalRecap'];
 }
 
 const useStyles = makeStyles(theme => ({
@@ -94,77 +98,7 @@ const secondsToHours = (seconds: number): number => {
     return seconds / 3600;
 };
 
-// Helper function to calculate trend and change percentage
-const calculateTrend = (quarters: any[], metricKey: string): { trend: string, change: string, isImproving: boolean } => {
-    if (quarters.length < 2) return { trend: 'flat', change: '0%', isImproving: false };
-    
-    // Calculate average of first half vs second half for more stable comparison
-    const midPoint = Math.floor(quarters.length / 2);
-    const firstHalf = quarters.slice(0, midPoint);
-    const secondHalf = quarters.slice(midPoint);
-    
-    const firstHalfAvg = firstHalf.reduce((sum, q) => sum + q[metricKey], 0) / firstHalf.length;
-    const secondHalfAvg = secondHalf.reduce((sum, q) => sum + q[metricKey], 0) / secondHalf.length;
-    
-    // Avoid division by zero
-    if (firstHalfAvg === 0) {
-        if (secondHalfAvg === 0) {
-            return { trend: 'flat', change: '0%', isImproving: false };
-        }
-        // nothing to compare against; higher is only an improvement for deployments
-        return { trend: 'up', change: 'new', isImproving: metricKey === 'numOfDeploysPerDay' };
-    }
-    
-    const percentageChange = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100);
-    
-    // Round the percentage: if decimal >= 0.5, round up; otherwise round down
-    const roundedPercentage = Math.round(percentageChange);
-    
-    switch (metricKey) {
-        case 'numOfDeploysPerDay':
-            // For deployments, higher is better
-            if (secondHalfAvg > firstHalfAvg) {
-                return { trend: 'up', change: `+${roundedPercentage}%`, isImproving: true };
-            } else if (secondHalfAvg < firstHalfAvg) {
-                return { trend: 'down', change: `${roundedPercentage}%`, isImproving: false };
-            }
-            break;
-            
-        case 'avgLeadTimeInSec':
-            // For lead time, lower is better
-            if (secondHalfAvg < firstHalfAvg) {
-                return { trend: 'down', change: `${Math.abs(roundedPercentage)}%`, isImproving: true };
-            } else if (secondHalfAvg > firstHalfAvg) {
-                return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
-            }
-            break;
-            
-        case 'failureRatePercent':
-            // For failure rate, lower is better
-            if (secondHalfAvg < firstHalfAvg) {
-                return { trend: 'down', change: `${Math.abs(roundedPercentage)}%`, isImproving: true };
-            } else if (secondHalfAvg > firstHalfAvg) {
-                return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
-            }
-            break;
-            
-        case 'avgMttrDurationInSec':
-            // For MTTR, lower is better
-            if (secondHalfAvg < firstHalfAvg) {
-                return { trend: 'down', change: `${Math.abs(roundedPercentage)}%`, isImproving: true };
-            } else if (secondHalfAvg > firstHalfAvg) {
-                return { trend: 'up', change: `${roundedPercentage}%`, isImproving: false };
-            }
-            break;
-
-        default:
-            break;
-    }
-    
-    return { trend: 'flat', change: '0%', isImproving: false };
-};
-
-export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
+export const ExecutiveSummary = ({ metricsData, previousRecap }: ExecutiveSummaryProps) => {
     const classes = useStyles();
 
     // Show loading state if no data
@@ -172,6 +106,15 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
         return (
             <div className={classes.loadingContainer}>
                 <Typography>No metrics data available</Typography>
+            </div>
+        );
+    }
+
+    // Zeros would otherwise read as a perfect lead time and failure rate
+    if (metricsData.totalRecap.numOfDeploys === 0) {
+        return (
+            <div className={classes.loadingContainer}>
+                <Typography>No deployments recorded in Sleuth in this period.</Typography>
             </div>
         );
     }
@@ -197,11 +140,23 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
         value: secondsToHours(quarter.avgMttrDurationInSec)
     }));
 
-    // Calculate trends with improvement indicators
-    const deploymentsTrend = calculateTrend(metricsData.quarters, 'numOfDeploysPerDay');
-    const leadTimeTrend = calculateTrend(metricsData.quarters, 'avgLeadTimeInSec');
-    const failureRateTrend = calculateTrend(metricsData.quarters, 'failureRatePercent');
-    const mttrTrend = calculateTrend(metricsData.quarters, 'avgMttrDurationInSec');
+    // Trends compare the selected period with the one before it, as Sleuth and the component view do
+    const current = metricsData.totalRecap;
+    const noComparison = { trend: 'flat', change: 'n/a', isImproving: false };
+    const hadDeployments = (previousRecap?.numOfDeploys ?? 0) > 0;
+    // the periods are equally long, so deploy counts give the exact change in frequency
+    const deploymentsTrend = previousRecap
+        ? describePeriodTrend(MetricType.Frequency, current.numOfDeploys, previousRecap.numOfDeploys)
+        : noComparison;
+    const leadTimeTrend = previousRecap
+        ? describePeriodTrend(MetricType.LeadTime, current.avgLeadTimeInSec, previousRecap.avgLeadTimeInSec, hadDeployments)
+        : noComparison;
+    const failureRateTrend = previousRecap
+        ? describePeriodTrend(MetricType.FailureRate, current.failureRatePercent, previousRecap.failureRatePercent, hadDeployments)
+        : noComparison;
+    const mttrTrend = previousRecap
+        ? describePeriodTrend(MetricType.Mttr, current.avgMttrDurationInSec, previousRecap.avgMttrDurationInSec)
+        : noComparison;
 
     const metrics = [
         {
@@ -246,8 +201,14 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
         },
     ];
 
+    // an unchanged or incomparable metric is neither good nor bad
+    const trendColor = (trend: string, isImproving: boolean) => {
+        if (trend === 'flat') return '#95a5a6';
+        return isImproving ? '#2ecc71' : '#e74c3c';
+    };
+
     const getTrendIcon = (trend: string, isImproving: boolean) => {
-        const color = isImproving ? '#2ecc71' : '#e74c3c';
+        const color = trendColor(trend, isImproving);
         
         switch (trend) {
             case 'up':
@@ -263,9 +224,9 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
         <Grid container spacing={3}>
             {metrics.map((metric) => {
                 // Determine colors based on whether the trend is improving
-                const valueColor = metric.isImproving ? '#2ecc71' : '#e74c3c';
-                const lineColor = metric.isImproving ? '#2ecc71' : '#e74c3c';
-                const changeColor = metric.isImproving ? '#2ecc71' : '#e74c3c';
+                const valueColor = trendColor(metric.trend, metric.isImproving);
+                const lineColor = valueColor;
+                const changeColor = valueColor;
                 
                 return (
                     <Grid item xs={12} sm={6} md={3} key={metric.label}>
@@ -288,6 +249,11 @@ export const ExecutiveSummary = ({ metricsData }: ExecutiveSummaryProps) => {
                                     >
                                         {metric.change}
                                     </Typography>
+                                    {metric.change !== 'n/a' && (
+                                        <Typography variant="caption" color="textSecondary">
+                                            vs previous period
+                                        </Typography>
+                                    )}
                                 </Box>
                                 <Box className={classes.chartContainer}>
                                     <ResponsiveContainer width="100%" height="100%">
