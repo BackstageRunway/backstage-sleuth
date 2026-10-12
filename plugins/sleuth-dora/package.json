@@ -1,6 +1,6 @@
 {
   "name": "@backstagerunway/plugin-sleuth-dora",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Sleuth DORA metrics in Backstage: screens for the whole organisation, for teams, and for each service",
   "author": "Backstage Runway",
   "homepage": "https://backstagerunway.com",
@@ -57,7 +57,8 @@
   "files": [
     "dist",
     "config.d.ts",
-    "docs/screenshots/*.png"
+    "docs/screenshots/*.png",
+    "docs/logo/*.svg"
   ],
   "configSchema": "config.d.ts",
   "keywords": [
