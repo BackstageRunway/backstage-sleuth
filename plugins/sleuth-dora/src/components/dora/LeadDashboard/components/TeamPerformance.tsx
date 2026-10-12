@@ -355,7 +355,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   <AnimatedNumber 
                                                       value={team.metrics.deploymentFrequency.replace('/day','')} 
                                                       color={theme.palette.text.primary} 
-                                                      fontSize="2rem" 
+                                                      fontSize="1.5rem" 
                                                       unit="/day"
                                                   />
                                               </Box>
@@ -365,7 +365,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   <Typography variant="caption" className={classes.metricLabel} style={{ display: 'block', marginBottom: '0.5rem' }}>
                                                       Lead Time
                                                   </Typography>
-                                                  <span style={{ fontWeight: 700, fontSize: '2rem', color: '#3498db', display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                                  <span style={{ fontWeight: 700, fontSize: '1.5rem', color: '#3498db', display: 'inline-block', whiteSpace: 'nowrap' }}>
                                                       {team.hasDeployments ? team.metrics.leadTime : '–'}
                                                   </span>
                                               </Box>
@@ -382,11 +382,11 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                       <AnimatedNumber
                                                           value={team.metrics.failureRate.replace('%','')}
                                                           color="#e74c3c"
-                                                          fontSize="2rem"
+                                                          fontSize="1.5rem"
                                                           unit="%"
                                                       />
                                                   ) : (
-                                                      <span style={{ fontWeight: 700, fontSize: '2rem', color: '#e74c3c', display: 'inline-block' }}>–</span>
+                                                      <span style={{ fontWeight: 700, fontSize: '1.5rem', color: '#e74c3c', display: 'inline-block' }}>–</span>
                                                   )}
                                               </Box>
                                           </Grid>
@@ -395,7 +395,7 @@ export const TeamPerformance = ({ selectedTeam, allTeamsData, isLoading = false 
                                                   <Typography variant="caption" className={classes.metricLabel} style={{ display: 'block', marginBottom: '0.5rem' }}>
                                                       MTTR
                                                   </Typography>
-                                                  <span style={{ fontWeight: 700, fontSize: '2rem', color: '#f1c40f', display: 'inline-block', whiteSpace: 'nowrap' }}>
+                                                  <span style={{ fontWeight: 700, fontSize: '1.5rem', color: '#f1c40f', display: 'inline-block', whiteSpace: 'nowrap' }}>
                                                       {team.hasDeployments ? team.metrics.mttr : '–'}
                                                   </span>
                                               </Box>
