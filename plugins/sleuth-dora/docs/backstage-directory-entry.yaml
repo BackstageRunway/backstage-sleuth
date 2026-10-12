@@ -1,0 +1,14 @@
+# The entry for the Backstage plugin directory (https://backstage.io/plugins).
+# To submit it, copy this file to microsite/data/plugins/sleuth-dora.yaml in a fork of
+# backstage/backstage, set addedDate to the day of the pull request, run
+# `node ./scripts/verify-plugin-directory.js` there, and open the pull request.
+---
+title: Sleuth DORA Metrics
+author: Backstage Runway
+authorUrl: https://backstagerunway.com
+category: Monitoring
+description: See Sleuth DORA metrics in Backstage for the whole organisation, for each team and for each service, with the change since the previous period.
+documentation: https://www.npmjs.com/package/@backstagerunway/plugin-sleuth-dora
+iconUrl: https://backstagerunway.com/apple-touch-icon.png
+npmPackageName: '@backstagerunway/plugin-sleuth-dora'
+addedDate: '2026-10-12'

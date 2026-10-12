@@ -22,7 +22,7 @@ matches what Sleuth shows for the same period.
 One page with the four metrics across every project, how each has changed since the previous period,
 and how each moved within the period you picked.
 
-![Executive screen](docs/screenshots/executive.png)
+![Executive screen](https://cdn.jsdelivr.net/npm/@backstagerunway/plugin-sleuth-dora/docs/screenshots/executive.png)
 
 ### For team leads: your teams
 
@@ -30,17 +30,17 @@ A card for each team you belong to, with its four metrics and a badge that says 
 improving, stable or declining. A team whose failure rate or lead time got worse is moved to the front
 and marked "Take Action".
 
-![Team screen](docs/screenshots/team.png)
+![Team screen](https://cdn.jsdelivr.net/npm/@backstagerunway/plugin-sleuth-dora/docs/screenshots/team.png)
 
 ### For engineers: one service
 
 A "Sleuth" tab on a service or website in the catalog. It shows the four metrics for that one service,
 how they changed, how they rate from Low to Elite, and any observation Sleuth itself has made.
 
-![Sleuth tab on a component](docs/screenshots/component.png)
+![Sleuth tab on a component](https://cdn.jsdelivr.net/npm/@backstagerunway/plugin-sleuth-dora/docs/screenshots/component.png)
 
-New to these screens? [Reading the dashboards](docs/reading-the-dashboards.md) explains every number,
-arrow, colour and badge in plain language.
+New to these screens? [Reading the screens](#reading-the-screens) below explains the arrows, colours
+and badges.
 
 ## What you need
 
@@ -79,8 +79,7 @@ dora:
     defaultProjectSlug: my-project # the Sleuth project to use when a component does not name one
 ```
 
-Only `organizationId` and `apiKey` are required. Every setting is described in
-[CONFIGURATION.md](CONFIGURATION.md).
+Only `organizationId` and `apiKey` are required. [Every setting](#every-setting) is listed further down.
 
 ### 4. Add the screens to your app
 
@@ -152,7 +151,7 @@ A component with neither a project nor a code deployment annotation still gets a
 saying which names were assumed. If Sleuth has no code deployment by that name, the tab says so and
 tells you which annotation to check.
 
-![A component that is not linked to Sleuth](docs/screenshots/component-not-mapped.png)
+![A component that is not linked to Sleuth](https://cdn.jsdelivr.net/npm/@backstagerunway/plugin-sleuth-dora/docs/screenshots/component-not-mapped.png)
 
 ## Linking teams to Sleuth
 
@@ -162,6 +161,63 @@ entry in the Backstage catalog (the `memberOf` list) and asks Sleuth for a team 
 So for a team to appear, **the Backstage group name must be the same as the Sleuth team's slug**. A
 group that Sleuth does not know is left out. If Sleuth knows none of a person's groups, the screen shows
 an error instead of empty cards.
+
+## Reading the screens
+
+**The period.** The buttons at the top choose the last 7, 14, 28 or 90 days. Today counts as one of the
+days, and days are counted in UTC.
+
+**The arrows.** The arrow and percentage next to a number compare the period you picked with the period
+of the same length just before it. The arrow's direction is whether the number went up or down. Its
+colour says whether that is good: green is better, red is worse, grey is no change. Lower is better
+for lead time, failure rate and MTTR, so a green arrow pointing down is normal for those.
+
+| Where a percentage would be, you see | It means                                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------- |
+| `new`                                | There were no deployments in the previous period, and now there are                 |
+| `from 0%` or `from 0m`               | The value was zero before and is not zero now                                       |
+| `n/a`                                | There is nothing to compare with, for example no deployments in the previous period |
+| `–`                                  | Nothing to measure here. A dash never means zero                                    |
+
+**No deployments.** When nothing was released in the period, the screens say so instead of showing
+zeros, because a lead time of zero and a failure rate of 0% would look like a perfect result.
+
+**Team badges.**
+
+| Badge          | When a team gets it                                                                 |
+| -------------- | ----------------------------------------------------------------------------------- |
+| Declining      | Its failure rate or its lead time got worse by 5% or more                           |
+| Improving      | It deploys at least 5% more often, and neither failure rate nor lead time got worse |
+| Stable         | Neither of the above, or there was no earlier period to compare with                |
+| No deployments | It released nothing in the period                                                   |
+
+**Ratings on a component.** Each metric is placed on a scale from Low to Elite. A green tick is where it
+is now; a grey tick is where it was in the previous period.
+
+|                      | Elite               | High                 | Medium                | Low        |
+| -------------------- | ------------------- | -------------------- | --------------------- | ---------- |
+| Deployment frequency | At least once a day | At least once a week | At least once a month | Less often |
+| Lead time            | Up to one day       | Up to one week       | Up to 30 days         | Longer     |
+| Failure rate         | Up to 5%            | Up to 10%            | Up to 15%             | Higher     |
+| MTTR                 | Up to one hour      | Up to one day        | Up to one week        | Longer     |
+
+**MTTR on a component is for the whole project.** Sleuth measures recovery time per project and
+environment, not per code deployment, so every component in a project shows the same MTTR.
+
+## Every setting
+
+| Setting under `dora.sleuth` | Required | Default                 | What it does                                                                                   |
+| --------------------------- | -------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `organizationId`            | Yes      |                         | The short name (slug) of your Sleuth organisation                                              |
+| `apiKey`                    | Yes      |                         | Your Sleuth API key. It stays in the backend and is never sent to the browser                  |
+| `environment`               | No       | `production`            | The Sleuth environment the screens report on, as its slug                                      |
+| `defaultProjectSlug`        | No       | `sleuth`                | The Sleuth project used for a component that does not name one                                 |
+| `defaultTimeRange`          | No       | `last28days`            | The period the team screen opens with: `last7days`, `last14days`, `last28days` or `last90days` |
+| `cacheTtlSeconds`           | No       | `300`                   | How long an answer from Sleuth is reused before asking again                                   |
+| `apiUrl`                    | No       | `https://app.sleuth.io` | Where Sleuth is. Change it only if you were given a different address                          |
+
+If `organizationId` or `apiKey` is missing, the rest of Backstage still starts; only the Sleuth screens
+are affected, and they name the missing setting.
 
 ## When something looks wrong
 
@@ -176,11 +232,6 @@ an error instead of empty cards.
 | "Failed to load user teams: No user entity found"    | You are signed in but have no user entry in the catalog                                | Add a user entry for yourself                                                       |
 | The numbers look out of date                         | Answers from Sleuth are kept for five minutes                                          | Wait, or lower `cacheTtlSeconds`                                                    |
 
-## Working on the plugin
+## Licence
 
-```bash
-yarn install
-yarn start       # the app on localhost:3000 and the backend on localhost:7007
-yarn test        # unit and screen tests
-yarn test:e2e    # the three screens in a real browser, with fixed figures and no API key needed
-```
+Apache-2.0.

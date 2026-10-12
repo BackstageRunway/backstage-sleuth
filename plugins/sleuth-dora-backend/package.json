@@ -1,6 +1,9 @@
 {
   "name": "@backstagerunway/plugin-sleuth-dora-backend",
-  "version": "0.6.0",
+  "version": "0.7.0",
+  "description": "Backend for the Sleuth DORA metrics Backstage plugin: fetches the metrics from Sleuth and keeps the API key on the server",
+  "author": "Backstage Runway",
+  "homepage": "https://backstagerunway.com",
   "license": "Apache-2.0",
   "main": "src/index.ts",
   "types": "src/index.ts",
