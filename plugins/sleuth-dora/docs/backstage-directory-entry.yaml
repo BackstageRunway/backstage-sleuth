@@ -12,3 +12,4 @@ documentation: https://www.npmjs.com/package/@backstagerunway/plugin-sleuth-dora
 iconUrl: https://cdn.jsdelivr.net/npm/@backstagerunway/plugin-sleuth-dora/docs/logo/backstage-runway-icon-sky.svg
 npmPackageName: '@backstagerunway/plugin-sleuth-dora'
 addedDate: '2026-10-12'
+status: active # required by the verify script, though the Backstage docs do not list it
